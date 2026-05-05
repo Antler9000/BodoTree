@@ -1,21 +1,731 @@
-#include "heap.h"
+//로그 출력문들을 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
+//#define TREE_LOG	
+//#define TREE_ERROR
+//#define TREE_WARNING
+
+//속도 테스트를 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
+#define RANDOM_WORKLOAD_SPEED_TEST
+#define LINEAR_INCREASE_WORKLOAD_SPEED_TEST
+#define LINEAR_DECREASE_WORKLOAD_SPEED_TEST
+
+#include "heap.h"				//정의한 힙을 테스팅함
+#include <chrono>;				//속도 테스트를 위해 사용함
+#include <string>;				//..
+#include <numeric>;				//..
+#include <random>;				//..
+#include <queue>;				//..
+using namespace chrono;			//..
+
+template <typename DataType>
+void PrintData(const DataType& retrievedData);
+
+void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
+
+void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
+
+void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
+
+//pushDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Heap와 priority_queue에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
+time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
+
+time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
 
 int main()
 {
-	MinHeap testHeap;
+	//디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
-	testHeap.Push(345);
-	testHeap.Push(234);
-	testHeap.Push(123);
-	testHeap.Push(500);
-	testHeap.Push(600);
-	testHeap.Push(400);
-	cout << testHeap.Pop() << endl;
-	cout << testHeap.Pop() << endl;
-	cout << testHeap.Pop() << endl;
-	cout << testHeap.Pop() << endl;
-	cout << testHeap.Pop() << endl;
-	cout << testHeap.Pop() << endl;
+	cout << endl << "testing 1 : MinHeap<int>--------------------------------------------------------------------------" << endl;
+
+	MinHeap<int> intTestHeap;
+
+	cout << endl << "푸시 (힙 A)" << endl;
+	intTestHeap.Push(5, 55);
+	intTestHeap.Push(7, 77);
+	intTestHeap.Push(3, 33);
+	intTestHeap.Push(4, 44);
+	intTestHeap.Push(6, 66);
+	intTestHeap.Push(9, 99);
+	intTestHeap.Push(2, 22);
+	intTestHeap.PrintHeap();
+
+	cout << endl << "명시적 복사 (힙 A -> B)" << endl;
+	MinHeap<int> intExplicitCopyTestHeap;
+	intExplicitCopyTestHeap.CopyHeap(intTestHeap);
+	intExplicitCopyTestHeap.PrintHeap();
+
+	cout << endl << "복사 생성자 (힙 A -> C)" << endl;
+	MinHeap<int> intCopyConstructorTestHeap = intTestHeap;
+	intCopyConstructorTestHeap.PrintHeap();
+
+	cout << endl << "복사 할당 연산자 (힙 A -> D)" << endl;
+	MinHeap<int> intCopyAssignmentTestHeap;
+	intCopyAssignmentTestHeap = intTestHeap;
+	intCopyAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "이동 생성자 (힙 C -> E)" << endl;
+	MinHeap<int> intMoveConstructorTestHeap = move(intCopyConstructorTestHeap);
+	intMoveConstructorTestHeap.PrintHeap();
+
+	cout << endl << "이동 할당 연산자 (힙 D -> F)" << endl;
+	MinHeap<int> intMoveAssignmentTestHeap;
+	intMoveAssignmentTestHeap = move(intCopyAssignmentTestHeap);
+	intMoveAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "이동 후 소스 힙는 비워짐 (힙 C, D)" << endl;
+	intCopyConstructorTestHeap.PrintHeap();
+	intCopyAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "팝 (힙 A)" << endl;
+	int intPoppedData1;
+	intTestHeap.Pop(intPoppedData1);
+	PrintData(intPoppedData1);
+
+	int intPoppedData2;
+	intTestHeap.Pop(intPoppedData2);
+	PrintData(intPoppedData2);
+
+	int intPoppedData3;
+	intTestHeap.Pop(intPoppedData3);
+	PrintData(intPoppedData3);
+
+	int intPoppedData4;
+	intTestHeap.Pop(intPoppedData4);
+	PrintData(intPoppedData4);
+
+	int intPoppedData5;
+	intTestHeap.Pop(intPoppedData5);
+	PrintData(intPoppedData5);
+
+	int intPoppedData6;
+	intTestHeap.Pop(intPoppedData6);
+	PrintData(intPoppedData6);
+
+	int intPoppedData7;
+	intTestHeap.Pop(intPoppedData7);
+	PrintData(intPoppedData7);
+
+	cout << endl << "비워진 상태에서 팝 (힙 A)" << endl;
+	int intPoppedData8;
+	intTestHeap.Pop(intPoppedData8);
+	PrintData(intPoppedData8);
+
+	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
+	intExplicitCopyTestHeap.PrintHeap();
+
+	cout << endl << "testing 2 : MinHeap<float>--------------------------------------------------------------------------" << endl;
+
+	MinHeap<float> floatTestHeap;
+
+	cout << endl << "푸시 (힙 A)" << endl;
+	floatTestHeap.Push(5, 0.55f);
+	floatTestHeap.Push(7, 0.77f);
+	floatTestHeap.Push(3, 0.33f);
+	floatTestHeap.Push(4, 0.44f);
+	floatTestHeap.Push(6, 0.66f);
+	floatTestHeap.Push(9, 0.99f);
+	floatTestHeap.Push(2, 0.22f);
+	floatTestHeap.PrintHeap();
+
+	cout << endl << "명시적 복사 (힙 A -> B)" << endl;
+	MinHeap<float> floatExplicitCopyTestHeap;
+	floatExplicitCopyTestHeap.CopyHeap(floatTestHeap);
+	floatExplicitCopyTestHeap.PrintHeap();
+
+	cout << endl << "복사 생성자 (힙 A -> C)" << endl;
+	MinHeap<float> floatCopyConstructorTestHeap = floatTestHeap;
+	floatCopyConstructorTestHeap.PrintHeap();
+
+	cout << endl << "복사 할당 연산자 (힙 A -> D)" << endl;
+	MinHeap<float> floatCopyAssignmentTestHeap;
+	floatCopyAssignmentTestHeap = floatTestHeap;
+	floatCopyAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "이동 생성자 (힙 C -> E)" << endl;
+	MinHeap<float> floatMoveConstructorTestHeap = move(floatCopyConstructorTestHeap);
+	floatMoveConstructorTestHeap.PrintHeap();
+
+	cout << endl << "이동 할당 연산자 (힙 D -> F)" << endl;
+	MinHeap<float> floatMoveAssignmentTestHeap;
+	floatMoveAssignmentTestHeap = move(floatCopyAssignmentTestHeap);
+	floatMoveAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "이동 후 소스 힙는 비워짐 (힙 C, D)" << endl;
+	floatCopyConstructorTestHeap.PrintHeap();
+	floatCopyAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "팝 (힙 A)" << endl;
+	float floatPoppedData1;
+	floatTestHeap.Pop(floatPoppedData1);
+	PrintData(floatPoppedData1);
+
+	float floatPoppedData2;
+	floatTestHeap.Pop(floatPoppedData2);
+	PrintData(floatPoppedData2);
+
+	float floatPoppedData3;
+	floatTestHeap.Pop(floatPoppedData3);
+	PrintData(floatPoppedData3);
+
+	float floatPoppedData4;
+	floatTestHeap.Pop(floatPoppedData4);
+	PrintData(floatPoppedData4);
+
+	float floatPoppedData5;
+	floatTestHeap.Pop(floatPoppedData5);
+	PrintData(floatPoppedData5);
+
+	float floatPoppedData6;
+	floatTestHeap.Pop(floatPoppedData6);
+	PrintData(floatPoppedData6);
+
+	float floatPoppedData7;
+	floatTestHeap.Pop(floatPoppedData7);
+	PrintData(floatPoppedData7);
+
+	cout << endl << "비워진 상태에서 팝 (힙 A)" << endl;
+	float floatPoppedData8;
+	floatTestHeap.Pop(floatPoppedData8);
+	PrintData(floatPoppedData8);
+
+	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
+	floatExplicitCopyTestHeap.PrintHeap();
+
+	cout << endl << "testing 3 : MinHeap<string>--------------------------------------------------------------------------" << endl;
+
+	MinHeap<string> stringTestHeap;
+
+	cout << endl << "푸시 (힙 A)" << endl;
+	stringTestHeap.Push(5, "Panther");
+	stringTestHeap.Push(7, "Comet");
+	stringTestHeap.Push(3, "Crusader");
+	stringTestHeap.Push(4, "Sherman");
+	stringTestHeap.Push(6, "Tiger");
+	stringTestHeap.Push(9, "Mouse");
+	stringTestHeap.Push(2, "Stuart");
+	stringTestHeap.PrintHeap();
+
+	cout << endl << "명시적 복사 (힙 A -> B)" << endl;
+	MinHeap<string> stringExplicitCopyTestHeap;
+	stringExplicitCopyTestHeap.CopyHeap(stringTestHeap);
+	stringExplicitCopyTestHeap.PrintHeap();
+
+	cout << endl << "복사 생성자 (힙 A -> C)" << endl;
+	MinHeap<string> stringCopyConstructorTestHeap = stringTestHeap;
+	stringCopyConstructorTestHeap.PrintHeap();
+
+	cout << endl << "복사 할당 연산자 (힙 A -> D)" << endl;
+	MinHeap<string> stringCopyAssignmentTestHeap;
+	stringCopyAssignmentTestHeap = stringTestHeap;
+	stringCopyAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "이동 생성자 (힙 C -> E)" << endl;
+	MinHeap<string> stringMoveConstructorTestHeap = move(stringCopyConstructorTestHeap);
+	stringMoveConstructorTestHeap.PrintHeap();
+
+	cout << endl << "이동 할당 연산자 (힙 D -> F)" << endl;
+	MinHeap<string> stringMoveAssignmentTestHeap;
+	stringMoveAssignmentTestHeap = move(stringCopyAssignmentTestHeap);
+	stringMoveAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "이동 후 소스 힙는 비워짐 (힙 C, D)" << endl;
+	stringCopyConstructorTestHeap.PrintHeap();
+	stringCopyAssignmentTestHeap.PrintHeap();
+
+	cout << endl << "팝 (힙 A)" << endl;
+	string stringPoppedData1;
+	stringTestHeap.Pop(stringPoppedData1);
+	PrintData(stringPoppedData1);
+
+	string stringPoppedData2;
+	stringTestHeap.Pop(stringPoppedData2);
+	PrintData(stringPoppedData2);
+
+	string stringPoppedData3;
+	stringTestHeap.Pop(stringPoppedData3);
+	PrintData(stringPoppedData3);
+
+	string stringPoppedData4;
+	stringTestHeap.Pop(stringPoppedData4);
+	PrintData(stringPoppedData4);
+
+	string stringPoppedData5;
+	stringTestHeap.Pop(stringPoppedData5);
+	PrintData(stringPoppedData5);
+
+	string stringPoppedData6;
+	stringTestHeap.Pop(stringPoppedData6);
+	PrintData(stringPoppedData6);
+
+	string stringPoppedData7;
+	stringTestHeap.Pop(stringPoppedData7);
+	PrintData(stringPoppedData7);
+
+	cout << endl << "비워진 상태에서 팝 (힙 A)" << endl;
+	string stringPoppedData8;
+	stringTestHeap.Pop(stringPoppedData8);
+	PrintData(stringPoppedData8);
+
+	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
+	stringExplicitCopyTestHeap.PrintHeap();
+
+	cout << endl << "testing 4 : Random Workload Speed Test---------------------------------------------------------" << endl;
+
+	/*	(테스팅 환경)
+		[기본]
+		- CPU									: i5-13600KF, 3500Mhz, 14 코어, 20 논리 프로세서
+		- RAM									: 32GB, DDR4
+		- OS									: Windows 11, 버전 25H2, 빌드 26200.8246
+		- IDE									: Microsoft Visual Studio Community 2026 (64 - bit) 버전 18.5.2
+		- 플랫폼 도구 집합						: v145 for Microsoft C++ Build Tools
+		- 컴파일러 버전							: x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.50.35730
+
+		[상세]
+		- 구성 선택								: Release x64
+		- 디버깅 여부							: 디버깅하지 않고 시작(Ctrl + F5)
+		- C / C++ 디버그 정보 형식				: 프로그램 데이터베이스(/Zi)
+		- C / C++ 최적화 설정					: 최대 최적화(속도 우선)(/O2)
+		- C / C++ 인라인 함수 확장				: 적합한 것 모두 확장(/Ob2)
+		- C / C++ 내장 함수 사용				: 예(/Oi)
+		- C / C++ 크기 또는 속도				: 코드 속도 우선(/Ot)
+		- C / C++ 전체 프로그램 최적화			: 예(/GL)
+		- C / C++ 전처리기 정의　				: NDEBUG;_CONSOLE;%(PreprocessorDefinitions)
+		- C / C++ 코드 생성 기본 런타임 검사	: 기본값
+		- C / C++ 코드 생성 런타임 라이브러리	: 다중 스레드 DLL(/MD)
+		- C / C++ 언어 표준						: 기본값(ISO C++ 14 표준)
+		- C / C++ 출력 파일　어셈블러 출력		: 소스 코드로 구성된 어셈블리(/FAs)
+		- 링커 링크 타임 코드 생성				: 빠른 링크 타임 코드 생성 사용(/LTCG:incremental)
+	*/
+	
+	/*	(테스팅 방법)
+		randomWorkloadNum 횟수만큼 복사 푸시(힙 A), 이동 푸시(힙 B), 팝(힙 A), 소멸(힙 B)을 수행함
+		키는 [0,randomWorkloadNum-1] 의 중복되지 않는 키 값들을 랜덤하게 셔플해놓고 사용함
+		데이터는 randomWorkloadPerDataLen 으로 지정된 길이의 string 객체를 randomWorkloadNum 개 만들어놓고 사용함
+	*/
+
+	/*	(테스팅 결과)
+		[randomWorkloadNum = 10,000,000  |  randomWorkloadPerDataLen = 30]
+		복사 푸시	: Heap = 2.1초	|	std::priority_queue = 1.2초
+		이동 푸시	: Heap = 1.5초	|	std::priority_queue = 0.7초
+		팝			: Heap = 12.7초	|	std::priority_queue = 13.2초
+		소멸		: Heap = 1.2초	|	std::priority_queue = 0.6초
+	*/
+
+	/*	(테스팅 해석)
+		우선순위큐가 pop(..)과 top(..)을 나누어 호출해주는 과정에서 페널티를 지님에도, 힙의 Pop(..)과 거의 차이가 안 남
+		즉 전반적으로 힙의 최적화 수준이 우선순위큐에 비해 크게 떨어짐
+		
+	*/
+
+#ifdef RANDOM_WORKLOAD_SPEED_TEST
+	const int randomWorkloadNum = 10000000;
+	const int randomWorkloadPerDataLen = 30;
+	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
+#endif
+
+	cout << endl << "testing 5 : Linear Increasing Workload Speed Test----------------------------------------------" << endl;
+
+	/*	(테스팅 환경)
+		앞선 테스트와 동일
+	*/
+
+	/*	(테스팅 방법)
+		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
+	*/
+
+	/*	(테스팅 결과)
+		[linearIncreaseWorkloadNum = 앞선 테스트와 동일  |  linearIncreaseWorkloadPerDataLen = 앞선 테스트와 동일]
+		복사 푸시	: Heap = 1.4초	|	std::priority_queue = 1.0초
+		이동 푸시	: Heap = 1.0초	|	std::priority_queue = 0.6초
+		팝			: Heap = 2.8초	|	std::priority_queue = 1.6초
+		소멸		: Heap = 0.9초	|	std::priority_queue = 0.4초
+	*/
+
+	/*	(테스팅 해석)
+		힙과 우선순위큐 둘 다 오름차순에서 푸시가 팝보다 더 빠르고, 내림차순에서는 반대로 팝이 푸시보다 더 빠름
+		-오름차순으로 푸시되면, 최소힙은 별다른 조정을 해줄 필요가 없기 때문에 최선의 시간이 걸리게 됨
+		-반면 푸시 과정에서 조정이 일어나지 않았으므로, 항상 힙의 마지막 요소가 최대값이 존재하여서 팝 과정에서는 최악의 시간이 걸리게 됨
+		
+		이러한 공통적인 경향성을 지니지만, 여전히 Heap의 최적화 수준은 우선수위큐에 비해 크게 떨어짐
+	*/
+
+#ifdef LINEAR_INCREASE_WORKLOAD_SPEED_TEST
+	const int linearIncreaseWorkloadNum = randomWorkloadNum;
+	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	LinearIncreaseWorkloadSpeedTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
+#endif
+
+	cout << endl << "testing 6 : Linear Decreasing Workload Speed Test----------------------------------------------" << endl;
+
+	/*	(테스팅 환경)
+		앞선 테스트와 동일
+	*/
+
+	/*	(테스팅 방법)
+		앞선 테스트와 동일하나 키를 역순으로 사용함
+	*/
+
+	/*	(테스팅 결과)
+		[linearDecreaseWorkloadNum = 앞선 테스트와 동일  |  linearDecreaseWorkloadPerDataLen = 앞선 테스트와 동일]
+		복사 푸시	: Heap = 3.5초	|	std::priority_queue = 1.5초
+		이동 푸시	: Heap = 3.0초	|	std::priority_queue = 1.0초
+		팝			: Heap = 2.1초	|	std::priority_queue = 0.9초
+		소멸		: Heap = 1.2초	|	std::priority_queue = 0.5초
+	*/
+
+	/*	(테스팅 해석)
+		앞선 테스트와 동일
+	*/
+
+#ifdef LINEAR_DECREASE_WORKLOAD_SPEED_TEST
+	const int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
+	const int linearDecreaseWorkloadPerDataLen = linearIncreaseWorkloadPerDataLen;
+	LinearDecreaseWorkloadSpeedTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
+#endif
+
+	cout << endl << "testing ended----------------------------------------------------------------------------------" << endl;
 
 	return 0;
+}
+
+template <typename DataType>
+void PrintData(const DataType& retrievedData)
+{
+	cout << "retrieved data : " << retrievedData << endl;
+}
+
+void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
+{
+	cout << endl << "랜덤 워크로드 준비 중...." << endl;
+
+	vector<string> pushTestDatum;
+	pushTestDatum.reserve(workloadNum);
+	for (int i = 0; i < workloadNum; i++)
+	{
+		pushTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+	}
+
+	vector<int> pushTestKeys(workloadNum);
+	iota(pushTestKeys.begin(), pushTestKeys.end(), 0);
+	mt19937 pushTestRng(123456);
+	shuffle(pushTestKeys.begin(), pushTestKeys.end(), pushTestRng);
+
+	vector<int> retrieveTestKeys(workloadNum);
+	iota(retrieveTestKeys.begin(), retrieveTestKeys.end(), 0);
+	mt19937 retrieveTestRng(654321);
+	shuffle(retrieveTestKeys.begin(), retrieveTestKeys.end(), retrieveTestRng);
+
+	vector<int> removeTestKeys(workloadNum);
+	iota(removeTestKeys.begin(), removeTestKeys.end(), 0);
+	mt19937 removeTestRng(162534);
+	shuffle(removeTestKeys.begin(), removeTestKeys.end(), removeTestRng);
+
+	steady_clock clock;
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	cout << endl << "랜덤 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestHeap(clock, workloadNum, pushTestDatum, pushTestKeys);
+
+	timeEnd = clock.now();
+
+	cout << endl << "Heap 소멸자 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "-----------------------------------------------------------" << endl;
+
+	cout << endl << "랜덤 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestPriorityQueue(clock, workloadNum, pushTestDatum, pushTestKeys);
+
+	timeEnd = clock.now();
+
+	cout << endl << "priority_queue 소멸자 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+}
+
+void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
+{
+	cout << endl << "선형 증가 워크로드 준비 중...." << endl;
+
+	vector<string> pushTestDatum;
+	pushTestDatum.reserve(workloadNum);
+	for (int i = 0; i < workloadNum; i++)
+	{
+		pushTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+	}
+
+	vector<int> pushTestKeys(workloadNum);
+	iota(pushTestKeys.begin(), pushTestKeys.end(), 0);
+
+	vector<int> retrieveTestKeys = pushTestKeys;
+
+	vector<int> removeTestKeys = pushTestKeys;
+
+	steady_clock clock;
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	cout << endl << "선형 증가 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestHeap(clock, workloadNum, pushTestDatum, pushTestKeys);
+
+	timeEnd = clock.now();
+
+	cout << endl << "Heap 소멸자 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "-----------------------------------------------------------" << endl;
+
+	cout << endl << "선형 증가 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestPriorityQueue(clock, workloadNum, pushTestDatum, pushTestKeys);
+
+	timeEnd = clock.now();
+
+	cout << endl << "priority_queue 소멸자 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+}
+
+void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
+{
+	cout << endl << "선형 감소 워크로드 준비 중...." << endl;
+
+	vector<string> pushTestDatum;
+	pushTestDatum.reserve(workloadNum);
+	for (int i = 0; i < workloadNum; i++)
+	{
+		pushTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+	}
+
+	vector<int> pushTestKeys(workloadNum);
+	iota(pushTestKeys.rbegin(), pushTestKeys.rend(), 0);
+
+	vector<int> retrieveTestKeys = pushTestKeys;
+
+	vector<int> removeTestKeys = pushTestKeys;
+
+	steady_clock clock;
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	cout << endl << "선형 감소 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestHeap(clock, workloadNum, pushTestDatum, pushTestKeys);
+
+	timeEnd = clock.now();
+
+	cout << endl << "Heap 소멸자 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "-----------------------------------------------------------" << endl;
+
+	cout << endl << "선형 감소 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestPriorityQueue(clock, workloadNum, pushTestDatum, pushTestKeys);
+
+	timeEnd = clock.now();
+
+	cout << endl << "priority_queue 소멸자 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+}
+
+time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload)
+{
+	MinHeap<string> copyPushTestHeap;
+	MinHeap<string> movePushTestHeap;
+
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	cout << endl << "Heap 복사 푸시 측정 시작" << endl;
+	cout << endl << "|------------------|" << endl;
+
+	timeBegin = clock.now();
+
+	for (int i = 0; i < workloadNum; i++)
+	{
+		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
+
+		copyPushTestHeap.Push(pushKeyWorkload[i], pushDataWorkload[i]);
+	}
+	cout << endl;
+
+	timeEnd = clock.now();
+
+	cout << endl << "Heap 복사 푸시 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "Heap 이동 푸시 측정 시작" << endl;
+	cout << endl << "|------------------|" << endl;
+
+	timeBegin = clock.now();
+
+	for (int i = 0; i < workloadNum; i++)
+	{
+		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
+
+		movePushTestHeap.Push(pushKeyWorkload[i], move(pushDataWorkload[i]));
+	}
+	cout << endl;
+
+	timeEnd = clock.now();
+
+	cout << endl << "Heap 이동 푸시 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "Heap 팝 측정 시작" << endl;
+	cout << endl << "|------------------|" << endl;
+
+	timeBegin = clock.now();
+
+	string retrievedData;
+	for (int i = 0; i < workloadNum; i++)
+	{
+		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
+
+		copyPushTestHeap.Pop(retrievedData);
+		retrievedData += 'a';			//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+	}
+	cout << endl;
+
+	timeEnd = clock.now();
+
+	cout << endl << "Heap 팝 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << workloadNum << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "Heap 소멸자 측정 시작" << endl;
+	return clock.now();
+}
+
+time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTestRepeat, vector<string> pushTestDatum, const vector<int>& pushTestKeys)
+{
+	struct PriorityQueueNode
+	{
+		int m_key;
+		string m_data;
+
+		PriorityQueueNode(int newKey, const string& newData) : m_key(newKey), m_data(newData)
+		{
+
+		}
+
+		PriorityQueueNode(int newKey, string&& newData) noexcept : m_key(newKey), m_data(move(newData))
+		{
+
+		}
+	};
+
+	struct LessCompare
+	{
+		bool operator()(const PriorityQueueNode& a, const PriorityQueueNode& b) const noexcept
+		{
+			return a.m_key > b.m_key;
+		}
+	};
+
+	priority_queue<PriorityQueueNode, vector<PriorityQueueNode>, LessCompare> copyPushTestPriorityQueue;
+	priority_queue<PriorityQueueNode, vector<PriorityQueueNode>, LessCompare> movePushTestPriorityQueue;
+
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	cout << endl << "priority_queue 복사 푸시 측정 시작" << endl;
+	cout << endl << "|------------------|" << endl;
+
+	timeBegin = clock.now();
+
+	for (int i = 0; i < speedTestRepeat; i++)
+	{
+		if (i % ((speedTestRepeat / 20) + 1) == 0) cout << "*";
+
+		copyPushTestPriorityQueue.emplace( pushTestKeys[i], pushTestDatum[i] );
+	}
+	cout << endl;
+
+	timeEnd = clock.now();
+
+	cout << endl << "priority_queue 복사 푸시 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << speedTestRepeat << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "priority_queue 이동 푸시 측정 시작" << endl;
+	cout << endl << "|------------------|" << endl;
+
+	timeBegin = clock.now();
+
+	for (int i = 0; i < speedTestRepeat; i++)
+	{
+		if (i % ((speedTestRepeat / 20) + 1) == 0) cout << "*";
+
+		movePushTestPriorityQueue.emplace(pushTestKeys[i], move(pushTestDatum[i]));
+	}
+	cout << endl;
+
+	timeEnd = clock.now();
+
+	cout << endl << "priority_queue 이동 푸시 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << speedTestRepeat << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "priority_queue 팝 측정 시작" << endl;
+	cout << endl << "|------------------|" << endl;
+
+	timeBegin = clock.now();
+
+	string retrievedData;
+	for (int i = 0; i < speedTestRepeat; i++)
+	{
+		if (i % ((speedTestRepeat / 20) + 1) == 0) cout << "*";
+
+		//priority_queue는 pop 메소드가 top 아이템을 반환하지 않기 때문에, 동일한 기능을 수행하는 시간을 비교하기 위해 top()과 pop()을 연달아 호출하도록 함
+		retrievedData = copyPushTestPriorityQueue.top().m_data;
+		copyPushTestPriorityQueue.pop();
+		retrievedData += 'a';		//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+	}
+	cout << endl;
+
+	timeEnd = clock.now();
+
+	cout << endl << "priority_queue 팝 측정 종료" << endl;
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << speedTestRepeat << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << endl;
+
+	cout << endl << "priority_queue 소멸자 측정 시작" << endl;
+	return clock.now();
 }

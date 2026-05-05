@@ -10,9 +10,8 @@ class BstNode
 {
 	friend class BstTemplate<BstNode, DataType>;
 
-public : 
+public: 
 
-	//newData가 lvalue 참조와 rvalue 참조인 경우를 각각 다르게 처리하기 위해서 참조 붕괴를 사용했음
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData)
 		: m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
@@ -20,12 +19,9 @@ public :
 
 	}
 
-	BstNode(const BstNode& sourceNode)
+	BstNode(const BstNode& sourceNode) : m_key(sourceNode.m_key), m_data(sourceNode.m_data), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
-		m_key = sourceNode.m_key;
-		m_data = sourceNode.m_data;
-		m_pLeftChild = nullptr;
-		m_pRightChild = nullptr;
+
 	}
 
 	//트리 클래스에 소멸자가 정의되어있으므로 노드의 소멸자 정의는 필요 없음
@@ -56,10 +52,17 @@ class Bst : public BstTemplate<BstNode, DataType>
 {
 public:
 
-	Bst() : BstTemplate<BstNode, DataType>()
-	{
-	
-	}
+	Bst() = default;
+
+	Bst(const Bst<DataType>& sourceBst) = default;
+
+	Bst(Bst<DataType>&& sourceBst) = default;
+
+	Bst<DataType>& operator = (const Bst<DataType>& sourceBst) = default;
+
+	Bst<DataType>& operator = (Bst<DataType>&& sourceBst) = default;
+
+	~Bst() = default;
 };
 
 #endif //BST_USING_WHILE_H

@@ -20,11 +20,8 @@ public:
 		CopyStack(sourceStack);
 	}
 
-	Stack(Stack&& sourceStack) noexcept
+	Stack(Stack&& sourceStack) noexcept : m_pData(sourceStack.m_pData), m_size(sourceStack.m_size), m_capacity(sourceStack.m_capacity)
 	{
-		m_pData = sourceStack.m_pData;
-		m_size = sourceStack.m_size;
-		m_capacity = sourceStack.m_capacity;
 		sourceStack.m_pData = nullptr;
 		sourceStack.m_size = 0;
 		sourceStack.m_capacity = 0;
@@ -137,7 +134,7 @@ public:
 
 	bool IsEmpty()
 	{
-		if (m_size == 0)
+		if (m_size <= 0)
 		{
 			return true;
 		}

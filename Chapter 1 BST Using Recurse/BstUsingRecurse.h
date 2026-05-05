@@ -17,7 +17,7 @@ class BstNode
 private:
 
 	template <typename NewDataType = DataType>
-	BstNode(const int newKey, NewDataType&& newData)
+	BstNode(int newKey, NewDataType&& newData)
 		: m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
@@ -58,43 +58,42 @@ public:
 		LogPrint("empty constructor");
 	}
 
-	Bst(const Bst<DataType>& sourceBST)
+	Bst(const Bst<DataType>& sourceBst) : m_pHead(nullptr)
 	{
 		LogPrint("copy constructor");
 
-		CopyTree(sourceBST);
+		CopyTree(sourceBst);
 	}
 
-	Bst(Bst<DataType>&& sourceBST) noexcept
+	Bst(Bst<DataType>&& sourceBst) noexcept : m_pHead(sourceBst.m_pHead)
 	{
 		LogPrint("move constructor");
 
-		m_pHead = sourceBST.m_pHead;
-		sourceBST.m_pHead = nullptr;
+		sourceBst.m_pHead = nullptr;
 	}
 
-	Bst<DataType>& operator = (const Bst<DataType>& sourceBST)
+	Bst<DataType>& operator = (const Bst<DataType>& sourceBst)
 	{
 		LogPrint("copy assignment");
 
-		CopyTree(sourceBST);
+		CopyTree(sourceBst);
 
 		return *this;
 	}
 
-	Bst<DataType>& operator = (Bst<DataType>&& sourceBST) noexcept
+	Bst<DataType>& operator = (Bst<DataType>&& sourceBst) noexcept
 	{
 		LogPrint("move assignment");
 
-		if (this == &sourceBST)
+		if (this == &sourceBst)
 		{
 			return *this;
 		}
 
 		RemoveTree();
 
-		m_pHead = sourceBST.m_pHead;
-		sourceBST.m_pHead = nullptr;
+		m_pHead = sourceBst.m_pHead;
+		sourceBst.m_pHead = nullptr;
 
 		return *this;
 	}
@@ -109,7 +108,7 @@ public:
 	//bool 반환값이 false인 경우 : newKey와 같은 키의 노드가 이미 존재하는 경우
 	//newData가 lvalue 참조와 rvalue 참조인 경우를 각각 다르게 처리하기 위해서 참조 붕괴를 사용했음
 	template <typename InsertDataType = DataType>
-	bool Insert(const int newKey, InsertDataType&& newData)
+	bool Insert(int newKey, InsertDataType&& newData)
 	{
 		LogPrint("insert");
 
@@ -126,7 +125,7 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
-	bool Retrieve(const int retrieveTargetKey, DataType& outData) const
+	bool Retrieve(int retrieveTargetKey, DataType& outData) const
 	{
 		LogPrint("retrieve");
 
@@ -141,7 +140,7 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
-	bool Remove(const int removeTargetKey)
+	bool Remove(int removeTargetKey)
 	{
 		LogPrint("remove one item");
 
@@ -177,12 +176,12 @@ public:
 
 	//트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
 	//복사를 통한 인자 전달은 성능에도 안 좋고, 게다가 복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
-	void CopyTree(const Bst<DataType>& sourceBST)
+	void CopyTree(const Bst<DataType>& sourceBst)
 	{
 		LogPrint("copy tree");
 
 		Bst<DataType> tempTree;
-		tempTree.CopyTreeRecurse(sourceBST.m_pHead);
+		tempTree.CopyTreeRecurse(sourceBst.m_pHead);
 		*this = move(tempTree);
 	}
 
@@ -231,11 +230,11 @@ public:
 private:
 
 	template <typename InsertDataType = DataType>
-	bool InsertRecurse(BstNode<DataType>* pSearchTargetNode, const int newKey, InsertDataType&& newData);
+	bool InsertRecurse(BstNode<DataType>* pSearchTargetNode, int newKey, InsertDataType&& newData);
 
-	bool RetrieveRecurse(const BstNode<DataType>* pSearchTargetNode, const int retrieiveTargetKey, DataType& outData) const;
+	bool RetrieveRecurse(const BstNode<DataType>* pSearchTargetNode, int retrieiveTargetKey, DataType& outData) const;
 
-	bool RemoveRecurse(BstNode<DataType>* pSearchTargetNode, const int removeTargetKey);
+	bool RemoveRecurse(BstNode<DataType>* pSearchTargetNode, int removeTargetKey);
 
 	//삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
 	void RemoveTarget(BstNode<DataType>*& pRemoveTargetNode);
@@ -259,7 +258,7 @@ private:
 
 template <typename DataType>
 template <typename InsertDataType>
-bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchTargetNode, const int newKey, InsertDataType&& newData)
+bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchTargetNode, int newKey, InsertDataType&& newData)
 {
 	if (newKey < pSearchTargetNode->m_key)
 	{
@@ -296,7 +295,7 @@ bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchTargetNode, const in
 }
 
 template <typename DataType>
-bool Bst<DataType>::RetrieveRecurse(const BstNode<DataType>* pSearchTargetNode, const int retrieveTargetKey, DataType& outData) const
+bool Bst<DataType>::RetrieveRecurse(const BstNode<DataType>* pSearchTargetNode, int retrieveTargetKey, DataType& outData) const
 {
 	if (retrieveTargetKey < pSearchTargetNode->m_key)
 	{
@@ -333,7 +332,7 @@ bool Bst<DataType>::RetrieveRecurse(const BstNode<DataType>* pSearchTargetNode, 
 }
 
 template <typename DataType>
-bool Bst<DataType>::RemoveRecurse(BstNode<DataType>* pSearchTargetNode, const int removeTargetKey)
+bool Bst<DataType>::RemoveRecurse(BstNode<DataType>* pSearchTargetNode, int removeTargetKey)
 {
 	if (removeTargetKey < pSearchTargetNode->m_key)
 	{

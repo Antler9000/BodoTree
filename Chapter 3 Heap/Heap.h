@@ -2,45 +2,114 @@
 #define HEAP_H
 
 #include "../Common/Debug.h"	//정의한 로그 출력 매크로를 사용함
+#include <memory>				//유니크 포인터를 사용함
 #include <utility>				//이동 시맨틱을 사용함
 using namespace std;
 
+template <typename DataType>
+class Heap;
+
+template <typename DataType>
+class MinHeap;
+
+template <typename DataType>
+class MaxHeap;
+
+template <typename DataType>
+class HeapNode
+{
+	//MinHeap과 MaxHeap 까지만 구현할 예정이므로, 굳이 추가클래스 구현에 열려있을 필요가 없어 여기에 friend를 일일이 선언하는 방식을 사용했음
+	friend class Heap <DataType>;
+	friend class MinHeap<DataType>;
+	friend class MaxHeap<DataType>;
+
+public:
+
+	HeapNode() : m_key(0), m_data()
+	{
+
+	}
+
+	template <typename NewDataType = DataType>
+	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(forward<NewDataType>(data))
+	{
+
+	}
+
+	HeapNode(const HeapNode& sourceHeapNode) : m_key(sourceHeapNode.m_key), m_data(sourceHeapNode.m_data)
+	{
+
+	}
+
+	HeapNode(HeapNode&& sourceHeapNode) noexcept : m_key(sourceHeapNode.m_key), m_data(move(sourceHeapNode.m_data))
+	{
+
+	}
+
+	HeapNode& operator = (const HeapNode& sourceHeapNode)
+	{
+		if (this == &sourceHeapNode)
+		{
+			return *this;
+		}
+
+		m_key = sourceHeapNode.m_key;
+		m_data = sourceHeapNode.m_data;
+
+		return *this;
+	}
+
+	HeapNode& operator = (HeapNode&& sourceHeapNode) noexcept
+	{
+		if (this == &sourceHeapNode)
+		{
+			return *this;
+		}
+
+		m_key = sourceHeapNode.m_key;
+		m_data = move(sourceHeapNode.m_data);
+
+		sourceHeapNode.m_key = 0;
+		//source 측의 m_data는 DataType의 이동 생성자를 통해 이미 빈 상태가 되었다고 가정함
+
+		return *this;
+	}
+
+	~HeapNode() noexcept
+	{
+
+	}
+
+private:
+	
+	int m_key;
+	DataType m_data;
+};
+
+template <typename DataType>
 class Heap
 {
 public:
 
-	Heap()
+	Heap() : m_pNodeArr(DBG_NEW HeapNode<DataType>[50]), m_size(0), m_capacity(50)
 	{
 		LogPrint("empty constructor");
-
-		m_pData = DBG_NEW int[50];
-		m_size = 0;
-		m_capacity = 50;
 	}
 
-	Heap(const Heap& sourceHeap)
+	Heap(const Heap& sourceHeap) : m_pNodeArr(nullptr), m_size(0), m_capacity(0)
 	{
 		LogPrint("copy constructor");
 
-		m_pData = DBG_NEW int[sourceHeap.m_capacity];
-		m_capacity = sourceHeap.m_capacity;
-		m_size = sourceHeap.m_size;
-
-		for (int i = 0; i < m_size; i++)
-		{
-			m_pData[i] = sourceHeap.m_pData[i];
-		}
+		CopyHeap(sourceHeap);
 	}
 
-	Heap(Heap&& sourceHeap) noexcept
+	Heap(Heap&& sourceHeap) noexcept : m_pNodeArr(sourceHeap.m_pNodeArr), m_size(sourceHeap.m_size), m_capacity(sourceHeap.m_capacity)
 	{
 		LogPrint("move constructor");
 
-		m_pData = sourceHeap.m_pData;
-		sourceHeap.m_pData = nullptr;
-
-		m_capacity = sourceHeap.m_capacity;
-		m_size = sourceHeap.m_size;
+		sourceHeap.m_pNodeArr = nullptr;
+		sourceHeap.m_size = 0;
+		sourceHeap.m_capacity = 0;
 	}
 
 	Heap& operator = (const Heap& sourceHeap)
@@ -52,16 +121,9 @@ public:
 			return *this;
 		}
 
-		RemoveAll();
+		CopyHeap(sourceHeap);
 
-		m_pData = DBG_NEW int[sourceHeap.m_capacity];
-		m_capacity = sourceHeap.m_capacity;
-		m_size = sourceHeap.m_size;
-
-		for (int i = 0; i < m_size; i++)
-		{
-			m_pData[i] = sourceHeap.m_pData[i];
-		}
+		return *this;
 	}
 
 	Heap& operator = (Heap&& sourceHeap) noexcept
@@ -73,26 +135,32 @@ public:
 			return *this;
 		}
 
-		RemoveAll();
+		RemoveHeap();
 
-		m_pData = sourceHeap.m_pData;
-		sourceHeap.m_pData = nullptr;
+		m_pNodeArr = sourceHeap.m_pNodeArr;
+		sourceHeap.m_pNodeArr = nullptr;
+
+		m_size = sourceHeap.m_size;
+		sourceHeap.m_size = 0;
 
 		m_capacity = sourceHeap.m_capacity;
-		m_size = sourceHeap.m_size;
+		sourceHeap.m_capacity = 0;
+
+		return *this;
 	}
 
 	~Heap() noexcept
 	{
 		LogPrint("destructor");
 
-		delete[] m_pData;
-		m_pData = nullptr;
+		delete[] m_pNodeArr;
+		m_pNodeArr = nullptr;
 		m_size = 0;
 		m_capacity = 0;
 	}
 
-	void Push(int newData)
+	template <typename InsertDataType = DataType>
+	void Push(int newKey, InsertDataType&& newData)
 	{
 		LogPrint("push");
 
@@ -101,53 +169,182 @@ public:
 			GiveLargerMemorySpace();
 		}
 
-		m_pData[m_size] = newData;
+		m_pNodeArr[m_size] = HeapNode<DataType>(newKey, forward<InsertDataType>(newData));
 		m_size++;
+
 		ReorderByPromoting();
 	}
 
-	int GetTop()
-	{
-		LogPrint("get top");
-
-		if (m_size <= 0)
-		{
-			WarningPrint("can't get item from heap because heap is empty.");
-			return 0;
-		}
-
-		return m_pData[0];
-	}
-
-	int Pop()
+	//bool 반환값이 false인 경우 : 힙이 비어져 있는 경우
+	bool Pop(DataType& outData)
 	{
 		LogPrint("pop");
 
 		if (m_size <= 0)
 		{
-			WarningPrint("cannot pop item from heap because heap is empty.");
-			return 0;
+			WarningPrint("cannot pop from heap because heap is empty.");
+
+			return false;
 		}
 
-		int poppedData = m_pData[0];
+		outData = m_pNodeArr[0].m_data;		//DataType의 이동 생성자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
 
+		m_pNodeArr[0] = m_pNodeArr[m_size-1];
 		m_size--;
-		m_pData[0] = m_pData[m_size];
 		ReorderByDemoting();
 
-		return poppedData;
+		return true;
 	}
 
-	void RemoveAll()
+	//bool 반환값이 false인 경우 : 힙이 비어져 있는 경우
+	bool GetTop(DataType& outData)
 	{
-		LogPrint("remove all");
+		LogPrint("get top");
 
-		delete[] m_pData;
+		if (m_size <= 0)
+		{
+			WarningPrint("can't get top from heap because heap is empty.");
+
+			return false;
+		}
+
+		outData = m_pNodeArr[0].m_data;
+
+		return true;
+	}
+
+	bool IsEmpty()
+	{
+		if (m_size <= 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void RemoveHeap() noexcept
+	{
+		LogPrint("remove heap");
+
+		delete[] m_pNodeArr;
+		m_pNodeArr = nullptr;
 		m_size = 0;
 		m_capacity = 0;
 	}
 
+	void CopyHeap(const Heap& sourceHeap)
+	{
+		LogPrint("copy heap");
+
+		unique_ptr<HeapNode<DataType>[]> upTempData = unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[sourceHeap.m_capacity]);
+
+		for (int i = 0; i < sourceHeap.m_size; i++)
+		{
+			upTempData[i] = sourceHeap.m_pNodeArr[i];
+		}
+
+		delete[] m_pNodeArr;
+		m_pNodeArr = upTempData.release();
+		m_capacity = sourceHeap.m_capacity;
+		m_size = sourceHeap.m_size;
+	}
+
+	void PrintHeap()
+	{
+		LogPrint("print heap");
+
+		for (int i = 0; i < m_size; i++)
+		{
+			cout << "key : " << m_pNodeArr[i].m_key << " / data : " << m_pNodeArr[i].m_data << endl;
+		}
+	}
+
 protected:
+
+	void GiveLargerMemorySpace()
+	{
+		int newCapacity = (m_capacity == 0) ? (50) : (2 * m_capacity);
+		unique_ptr<HeapNode<DataType>[]> upTempData = unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[newCapacity]);
+
+		for (int i = 0; i < m_size; i++)
+		{
+			upTempData[i] = m_pNodeArr[i];	//DataType의 이동 생성자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
+		}
+
+		delete[] m_pNodeArr;
+		m_pNodeArr = upTempData.release();
+		m_capacity = newCapacity;
+	}
+
+	//Swap(..)으로부터 올라오는 예외에 안전하지 못한 구현이지만, 더 나은 방식이 생각나지 않아 그대로 두려고 함
+	void ReorderByPromoting()
+	{
+		int targetIndex = m_size - 1;
+		int parentIndex = GetParentIndex(targetIndex);
+
+		while (targetIndex != parentIndex && IsNotOrdered(parentIndex, targetIndex))
+		{
+			Swap(m_pNodeArr[targetIndex], m_pNodeArr[parentIndex]);
+
+			targetIndex = parentIndex;
+			parentIndex = GetParentIndex(targetIndex);
+		}
+	}
+
+	//Swap(..)으로부터 올라오는 예외에 안전하지 못한 구현이지만, 더 나은 방식이 생각나지 않아 그대로 두려고 함
+	void ReorderByDemoting()
+	{
+		int targetIndex = 0;
+		int leftChildIndex = GetLeftChildIndex(targetIndex);
+		int rightChildIndex = GetRightChildIndex(targetIndex);
+		int targetChildIndex;
+
+		while (leftChildIndex < m_size)
+		{
+			if (rightChildIndex < m_size)
+			{
+				if (IsLeftChildTarget(leftChildIndex, rightChildIndex))
+				{
+					targetChildIndex = leftChildIndex;
+				}
+				else
+				{
+					targetChildIndex = rightChildIndex;
+				}
+			}
+			else
+			{
+				targetChildIndex = leftChildIndex;
+			}
+
+			if (IsNotOrdered(targetIndex, targetChildIndex))
+			{
+				Swap(m_pNodeArr[targetIndex], m_pNodeArr[targetChildIndex]);
+
+				targetIndex = targetChildIndex;
+				leftChildIndex = GetLeftChildIndex(targetIndex);
+				rightChildIndex = GetRightChildIndex(targetIndex);
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+
+protected:
+
+	//데이터 타입의 이동 할당 연산자가 noexcept임이 보장되지 않기에, Swap(..)에 noexcept를 붙이지 않았다
+	//같은 이유로 Swap(..) 내부도 예외 안전성이 강하지 못하나, 더 나은 방식이 생각나지 않아 이대로 두려고 한다
+	void Swap(HeapNode<DataType>& dataA, HeapNode<DataType>& dataB)
+	{
+		HeapNode<DataType> temp = move(dataA);
+		dataA = move(dataB);
+		dataB = move(temp);
+	}
 
 	int GetLeftChildIndex(int dataIndex)
 	{
@@ -164,107 +361,37 @@ protected:
 		return ((dataIndex - 1) / 2);
 	}
 
-	void Swap(int& dataA, int& dataB)
-	{
-		int temp = move(dataA);
-		dataA = move(dataB);
-		dataB = move(temp);
-	}
-
 	virtual bool IsNotOrdered(int parentIndex, int childIndex) = 0;					//상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
 
 	virtual bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex) = 0;	//상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
 
-	void ReorderByPromoting();
-
-	void ReorderByDemoting();
-
-	void GiveLargerMemorySpace()
-	{
-		int newCapacity = (m_capacity == 0) ? (50) : (2 * m_capacity);
-		int* newData = DBG_NEW int[newCapacity];
-
-		for (int i = 0; i < m_size; i++)
-		{
-			newData[i] = m_pData[i];
-		}
-
-		delete[] m_pData;
-		m_pData = newData;
-		m_capacity = newCapacity;
-	}
-
 protected:
 
-	int* m_pData;
+	HeapNode<DataType>* m_pNodeArr;
 	int m_size;
 	int m_capacity;
 };
 
-void Heap::ReorderByPromoting()
-{
-	int targetIndex = m_size - 1;
-	int parentIndex = GetParentIndex(targetIndex);
-
-	while (targetIndex != parentIndex && IsNotOrdered(parentIndex, targetIndex))
-	{
-		Swap(m_pData[targetIndex], m_pData[parentIndex]);
-		targetIndex = parentIndex;
-		parentIndex = GetParentIndex(targetIndex);
-	}
-}
-
-void Heap::ReorderByDemoting()
-{
-	int targetIndex = 0;
-	int leftChildIndex = GetLeftChildIndex(targetIndex);
-	int rightChildIndex = GetRightChildIndex(targetIndex);
-	int targetChildIndex;
-
-	while (leftChildIndex < m_size)
-	{
-		if (rightChildIndex < m_size)
-		{
-			if (IsLeftChildTarget(leftChildIndex, rightChildIndex))
-			{
-				targetChildIndex = leftChildIndex;
-			}
-			else
-			{
-				targetChildIndex = rightChildIndex;
-			}
-		}
-		else
-		{
-			targetChildIndex = leftChildIndex;
-		}
-
-		if (IsNotOrdered(targetIndex, targetChildIndex))
-		{
-			Swap(m_pData[targetIndex], m_pData[targetChildIndex]);
-
-			targetIndex = targetChildIndex;
-			leftChildIndex = GetLeftChildIndex(targetIndex);
-			rightChildIndex = GetRightChildIndex(targetIndex);
-		}
-		else
-		{
-			break;
-		}
-	}
-}
-
-class MinHeap : public Heap
+template <typename DataType>
+class MinHeap : public Heap<DataType>
 {
 public:
 
-	MinHeap() : Heap() {}
+	MinHeap() = default;
+
+	MinHeap(const MinHeap& sourceMinHeap) = default;
+
+	MinHeap(MinHeap&& sourceMinHeap) noexcept = default;
+
+	MinHeap& operator = (const MinHeap& sourceMinHeap) = default;
+
+	MinHeap& operator = (MinHeap&& sourceMinHeap) noexcept = default;
 
 private:
 
 	bool IsNotOrdered(int parentIndex, int childIndex)
 	{
-		if (m_pData[parentIndex] > m_pData[childIndex])
+		if (this->m_pNodeArr[parentIndex].m_key > this->m_pNodeArr[childIndex].m_key)
 		{
 			return true;
 		}
@@ -276,7 +403,7 @@ private:
 
 	bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex)
 	{
-		if (m_pData[leftChildIndex] < m_pData[rightChildIndex])
+		if (this->m_pNodeArr[leftChildIndex].m_key < this->m_pNodeArr[rightChildIndex].m_key)
 		{
 			return true;
 		}
@@ -287,17 +414,26 @@ private:
 	}
 };
 
-class MaxHeap : public Heap
+template <typename DataType>
+class MaxHeap : public Heap<DataType>
 {
 public:
 
-	MaxHeap() : Heap() {}
+	MaxHeap() = default;
+
+	MaxHeap(const MaxHeap& sourceMaxHeap) = default;
+
+	MaxHeap(MaxHeap&& sourceMaxHeap) noexcept = default;
+
+	MaxHeap& operator = (const MaxHeap& sourceMaxHeap) = default;
+
+	MaxHeap& operator = (MaxHeap&& sourceMaxHeap) noexcept = default;
 
 private:
 
 	bool IsNotOrdered(int parentIndex, int childIndex)
 	{
-		if (m_pData[parentIndex] < m_pData[childIndex])
+		if (this->m_pNodeArr[parentIndex].m_key < this->m_pNodeArr[childIndex].m_key)
 		{
 			return true;
 		}
@@ -309,7 +445,7 @@ private:
 
 	bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex)
 	{
-		if (m_pData[leftChildIndex] > m_pData[rightChildIndex])
+		if (this->m_pNodeArr[leftChildIndex].m_key > this->m_pNodeArr[rightChildIndex].m_key)
 		{
 			return true;
 		}

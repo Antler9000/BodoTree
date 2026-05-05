@@ -8,7 +8,7 @@
 #define LINEAR_INCREASE_WORKLOAD_SPEED_TEST
 #define LINEAR_DECREASE_WORKLOAD_SPEED_TEST
 
-#include "BstUsingWhile.h"		//정의한 BST를 테스팅함
+#include "BstUsingWhile.h"		//정의한 Bst를 테스팅함
 #include <chrono>;				//속도 테스트를 위해 사용함
 #include <string>;				//..
 #include <numeric>;				//..
@@ -17,18 +17,18 @@
 using namespace chrono;			//..
 
 template <typename DataType>
-void PrintKeyAndData(const int key, const DataType retrievedData);
+void PrintKeyAndData(int key, const DataType& retrievedData);
 
-void RandomWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen);
+void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
 
-void LinearIncreaseWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen);
+void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
 
-void LinearDecreaseWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen);
+void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
 
-//insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 BST와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
-time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
+//insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Bst와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
+time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
-time_point<steady_clock> SpeedTestMap(steady_clock& clock, const int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
+time_point<steady_clock> SpeedTestMap(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 int main()
 {
@@ -39,204 +39,204 @@ int main()
 
 	cout << endl << "testing 1 : Bst<int>--------------------------------------------------------------------------" << endl;
 
-	Bst<int> intTestBST;
+	Bst<int> intTestBst;
 
 	cout << endl << "삽입 (트리 A)" << endl;
-	intTestBST.Insert(5, 1515);
-	intTestBST.Insert(7, 2727);
-	intTestBST.Insert(3, 2323);
-	intTestBST.Insert(4, 3434);
-	intTestBST.Insert(6, 3636);
-	intTestBST.Insert(9, 3939);
-	intTestBST.Insert(2, 3232);
-	intTestBST.PreorderPrint();
+	intTestBst.Insert(5, 1515);
+	intTestBst.Insert(7, 2727);
+	intTestBst.Insert(3, 2323);
+	intTestBst.Insert(4, 3434);
+	intTestBst.Insert(6, 3636);
+	intTestBst.Insert(9, 3939);
+	intTestBst.Insert(2, 3232);
+	intTestBst.PreorderPrint();
 
 	cout << endl << "중위 순회 출력 (트리 A)" << endl;
-	intTestBST.InorderPrint();
+	intTestBst.InorderPrint();
 
 	cout << endl << "후위 순회 출력 (트리 A)" << endl;
-	intTestBST.PostorderPrint();
+	intTestBst.PostorderPrint();
 
 	cout << endl << "검색 (트리 A)" << endl;
 	int intRetrievedData = 0;
-	intTestBST.Retrieve(3, intRetrievedData);
+	intTestBst.Retrieve(3, intRetrievedData);
 	PrintKeyAndData(3, intRetrievedData);
 
 	cout << endl << "명시적 복사 (트리 A -> B)" << endl;
-	Bst<int> intExplicitCopyTestBST;
-	intExplicitCopyTestBST.CopyTree(intTestBST);
-	intExplicitCopyTestBST.PreorderPrint();
+	Bst<int> intExplicitCopyTestBst;
+	intExplicitCopyTestBst.CopyTree(intTestBst);
+	intExplicitCopyTestBst.PreorderPrint();
 
 	cout << endl << "복사 생성자 (트리 A -> C)" << endl;
-	Bst<int> intCopyConstructorTestBST = intTestBST;
-	intCopyConstructorTestBST.PreorderPrint();
+	Bst<int> intCopyConstructorTestBst = intTestBst;
+	intCopyConstructorTestBst.PreorderPrint();
 
 	cout << endl << "복사 할당 연산자 (트리 A -> D)" << endl;
-	Bst<int> intCopyAssignmentTestBST;
-	intCopyAssignmentTestBST = intTestBST;
-	intCopyAssignmentTestBST.PreorderPrint();
+	Bst<int> intCopyAssignmentTestBst;
+	intCopyAssignmentTestBst = intTestBst;
+	intCopyAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "이동 생성자 (트리 C -> E)" << endl;
-	Bst<int> intMoveConstructorTestBST = move(intCopyConstructorTestBST);
-	intMoveConstructorTestBST.PreorderPrint();
+	Bst<int> intMoveConstructorTestBst = move(intCopyConstructorTestBst);
+	intMoveConstructorTestBst.PreorderPrint();
 
 	cout << endl << "이동 할당 연산자 (트리 D -> F)" << endl;
-	Bst<int> intMoveAssignmentTestBST;
-	intMoveAssignmentTestBST = move(intCopyAssignmentTestBST);
-	intMoveAssignmentTestBST.PreorderPrint();
+	Bst<int> intMoveAssignmentTestBst;
+	intMoveAssignmentTestBst = move(intCopyAssignmentTestBst);
+	intMoveAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "이동 후 소스 트리는 비워짐 (트리 C, D)" << endl;
-	intCopyConstructorTestBST.PreorderPrint();
-	intCopyAssignmentTestBST.PreorderPrint();
+	intCopyConstructorTestBst.PreorderPrint();
+	intCopyAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "요소별 삭제 (트리 A)" << endl;
-	intTestBST.Remove(7);
-	intTestBST.PreorderPrint();
+	intTestBst.Remove(7);
+	intTestBst.PreorderPrint();
 
 	cout << endl << "요소별 삭제 (트리 A)" << endl;
-	intTestBST.Remove(3);
-	intTestBST.PreorderPrint();
+	intTestBst.Remove(3);
+	intTestBst.PreorderPrint();
 
 	cout << endl << "전체 삭제 (트리 A)" << endl;
-	intTestBST.RemoveTree();
-	intTestBST.PreorderPrint();
+	intTestBst.RemoveTree();
+	intTestBst.PreorderPrint();
 
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
-	intExplicitCopyTestBST.PreorderPrint();
+	intExplicitCopyTestBst.PreorderPrint();
 
 	cout << endl << "testing 2 : Bst<float>--------------------------------------------------------------------------" << endl;
 
-	Bst<float> floatTestBST;
+	Bst<float> floatTestBst;
 
 	cout << endl << "삽입 (트리 A)" << endl;
-	floatTestBST.Insert(5, 0.515f);
-	floatTestBST.Insert(7, 0.727f);
-	floatTestBST.Insert(3, 0.323f);
-	floatTestBST.Insert(4, 0.434f);
-	floatTestBST.Insert(6, 0.636f);
-	floatTestBST.Insert(9, 0.939f);
-	floatTestBST.Insert(2, 0.232f);
-	floatTestBST.PreorderPrint();
+	floatTestBst.Insert(5, 0.515f);
+	floatTestBst.Insert(7, 0.727f);
+	floatTestBst.Insert(3, 0.323f);
+	floatTestBst.Insert(4, 0.434f);
+	floatTestBst.Insert(6, 0.636f);
+	floatTestBst.Insert(9, 0.939f);
+	floatTestBst.Insert(2, 0.232f);
+	floatTestBst.PreorderPrint();
 
 	cout << endl << "중위 순회 출력 (트리 A)" << endl;
-	floatTestBST.InorderPrint();
+	floatTestBst.InorderPrint();
 
 	cout << endl << "후위 순회 출력 (트리 A)" << endl;
-	floatTestBST.PostorderPrint();
+	floatTestBst.PostorderPrint();
 
 	cout << endl << "검색 (트리 A)" << endl;
 	float floatRetrievedData = 0.0f;
-	floatTestBST.Retrieve(3, floatRetrievedData);
+	floatTestBst.Retrieve(3, floatRetrievedData);
 	PrintKeyAndData(3, floatRetrievedData);
 
 	cout << endl << "명시적 복사 (트리 A -> B)" << endl;
-	Bst<float> floatExplicitCopyTestBST;
-	floatExplicitCopyTestBST.CopyTree(floatTestBST);
-	floatExplicitCopyTestBST.PreorderPrint();
+	Bst<float> floatExplicitCopyTestBst;
+	floatExplicitCopyTestBst.CopyTree(floatTestBst);
+	floatExplicitCopyTestBst.PreorderPrint();
 
 	cout << endl << "복사 생성자 (트리 A -> C)" << endl;
-	Bst<float> floatCopyConstructorTestBST = floatTestBST;
-	floatCopyConstructorTestBST.PreorderPrint();
+	Bst<float> floatCopyConstructorTestBst = floatTestBst;
+	floatCopyConstructorTestBst.PreorderPrint();
 
 	cout << endl << "복사 할당 연산자 (트리 A -> D)" << endl;
-	Bst<float> floatCopyAssignmentTestBST;
-	floatCopyAssignmentTestBST = floatTestBST;
-	floatCopyAssignmentTestBST.PreorderPrint();
+	Bst<float> floatCopyAssignmentTestBst;
+	floatCopyAssignmentTestBst = floatTestBst;
+	floatCopyAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "이동 생성자 (트리 C -> E)" << endl;
-	Bst<float> floatMoveConstructorTestBST = move(floatCopyConstructorTestBST);
-	floatMoveConstructorTestBST.PreorderPrint();
+	Bst<float> floatMoveConstructorTestBst = move(floatCopyConstructorTestBst);
+	floatMoveConstructorTestBst.PreorderPrint();
 
 	cout << endl << "이동 할당 연산자 (트리 D -> F)" << endl;
-	Bst<float> floatMoveAssignmentTestBST;
-	floatMoveAssignmentTestBST = move(floatCopyAssignmentTestBST);
-	floatMoveAssignmentTestBST.PreorderPrint();
+	Bst<float> floatMoveAssignmentTestBst;
+	floatMoveAssignmentTestBst = move(floatCopyAssignmentTestBst);
+	floatMoveAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "이동 후 소스 트리는 비워짐 (트리 C, D)" << endl;
-	floatCopyConstructorTestBST.PreorderPrint();
-	floatCopyAssignmentTestBST.PreorderPrint();
+	floatCopyConstructorTestBst.PreorderPrint();
+	floatCopyAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "요소별 삭제 (트리 A)" << endl;
-	floatTestBST.Remove(7);
-	floatTestBST.PreorderPrint();
+	floatTestBst.Remove(7);
+	floatTestBst.PreorderPrint();
 
 	cout << endl << "요소별 삭제 (트리 A)" << endl;
-	floatTestBST.Remove(3);
-	floatTestBST.PreorderPrint();
+	floatTestBst.Remove(3);
+	floatTestBst.PreorderPrint();
 
 	cout << endl << "전체 삭제 (트리 A)" << endl;
-	floatTestBST.RemoveTree();
-	floatTestBST.PreorderPrint();
+	floatTestBst.RemoveTree();
+	floatTestBst.PreorderPrint();
 
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
-	floatExplicitCopyTestBST.PreorderPrint();
+	floatExplicitCopyTestBst.PreorderPrint();
 
 	cout << endl << "testing 3 : Bst<string>--------------------------------------------------------------------------" << endl;
 
-	Bst<string> stringTestBST;
+	Bst<string> stringTestBst;
 
 	cout << endl << "삽입 (트리 A)" << endl;
-	stringTestBST.Insert(5, "Panther");
-	stringTestBST.Insert(7, "Comet");
-	stringTestBST.Insert(3, "Crusader");
-	stringTestBST.Insert(4, "Sherman");
-	stringTestBST.Insert(6, "Tiger");
-	stringTestBST.Insert(9, "Mouse");
-	stringTestBST.Insert(2, "Stuart");
-	stringTestBST.PreorderPrint();
+	stringTestBst.Insert(5, "Panther");
+	stringTestBst.Insert(7, "Comet");
+	stringTestBst.Insert(3, "Crusader");
+	stringTestBst.Insert(4, "Sherman");
+	stringTestBst.Insert(6, "Tiger");
+	stringTestBst.Insert(9, "Mouse");
+	stringTestBst.Insert(2, "Stuart");
+	stringTestBst.PreorderPrint();
 
 	cout << endl << "중위 순회 출력 (트리 A)" << endl;
-	stringTestBST.InorderPrint();
+	stringTestBst.InorderPrint();
 
 	cout << endl << "후위 순회 출력 (트리 A)" << endl;
-	stringTestBST.PostorderPrint();
+	stringTestBst.PostorderPrint();
 
 	cout << endl << "검색 (트리 A)" << endl;
 	string stringRetrievedData = "";
-	stringTestBST.Retrieve(3, stringRetrievedData);
+	stringTestBst.Retrieve(3, stringRetrievedData);
 	PrintKeyAndData(3, stringRetrievedData);
 
 	cout << endl << "명시적 복사 (트리 A -> B)" << endl;
-	Bst<string> stringExplicitCopyTestBST;
-	stringExplicitCopyTestBST.CopyTree(stringTestBST);
-	stringExplicitCopyTestBST.PreorderPrint();
+	Bst<string> stringExplicitCopyTestBst;
+	stringExplicitCopyTestBst.CopyTree(stringTestBst);
+	stringExplicitCopyTestBst.PreorderPrint();
 
 	cout << endl << "복사 생성자 (트리 A -> C)" << endl;
-	Bst<string> stringCopyConstructorTestBST = stringTestBST;
-	stringCopyConstructorTestBST.PreorderPrint();
+	Bst<string> stringCopyConstructorTestBst = stringTestBst;
+	stringCopyConstructorTestBst.PreorderPrint();
 
 	cout << endl << "복사 할당 연산자 (트리 A -> D)" << endl;
-	Bst<string> stringCopyAssignmentTestBST;
-	stringCopyAssignmentTestBST = stringTestBST;
-	stringCopyAssignmentTestBST.PreorderPrint();
+	Bst<string> stringCopyAssignmentTestBst;
+	stringCopyAssignmentTestBst = stringTestBst;
+	stringCopyAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "이동 생성자 (트리 C -> E)" << endl;
-	Bst<string> stringMoveConstructorTestBST = move(stringCopyConstructorTestBST);
-	stringMoveConstructorTestBST.PreorderPrint();
+	Bst<string> stringMoveConstructorTestBst = move(stringCopyConstructorTestBst);
+	stringMoveConstructorTestBst.PreorderPrint();
 
 	cout << endl << "이동 할당 연산자 (트리 D -> F)" << endl;
-	Bst<string> stringMoveAssignmentTestBST;
-	stringMoveAssignmentTestBST = move(stringCopyAssignmentTestBST);
-	stringMoveAssignmentTestBST.PreorderPrint();
+	Bst<string> stringMoveAssignmentTestBst;
+	stringMoveAssignmentTestBst = move(stringCopyAssignmentTestBst);
+	stringMoveAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "이동 후 소스 트리는 비워짐 (트리 C, D)" << endl;
-	stringCopyConstructorTestBST.PreorderPrint();
-	stringCopyAssignmentTestBST.PreorderPrint();
+	stringCopyConstructorTestBst.PreorderPrint();
+	stringCopyAssignmentTestBst.PreorderPrint();
 
 	cout << endl << "요소별 삭제 (트리 A)" << endl;
-	stringTestBST.Remove(7);
-	stringTestBST.PreorderPrint();
+	stringTestBst.Remove(7);
+	stringTestBst.PreorderPrint();
 
 	cout << endl << "요소별 삭제 (트리 A)" << endl;
-	stringTestBST.Remove(3);
-	stringTestBST.PreorderPrint();
+	stringTestBst.Remove(3);
+	stringTestBst.PreorderPrint();
 
 	cout << endl << "전체 삭제 (트리 A)" << endl;
-	stringTestBST.RemoveTree();
-	stringTestBST.PreorderPrint();
+	stringTestBst.RemoveTree();
+	stringTestBst.PreorderPrint();
 
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
-	stringExplicitCopyTestBST.PreorderPrint();
+	stringExplicitCopyTestBst.PreorderPrint();
 
 	cout << endl << "testing 4 : Random Workload Speed Test---------------------------------------------------------" << endl;
 
@@ -258,27 +258,27 @@ int main()
 		- C / C++ 내장 함수 사용				: 예(/Oi)
 		- C / C++ 크기 또는 속도				: 코드 속도 우선(/Ot)
 		- C / C++ 전체 프로그램 최적화			: 예(/GL)
-		- C / C++ 기본 런타임 검사				: 기본값
+		- C / C++ 전처리기 정의　				: NDEBUG;_CONSOLE;%(PreprocessorDefinitions)
+		- C / C++ 코드 생성 기본 런타임 검사	: 기본값
 		- C / C++ 코드 생성 런타임 라이브러리	: 다중 스레드 DLL(/MD)
-		- C / C++ 전처리기 정의					: NDEBUG;_CONSOLE;%(PreprocessorDefinitions)
 		- C / C++ 언어 표준						: 기본값(ISO C++ 14 표준)
 		- C / C++ 출력 파일 어셈블러 출력		: 소스 코드로 구성된 어셈블리(/FAs)
 		- 링커 링크 타임 코드 생성				: 빠른 링크 타임 코드 생성 사용(/LTCG:incremental)
 	*/
 
 	/*	(테스팅 방법)
-		하나의 트리에 randomWorkloadNum 횟수만큼 복사 삽입, 이동 삽입, 검색, 삭제과 트리의 소멸을 수행함
+		randomWorkloadNum 횟수만큼 복사 삽입(트리 A), 이동 삽입(트리 B), 검색(트리 A), 삭제(트리 A)와 소멸(트리 B)을 수행함
 		키는 [0,randomWorkloadNum-1] 의 중복되지 않는 키 값들을 랜덤하게 셔플해놓고 사용함
 		데이터는 randomWorkloadPerDataLen 으로 지정된 길이의 string 객체를 randomWorkloadNum 개 만들어놓고 사용함
 	*/
 
 	/*	(테스팅 결과)
 		[randomWorkloadNum = 10,000,000  |  randomWorkloadPerDataLen = 30]
-		복사 삽입	: BST = 15.4초	|	std::map = 14.2초
-		이동 삽입	: BST = 14.0초	|	std::map = 13.2초
-		검색		: BST = 14.2초	|	std::map = 15.4초
-		삭제		: BST = 20.0초	|	std::map = 17.8초
-		소멸		: BST = 4.1초	|	std::map = 4.2초
+		복사 삽입	: Bst = 16.4초	|	std::map = 14.5초
+		이동 삽입	: Bst = 14.6초	|	std::map = 15.0초
+		검색		: Bst = 14.3초	|	std::map = 15.8초
+		삭제		: Bst = 20.3초	|	std::map = 19.3초
+		소멸		: Bst = 4.2초	|	std::map = 4.3초
 	*/
 
 	/*	(테스팅 해석)
@@ -299,30 +299,27 @@ int main()
 	*/
 
 	/*	(테스팅 방법)
-		하나의 트리에 linearIncreaseWorkloadNum 횟수만큼 복사 삽입, 이동 삽입, 검색, 삭제과 트리의 소멸을 수행함
-		키는 [0,linearIncreaseWorkloadNum-1]의 선형 키값들을 사용함
-		데이터는 linearIncreaseWorkloadPerDataLen으로 지정된 길이의 string 객체를 linearIncreaseWorkloadNum 개 만들어놓고 사용함
-		편향 삽입이 이뤄지므로 linearIncreaseWorkloadNum의 높이인 트리를 형성하도록 함
+		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
 	*/
 
 	/*	(테스팅 결과)
-		[linearIncreaseWorkloadNum = 100,000  |  linearIncreaseWorkloadPerDataLen = 30]
-		복사 삽입	: BST = 18.5초	|	std::map = 0.01초
-		이동 삽입	: BST = 18.1초	|	std::map = 0.00초
-		검색		: BST = 18.2초	|	std::map = 0.00초
-		삭제		: BST = 0.00초	|	std::map = 0.00초
-		소멸		: BST = 0.00초	|	std::map = 0.00초
+		[linearIncreaseWorkloadNum = 100,000  |  linearIncreaseWorkloadPerDataLen = 앞선 테스트와 동일]
+		복사 삽입	: Bst = 18.6초	|	std::map = 0.01초
+		이동 삽입	: Bst = 18.7초	|	std::map = 0.00초
+		검색		: Bst = 18.6초	|	std::map = 0.00초
+		삭제		: Bst = 0.00초	|	std::map = 0.00초
+		소멸		: Bst = 0.00초	|	std::map = 0.00초
 	*/
 
 	/*	(테스팅 해석)
-		트리 균형이 유지되는 std::map과 달리, 여기서 구현된 BST는 균형을 유지하지 않으므로,
-		테스트에 nlog(n)의 시간복잡도를 가지는 std::map과 달리, BST는 n^2의 시간 복잡도가 걸리기에 큰 차이가 남
-		다만 BST의 삭제는 헤드에서 바로 삭제가 일어나기에 트리의 높이에 영향을 받지 않으므로 빠른 속도를 보임 
+		트리 균형이 유지되는 std::map과 달리, 여기서 구현된 Bst는 균형을 유지하지 않으므로,
+		테스트에 nlog(n)의 시간복잡도를 가지는 std::map과 달리, Bst는 n^2의 시간 복잡도가 걸리기에 큰 차이가 남
+		다만 Bst의 삭제는 헤드에서 바로 삭제가 일어나기에 트리의 높이에 영향을 받지 않으므로 빠른 속도를 보임 
 	*/
 
 	#ifdef LINEAR_INCREASE_WORKLOAD_SPEED_TEST
 	const int linearIncreaseWorkloadNum = 100000;
-	const int linearIncreaseWorkloadPerDataLen = 30;
+	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadSpeedTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 	#endif
 
@@ -337,12 +334,12 @@ int main()
 	*/
 
 	/*	(테스팅 결과)
-		[linearDecreaseWorkloadNum = 100,000  |  linearDecreaseWorkloadPerDataLen = 30]
-		복사 삽입	: BST = 21.1초	|	std::map = 0.01초
-		이동 삽입	: BST = 18.3초	|	std::map = 0.00초
-		검색		: BST = 21.4초	|	std::map = 0.00초
-		삭제		: BST = 0.00초	|	std::map = 0.00초
-		소멸		: BST = 0.00초	|	std::map = 0.00초
+		[linearDecreaseWorkloadNum = 앞선 테스트와 동일  |  linearDecreaseWorkloadPerDataLen = 앞선 테스트와 동일]
+		복사 삽입	: Bst = 21.0초	|	std::map = 0.01초
+		이동 삽입	: Bst = 18.3초	|	std::map = 0.00초
+		검색		: Bst = 20.7초	|	std::map = 0.00초
+		삭제		: Bst = 0.00초	|	std::map = 0.01초
+		소멸		: Bst = 0.00초	|	std::map = 0.00초
 	*/
 
 	/*	(테스팅 해석)
@@ -350,8 +347,8 @@ int main()
 	*/
 
 	#ifdef LINEAR_DECREASE_WORKLOAD_SPEED_TEST
-	const int linearDecreaseWorkloadNum = 100000;
-	const int linearDecreaseWorkloadPerDataLen = 30;
+	const int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
+	const int linearDecreaseWorkloadPerDataLen = linearIncreaseWorkloadPerDataLen;
 	LinearDecreaseWorkloadSpeedTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 	#endif
 
@@ -361,12 +358,12 @@ int main()
 }
 
 template <typename DataType>
-void PrintKeyAndData(const int key, const DataType retrievedData)
+void PrintKeyAndData(int key, const DataType& retrievedData)
 {
 	cout << "retrieve key : " << key << ", retrieved data : " << retrievedData << endl;
 }
 
-void RandomWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen)
+void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 {
 	cout << endl << "랜덤 워크로드 준비 중...." << endl;
 
@@ -398,7 +395,7 @@ void RandomWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen
 	duration<double> timeDiff;
 
 	cout << endl << "랜덤 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestBST(clock, workloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
+	timeBegin = SpeedTestBst(clock, workloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
 
 	timeEnd = clock.now();
 
@@ -422,7 +419,7 @@ void RandomWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen
 	cout << endl << "map : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
 }
 
-void LinearIncreaseWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen)
+void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 {
 	cout << endl << "선형 증가 워크로드 준비 중...." << endl;
 
@@ -446,7 +443,7 @@ void LinearIncreaseWorkloadSpeedTest(const int workloadNum, const int workloadPe
 	duration<double> timeDiff;
 
 	cout << endl << "선형 증가 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestBST(clock, workloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
+	timeBegin = SpeedTestBst(clock, workloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
 
 	timeEnd = clock.now();
 
@@ -470,7 +467,7 @@ void LinearIncreaseWorkloadSpeedTest(const int workloadNum, const int workloadPe
 	cout << endl << "map : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
 }
 
-void LinearDecreaseWorkloadSpeedTest(const int workloadNum, const int workloadPerDataLen)
+void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 {
 	cout << endl << "선형 감소 워크로드 준비 중...." << endl;
 
@@ -494,7 +491,7 @@ void LinearDecreaseWorkloadSpeedTest(const int workloadNum, const int workloadPe
 	duration<double> timeDiff;
 
 	cout << endl << "선형 감소 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestBST(clock, workloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
+	timeBegin = SpeedTestBst(clock, workloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
 
 	timeEnd = clock.now();
 
@@ -518,10 +515,10 @@ void LinearDecreaseWorkloadSpeedTest(const int workloadNum, const int workloadPe
 	cout << endl << "map : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
 }
 
-time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload)
+time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload)
 {
-	Bst<string> copyInsertTestBST;
-	Bst<string> moveInsertTestBST;
+	Bst<string> copyInsertTestBst;
+	Bst<string> moveInsertTestBst;
 
 	time_point<steady_clock> timeBegin;
 	time_point<steady_clock> timeEnd;
@@ -536,7 +533,7 @@ time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum
 	{
 		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
 
-		copyInsertTestBST.Insert(insertKeyWorkload[i], insertDataWorkload[i]);
+		copyInsertTestBst.Insert(insertKeyWorkload[i], insertDataWorkload[i]);
 	}
 	cout << endl;
 
@@ -557,7 +554,7 @@ time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum
 	{
 		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
 
-		moveInsertTestBST.Insert(insertKeyWorkload[i], move(insertDataWorkload[i]));
+		moveInsertTestBst.Insert(insertKeyWorkload[i], move(insertDataWorkload[i]));
 	}
 	cout << endl;
 
@@ -580,7 +577,7 @@ time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum
 	{
 		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
 
-		copyInsertTestBST.Retrieve(insertKeyWorkload[i], retrievedData);
+		copyInsertTestBst.Retrieve(insertKeyWorkload[i], retrievedData);
 		retrievedData += 'a';			//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
@@ -602,7 +599,7 @@ time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum
 	{
 		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
 
-		copyInsertTestBST.Remove(removeKeyWorkload[i]);
+		copyInsertTestBst.Remove(removeKeyWorkload[i]);
 	}
 	cout << endl;
 
@@ -618,7 +615,7 @@ time_point<steady_clock> SpeedTestBST(steady_clock& clock, const int workloadNum
 	return clock.now();
 }
 
-time_point<steady_clock> SpeedTestMap(steady_clock& clock, const int speedTestRepeat, vector<string> insertTestDatum, const vector<int>& insertTestKeys, const vector<int>& retrieveTestKeys, const vector<int>& removeTestKeys)
+time_point<steady_clock> SpeedTestMap(steady_clock& clock, int speedTestRepeat, vector<string> insertTestDatum, const vector<int>& insertTestKeys, const vector<int>& retrieveTestKeys, const vector<int>& removeTestKeys)
 {
 	map<int, string> copyInsertTestMap;
 	map<int, string> moveInsertTestMap;

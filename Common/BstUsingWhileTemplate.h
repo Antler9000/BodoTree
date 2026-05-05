@@ -18,48 +18,47 @@ public:
 		LogPrint("empty constructor");
 	}
 
-	BstTemplate(const BstTemplate<NodeType, DataType>& sourceBST)
+	BstTemplate(const BstTemplate<NodeType, DataType>& sourceBst) : m_pHead(nullptr)
 	{
 		LogPrint("copy constructor");
 
-		CopyTree(sourceBST);
+		CopyTree(sourceBst);
 	}
 
-	BstTemplate(BstTemplate<NodeType, DataType>&& sourceBST) noexcept
+	BstTemplate(BstTemplate<NodeType, DataType>&& sourceBst) noexcept : m_pHead(sourceBst.m_pHead)
 	{
 		LogPrint("move constructor");
 
-		m_pHead = sourceBST.m_pHead;
-		sourceBST.m_pHead = nullptr;
+		sourceBst.m_pHead = nullptr;
 	}
 
-	BstTemplate<NodeType, DataType>& operator = (const BstTemplate<NodeType, DataType>& sourceBST)
+	BstTemplate<NodeType, DataType>& operator = (const BstTemplate<NodeType, DataType>& sourceBst)
 	{
 		LogPrint("copy assignment");
 
-		if (this == &sourceBST)
+		if (this == &sourceBst)
 		{
 			return *this;
 		}
 
-		CopyTree(sourceBST);
+		CopyTree(sourceBst);
 
 		return *this;
 	}
 
-	BstTemplate<NodeType, DataType>& operator = (BstTemplate<NodeType, DataType>&& sourceBST) noexcept
+	BstTemplate<NodeType, DataType>& operator = (BstTemplate<NodeType, DataType>&& sourceBst) noexcept
 	{
 		LogPrint("move assignment");
 
-		if (this == &sourceBST)
+		if (this == &sourceBst)
 		{
 			return *this;
 		}
 
 		RemoveTree();
 
-		m_pHead = sourceBST.m_pHead;
-		sourceBST.m_pHead = nullptr;
+		m_pHead = sourceBst.m_pHead;
+		sourceBst.m_pHead = nullptr;
 
 		return *this;
 	}
@@ -72,9 +71,8 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : newKey와 같은 키의 노드가 이미 존재하는 경우 
-	//newData가 lvalue 참조와 rvalue 참조인 경우를 각각 다르게 처리하기 위해서 참조 붕괴를 사용했음
 	template <typename InsertDataType = DataType>
-	bool Insert(const int newKey, InsertDataType&& newData)
+	bool Insert(int newKey, InsertDataType&& newData)
 	{
 		LogPrint("insert");
 		
@@ -83,7 +81,7 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
-	bool Retrieve(const int targetKey, DataType& outData) const
+	bool Retrieve(int targetKey, DataType& outData) const
 	{
 		LogPrint("retrieve");
 
@@ -91,7 +89,7 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
-	bool Remove(const int targetKey)
+	bool Remove(int targetKey)
 	{
 		LogPrint("remove one item");
 
@@ -103,17 +101,17 @@ public:
 	{
 		LogPrint("remove tree");
 
-		RemovingTreeByRotationRR();
+		RemovingBstByRotationRR();
 	}
 
 	//트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
 	//복사를 통한 인자 전달은 성능에도 안 좋고, 게다가 복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
-	void CopyTree(const BstTemplate& sourceBST)
+	void CopyTree(const BstTemplate& sourceBst)
 	{
 		LogPrint("copy tree");
 
 		BstTemplate<NodeType, DataType> tempTree;
-		sourceBST.PreorderTraverse(&BstTemplate::CopyNode, &tempTree);
+		sourceBst.PreorderTraverse(&BstTemplate::CopyNode, &tempTree);
 		*this = move(tempTree);
 	}
 
@@ -146,10 +144,10 @@ protected:	//제너릭 메소드들
 	//TODO : const 여부에 상관없는 하나의 제너릭 메소드로 통합할 수 있도록 제너릭 프로그래밍 방식을 개선하기
 	//TODO : 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
 	template <typename MethodType, typename ArgumentType>
-	bool Search(const int targetKey, MethodType&& method, ArgumentType&& argument);
+	bool Search(int targetKey, MethodType&& method, ArgumentType&& argument);
 
 	template <typename MethodType, typename ArgumentType>
-	bool Search(const int targetKey, MethodType&& method, ArgumentType&& argument) const;
+	bool Search(int targetKey, MethodType&& method, ArgumentType&& argument) const;
 
 	//전위순회로 돌면서 각 노드에 수행할 작업을 수행하는 제너릭 메소드임
 	//트리 복사의 소스 트리에서 실행되거나, 순회 출력 메소드에서만 사용되므로 const 메소드로 선언하였음
@@ -179,7 +177,7 @@ protected:	//제너릭 메소드에 전달되는 하위 작업 메소드들
 
 	void ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode);
 
-	void CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestTree) const;
+	void CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const;
 
 	//TODO : 제너릭 메소드들에 전달되는 매개변수의 개수가 유동적으로 조정될 수 있게 되면 더미 매개변수를 지우기
 	void PrintTargetNode(const NodeType<DataType>* pTargetNode, void* pDummyParameter) const;
@@ -187,7 +185,7 @@ protected:	//제너릭 메소드에 전달되는 하위 작업 메소드들
 protected:	//논 제너릭 하위 메소드
 
 	//트리의 소멸자와 이동 할당 연산자의 하위 메소드로 사용되므로 실패를 반환하거나 예외를 던지는 경우가 없도록 하였음
-	void RemovingTreeByRotationRR() noexcept;
+	void RemovingBstByRotationRR() noexcept;
 
 protected:
 
@@ -196,7 +194,7 @@ protected:
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::Search(const int targetKey, MethodType&& method, ArgumentType&& argument)
+inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& method, ArgumentType&& argument)
 {
 	if (m_pHead == nullptr)
 	{
@@ -239,7 +237,7 @@ inline bool BstTemplate<NodeType, DataType>::Search(const int targetKey, MethodT
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::Search(const int targetKey, MethodType&& method, ArgumentType&& argument) const
+inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& method, ArgumentType&& argument) const
 {
 	if (m_pHead == nullptr)
 	{
@@ -503,10 +501,10 @@ inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderSuccessor(NodeTyp
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestTree) const
+inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const
 {
 	unique_ptr<NodeType<DataType>> upCopiedNode = unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(*pSourceNode));
-	pDestTree->Search(pSourceNode->m_key, &BstTemplate::InsertNode, move(upCopiedNode));
+	pDestBst->Search(pSourceNode->m_key, &BstTemplate::InsertNode, move(upCopiedNode));
 }
 
 template <template <typename> class NodeType, typename DataType>
@@ -516,7 +514,7 @@ inline void BstTemplate<NodeType, DataType>::PrintTargetNode(const NodeType<Data
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::RemovingTreeByRotationRR() noexcept
+inline void BstTemplate<NodeType, DataType>::RemovingBstByRotationRR() noexcept
 {
 	while (m_pHead != nullptr)
 	{
