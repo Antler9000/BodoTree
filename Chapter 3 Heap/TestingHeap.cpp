@@ -3,11 +3,6 @@
 //#define TREE_ERROR
 //#define TREE_WARNING
 
-//속도 테스트를 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
-#define RANDOM_WORKLOAD_SPEED_TEST
-#define LINEAR_INCREASE_WORKLOAD_SPEED_TEST
-#define LINEAR_DECREASE_WORKLOAD_SPEED_TEST
-
 #include "heap.h"				//정의한 힙을 테스팅함
 #include <chrono>;				//속도 테스트를 위해 사용함
 #include <string>;				//..
@@ -35,7 +30,6 @@ int main()
 	//디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
 
 	cout << endl << "testing 1 : MinHeap<int>--------------------------------------------------------------------------" << endl;
 
@@ -79,36 +73,36 @@ int main()
 	intCopyAssignmentTestHeap.PrintHeap();
 
 	cout << endl << "팝 (힙 A)" << endl;
-	int intPoppedData1;
+	int intPoppedData1 = 0;
 	intTestHeap.Pop(intPoppedData1);
 	PrintData(intPoppedData1);
 
-	int intPoppedData2;
+	int intPoppedData2 = 0;
 	intTestHeap.Pop(intPoppedData2);
 	PrintData(intPoppedData2);
 
-	int intPoppedData3;
+	int intPoppedData3 = 0;
 	intTestHeap.Pop(intPoppedData3);
 	PrintData(intPoppedData3);
 
-	int intPoppedData4;
+	int intPoppedData4 = 0;
 	intTestHeap.Pop(intPoppedData4);
 	PrintData(intPoppedData4);
 
-	int intPoppedData5;
+	int intPoppedData5 = 0;
 	intTestHeap.Pop(intPoppedData5);
 	PrintData(intPoppedData5);
 
-	int intPoppedData6;
+	int intPoppedData6 = 0;
 	intTestHeap.Pop(intPoppedData6);
 	PrintData(intPoppedData6);
 
-	int intPoppedData7;
+	int intPoppedData7 = 0;
 	intTestHeap.Pop(intPoppedData7);
 	PrintData(intPoppedData7);
 
 	cout << endl << "비워진 상태에서 팝 (힙 A)" << endl;
-	int intPoppedData8;
+	int intPoppedData8 = 0;
 	intTestHeap.Pop(intPoppedData8);
 	PrintData(intPoppedData8);
 
@@ -157,36 +151,36 @@ int main()
 	floatCopyAssignmentTestHeap.PrintHeap();
 
 	cout << endl << "팝 (힙 A)" << endl;
-	float floatPoppedData1;
+	float floatPoppedData1 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData1);
 	PrintData(floatPoppedData1);
 
-	float floatPoppedData2;
+	float floatPoppedData2 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData2);
 	PrintData(floatPoppedData2);
 
-	float floatPoppedData3;
+	float floatPoppedData3 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData3);
 	PrintData(floatPoppedData3);
 
-	float floatPoppedData4;
+	float floatPoppedData4 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData4);
 	PrintData(floatPoppedData4);
 
-	float floatPoppedData5;
+	float floatPoppedData5 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData5);
 	PrintData(floatPoppedData5);
 
-	float floatPoppedData6;
+	float floatPoppedData6 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData6);
 	PrintData(floatPoppedData6);
 
-	float floatPoppedData7;
+	float floatPoppedData7 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData7);
 	PrintData(floatPoppedData7);
 
 	cout << endl << "비워진 상태에서 팝 (힙 A)" << endl;
-	float floatPoppedData8;
+	float floatPoppedData8 = 0.0f;
 	floatTestHeap.Pop(floatPoppedData8);
 	PrintData(floatPoppedData8);
 
@@ -235,69 +229,45 @@ int main()
 	stringCopyAssignmentTestHeap.PrintHeap();
 
 	cout << endl << "팝 (힙 A)" << endl;
-	string stringPoppedData1;
+	string stringPoppedData1 = "";
 	stringTestHeap.Pop(stringPoppedData1);
 	PrintData(stringPoppedData1);
 
-	string stringPoppedData2;
+	string stringPoppedData2 = "";
 	stringTestHeap.Pop(stringPoppedData2);
 	PrintData(stringPoppedData2);
 
-	string stringPoppedData3;
+	string stringPoppedData3 = "";
 	stringTestHeap.Pop(stringPoppedData3);
 	PrintData(stringPoppedData3);
 
-	string stringPoppedData4;
+	string stringPoppedData4 = "";
 	stringTestHeap.Pop(stringPoppedData4);
 	PrintData(stringPoppedData4);
 
-	string stringPoppedData5;
+	string stringPoppedData5 = "";
 	stringTestHeap.Pop(stringPoppedData5);
 	PrintData(stringPoppedData5);
 
-	string stringPoppedData6;
+	string stringPoppedData6 = "";
 	stringTestHeap.Pop(stringPoppedData6);
 	PrintData(stringPoppedData6);
 
-	string stringPoppedData7;
+	string stringPoppedData7 = "";
 	stringTestHeap.Pop(stringPoppedData7);
 	PrintData(stringPoppedData7);
 
 	cout << endl << "비워진 상태에서 팝 (힙 A)" << endl;
-	string stringPoppedData8;
+	string stringPoppedData8 = "";
 	stringTestHeap.Pop(stringPoppedData8);
 	PrintData(stringPoppedData8);
 
 	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
 	stringExplicitCopyTestHeap.PrintHeap();
+#endif
 
+#ifndef _DEBUG
 	cout << endl << "testing 4 : Random Workload Speed Test---------------------------------------------------------" << endl;
-
-	/*	(테스팅 환경)
-		[기본]
-		- CPU									: i5-13600KF, 3500Mhz, 14 코어, 20 논리 프로세서
-		- RAM									: 32GB, DDR4
-		- OS									: Windows 11, 버전 25H2, 빌드 26200.8246
-		- IDE									: Microsoft Visual Studio Community 2026 (64 - bit) 버전 18.5.2
-		- 플랫폼 도구 집합						: v145 for Microsoft C++ Build Tools
-		- 컴파일러 버전							: x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.50.35730
-
-		[상세]
-		- 구성 선택								: Release x64
-		- 디버깅 여부							: 디버깅하지 않고 시작(Ctrl + F5)
-		- C / C++ 디버그 정보 형식				: 프로그램 데이터베이스(/Zi)
-		- C / C++ 최적화 설정					: 최대 최적화(속도 우선)(/O2)
-		- C / C++ 인라인 함수 확장				: 적합한 것 모두 확장(/Ob2)
-		- C / C++ 내장 함수 사용				: 예(/Oi)
-		- C / C++ 크기 또는 속도				: 코드 속도 우선(/Ot)
-		- C / C++ 전체 프로그램 최적화			: 예(/GL)
-		- C / C++ 전처리기 정의　				: NDEBUG;_CONSOLE;%(PreprocessorDefinitions)
-		- C / C++ 코드 생성 기본 런타임 검사	: 기본값
-		- C / C++ 코드 생성 런타임 라이브러리	: 다중 스레드 DLL(/MD)
-		- C / C++ 언어 표준						: 기본값(ISO C++ 14 표준)
-		- C / C++ 출력 파일　어셈블러 출력		: 소스 코드로 구성된 어셈블리(/FAs)
-		- 링커 링크 타임 코드 생성				: 빠른 링크 타임 코드 생성 사용(/LTCG:incremental)
-	*/
 	
 	/*	(테스팅 방법)
 		randomWorkloadNum 횟수만큼 복사 푸시(힙 A), 이동 푸시(힙 B), 팝(힙 A), 소멸(힙 B)을 수행함
@@ -316,20 +286,13 @@ int main()
 	/*	(테스팅 해석)
 		우선순위큐가 pop(..)과 top(..)을 나누어 호출해주는 과정에서 페널티를 지님에도, 힙의 Pop(..)과 거의 차이가 안 남
 		즉 전반적으로 힙의 최적화 수준이 우선순위큐에 비해 크게 떨어짐
-		
 	*/
 
-#ifdef RANDOM_WORKLOAD_SPEED_TEST
 	const int randomWorkloadNum = 10000000;
 	const int randomWorkloadPerDataLen = 30;
 	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
-#endif
 
 	cout << endl << "testing 5 : Linear Increasing Workload Speed Test----------------------------------------------" << endl;
-
-	/*	(테스팅 환경)
-		앞선 테스트와 동일
-	*/
 
 	/*	(테스팅 방법)
 		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
@@ -351,17 +314,11 @@ int main()
 		이러한 공통적인 경향성을 지니지만, 여전히 Heap의 최적화 수준은 우선수위큐에 비해 크게 떨어짐
 	*/
 
-#ifdef LINEAR_INCREASE_WORKLOAD_SPEED_TEST
 	const int linearIncreaseWorkloadNum = randomWorkloadNum;
 	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadSpeedTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
-#endif
 
 	cout << endl << "testing 6 : Linear Decreasing Workload Speed Test----------------------------------------------" << endl;
-
-	/*	(테스팅 환경)
-		앞선 테스트와 동일
-	*/
 
 	/*	(테스팅 방법)
 		앞선 테스트와 동일하나 키를 역순으로 사용함
@@ -379,7 +336,6 @@ int main()
 		앞선 테스트와 동일
 	*/
 
-#ifdef LINEAR_DECREASE_WORKLOAD_SPEED_TEST
 	const int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
 	const int linearDecreaseWorkloadPerDataLen = linearIncreaseWorkloadPerDataLen;
 	LinearDecreaseWorkloadSpeedTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
