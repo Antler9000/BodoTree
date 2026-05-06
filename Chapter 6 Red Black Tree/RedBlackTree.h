@@ -27,15 +27,18 @@ class RedBlackTree;
 template <typename DataType>
 class RedBlackNode
 {
-private:
 	friend class BstTemplate<RedBlackNode, DataType>;
+
 	friend class RedBlackTree<DataType>;
+
 	friend ostream& operator <<(ostream& out, const RedBlackNode<DataType>& targetNode)
 	{
-		out << "key : " << targetNode.m_key << " / data : " << targetNode.m_data << " / color : " << targetNode.m_color;
+		out << "키 : " << targetNode.m_key << " / 데이터 : " << targetNode.m_data << " / 컬러 : " << targetNode.m_color;
 
 		return out;
 	}
+
+private:
 
 	int m_key;
 	DataType m_data;

@@ -510,7 +510,7 @@ inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* 
 template <template <typename> class NodeType, typename DataType>
 inline void BstTemplate<NodeType, DataType>::PrintTargetNode(const NodeType<DataType>* pTargetNode, void* pDummyParameter) const
 {
-	cout << "key : " << pTargetNode->m_key << " / data : " << pTargetNode->m_data << endl;
+	cout << *pTargetNode << endl;
 }
 
 template <template <typename> class NodeType, typename DataType>

@@ -34,13 +34,13 @@ int main()
 	Bst<int> intTestBst;
 
 	cout << endl << "삽입 (트리 A)" << endl;
-	intTestBst.Insert(5, 1515);
-	intTestBst.Insert(7, 2727);
-	intTestBst.Insert(3, 2323);
-	intTestBst.Insert(4, 3434);
-	intTestBst.Insert(6, 3636);
-	intTestBst.Insert(9, 3939);
-	intTestBst.Insert(2, 3232);
+	intTestBst.Insert(5, 55);
+	intTestBst.Insert(7, 77);
+	intTestBst.Insert(3, 33);
+	intTestBst.Insert(4, 44);
+	intTestBst.Insert(6, 66);
+	intTestBst.Insert(9, 99);
+	intTestBst.Insert(2, 22);
 	intTestBst.PreorderPrint();
 
 	cout << endl << "중위 순회 출력 (트리 A)" << endl;
@@ -101,13 +101,13 @@ int main()
 	Bst<float> floatTestBst;
 
 	cout << endl << "삽입 (트리 A)" << endl;
-	floatTestBst.Insert(5, 0.515f);
-	floatTestBst.Insert(7, 0.727f);
-	floatTestBst.Insert(3, 0.323f);
-	floatTestBst.Insert(4, 0.434f);
-	floatTestBst.Insert(6, 0.636f);
-	floatTestBst.Insert(9, 0.939f);
-	floatTestBst.Insert(2, 0.232f);
+	floatTestBst.Insert(5, 0.55f);
+	floatTestBst.Insert(7, 0.77f);
+	floatTestBst.Insert(3, 0.33f);
+	floatTestBst.Insert(4, 0.44f);
+	floatTestBst.Insert(6, 0.66f);
+	floatTestBst.Insert(9, 0.99f);
+	floatTestBst.Insert(2, 0.22f);
 	floatTestBst.PreorderPrint();
 
 	cout << endl << "중위 순회 출력 (트리 A)" << endl;
@@ -294,7 +294,7 @@ int main()
 template <typename DataType>
 void PrintKeyAndData(int key, const DataType& retrievedData)
 {
-	cout << "retrieve key : " << key << ", retrieved data : " << retrievedData << endl;
+	cout << "검색한 키 : " << key << " / 검색된 데이터 : " << retrievedData << endl;
 }
 
 void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)

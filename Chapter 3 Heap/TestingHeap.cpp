@@ -12,7 +12,7 @@
 using namespace chrono;			//..
 
 template <typename DataType>
-void PrintData(const DataType& retrievedData);
+void PrintData(const DataType& poppedData);
 
 void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
 
@@ -347,9 +347,9 @@ int main()
 }
 
 template <typename DataType>
-void PrintData(const DataType& retrievedData)
+void PrintData(const DataType& poppedData)
 {
-	cout << "retrieved data : " << retrievedData << endl;
+	cout << "ÆË µÈ µ¥ÀÌÅÍ : " << poppedData << endl;
 }
 
 void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)

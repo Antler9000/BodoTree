@@ -9,11 +9,19 @@ class AvlTree;
 
 template <typename DataType>
 class AVL_Node
-{
-private:
-	
+{	
 	friend class BstTemplate<AVL_Node, DataType>;
+
 	friend class AvlTree<DataType>;
+
+	friend ostream& operator <<(ostream& out, const AVL_Node<DataType>& printedNode)
+	{
+		cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data << " / 높이 : " << printedNode.m_height;
+
+		return out;
+	}
+
+private:
 
 	int m_key;
 	DataType m_data;

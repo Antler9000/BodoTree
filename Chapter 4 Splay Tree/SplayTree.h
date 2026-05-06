@@ -11,7 +11,15 @@ template <typename DataType>
 class SplayNode
 {
 	friend class SplayTree<DataType>;
+
 	friend class BstTemplate<SplayNode, DataType>;
+
+	friend ostream& operator <<(ostream& out, const SplayNode<DataType>& printedNode)
+	{
+		cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data;
+
+		return out;
+	}
 
 private:
 

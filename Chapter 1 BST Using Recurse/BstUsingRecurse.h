@@ -485,7 +485,7 @@ void Bst<DataType>::CopyTreeRecurse(const BstNode<DataType>* pSourceNode)
 template <typename DataType>
 void Bst<DataType>::PreorderPrintRecurse(const BstNode<DataType>* pTargetNode) const
 {
-	cout << "node m_key : " << pTargetNode->m_key << " / node m_data : " << pTargetNode->m_data << endl;
+	cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << endl;
 	if (pTargetNode->m_pLeftChild != nullptr) PreorderPrintRecurse(pTargetNode->m_pLeftChild);
 	if (pTargetNode->m_pRightChild != nullptr) PreorderPrintRecurse(pTargetNode->m_pRightChild);
 }
@@ -494,7 +494,7 @@ template <typename DataType>
 void Bst<DataType>::InorderPrintRecurse(const BstNode<DataType>* pTargetNode) const
 {
 	if (pTargetNode->m_pLeftChild != nullptr) InorderPrintRecurse(pTargetNode->m_pLeftChild);
-	cout << "node m_key : " << pTargetNode->m_key << " / node m_data : " << pTargetNode->m_data << endl;
+	cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << endl;
 	if (pTargetNode->m_pRightChild != nullptr) InorderPrintRecurse(pTargetNode->m_pRightChild);
 }
 
@@ -503,7 +503,7 @@ void Bst<DataType>::PostorderPrintRecurse(const BstNode<DataType>* pTargetNode) 
 {
 	if (pTargetNode->m_pLeftChild != nullptr) PostorderPrintRecurse(pTargetNode->m_pLeftChild);
 	if (pTargetNode->m_pRightChild != nullptr) PostorderPrintRecurse(pTargetNode->m_pRightChild);
-	cout << "node m_key : " << pTargetNode->m_key << " / node m_data : " << pTargetNode->m_data << endl;
+	cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << endl;
 }
 
 #endif //BST_USING_RECURSE_H

@@ -18,9 +18,11 @@ class MaxHeap;
 template <typename DataType>
 class HeapNode
 {
-	//MinHeap과 MaxHeap 까지만 구현할 예정이므로, 굳이 추가클래스 구현에 열려있을 필요가 없어 여기에 friend를 일일이 선언하는 방식을 사용했음
 	friend class Heap <DataType>;
+
+	//MinHeap과 MaxHeap 까지만 구현할 예정이므로, 굳이 추가클래스 구현에 열려있을 필요가 없어 여기에 friend를 일일이 선언하는 방식을 사용했음
 	friend class MinHeap<DataType>;
+
 	friend class MaxHeap<DataType>;
 
 public:
@@ -252,13 +254,14 @@ public:
 		m_size = sourceHeap.m_size;
 	}
 
+	//디버깅용 메소드임
 	void PrintHeap()
 	{
 		LogPrint("print heap");
 
 		for (int i = 0; i < m_size; i++)
 		{
-			cout << "key : " << m_pNodeArr[i].m_key << " / data : " << m_pNodeArr[i].m_data << endl;
+			cout << "키 : " << m_pNodeArr[i].m_key << " / 데이터 : " << m_pNodeArr[i].m_data << endl;
 		}
 	}
 
