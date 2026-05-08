@@ -4,6 +4,8 @@
 //#define TREE_WARNING
 
 #include "heap.h"				//정의한 힙을 테스팅함
+#include "iostream"				//콘솔 출력을 위해 사용함
+#include <iomanip>				//소숫점 출력을 위해 사용함
 #include <chrono>;				//속도 테스트를 위해 사용함
 #include <string>;				//..
 #include <numeric>;				//..
@@ -31,7 +33,7 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	cout << endl << "testing 1 : MinHeap<int>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 1/3 : MinHeap<int>--------------------------------------------------------------------------" << endl;
 
 	MinHeap<int> intTestHeap;
 
@@ -109,7 +111,7 @@ int main()
 	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
 	intExplicitCopyTestHeap.PrintHeap();
 
-	cout << endl << "testing 2 : MinHeap<float>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 2/3 : MinHeap<float>--------------------------------------------------------------------------" << endl;
 
 	MinHeap<float> floatTestHeap;
 
@@ -187,7 +189,7 @@ int main()
 	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
 	floatExplicitCopyTestHeap.PrintHeap();
 
-	cout << endl << "testing 3 : MinHeap<string>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 3/3 : MinHeap<string>--------------------------------------------------------------------------" << endl;
 
 	MinHeap<string> stringTestHeap;
 
@@ -267,7 +269,9 @@ int main()
 #endif
 
 #ifndef _DEBUG
-	cout << endl << "testing 4 : Random Workload Speed Test---------------------------------------------------------" << endl;
+	cout << fixed << setprecision(2);
+
+	cout << endl << "릴리즈 구성 테스트 1/3 : 랜덤 워크로드 속도 테스트---------------------------------------------------------" << endl;
 	
 	/*	(테스팅 방법)
 		randomWorkloadNum 횟수만큼 복사 푸시(힙 A), 이동 푸시(힙 B), 팝(힙 A), 소멸(힙 B)을 수행함
@@ -292,7 +296,7 @@ int main()
 	const int randomWorkloadPerDataLen = 30;
 	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
-	cout << endl << "testing 5 : Linear Increasing Workload Speed Test----------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 2/3 : 선형 증가 워크로드 속도 테스트----------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
@@ -318,7 +322,7 @@ int main()
 	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadSpeedTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
-	cout << endl << "testing 6 : Linear Decreasing Workload Speed Test----------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 3/3 : 선형 감소 워크로드 속도 테스트----------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		앞선 테스트와 동일하나 키를 역순으로 사용함
@@ -341,7 +345,7 @@ int main()
 	LinearDecreaseWorkloadSpeedTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 #endif
 
-	cout << endl << "testing ended----------------------------------------------------------------------------------" << endl;
+	cout << endl << "테스트 종료----------------------------------------------------------------------------------" << endl;
 
 	return 0;
 }
@@ -388,11 +392,9 @@ void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "Heap 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
 	cout << endl << "-----------------------------------------------------------" << endl;
 
@@ -401,11 +403,9 @@ void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "priority_queue 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 }
 
 void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
@@ -436,11 +436,9 @@ void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "Heap 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
 	cout << endl << "-----------------------------------------------------------" << endl;
 
@@ -449,11 +447,9 @@ void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "priority_queue 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 }
 
 void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
@@ -484,11 +480,9 @@ void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "Heap 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
 	cout << endl << "-----------------------------------------------------------" << endl;
 
@@ -497,11 +491,9 @@ void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "priority_queue 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 }
 
 time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload)
@@ -513,7 +505,7 @@ time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vec
 	time_point<steady_clock> timeEnd;
 	duration<double> timeDiff;
 
-	cout << endl << "Heap 복사 푸시 측정 시작" << endl;
+	cout << endl << "[Heap 복사 푸시 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -528,13 +520,11 @@ time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vec
 
 	timeEnd = clock.now();
 
-	cout << endl << "Heap 복사 푸시 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Heap : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "Heap 이동 푸시 측정 시작" << endl;
+	cout << endl << "[Heap 이동 푸시 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -549,13 +539,11 @@ time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vec
 
 	timeEnd = clock.now();
 
-	cout << endl << "Heap 이동 푸시 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Heap : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "Heap 팝 측정 시작" << endl;
+	cout << endl << "[Heap 팝 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -572,11 +560,9 @@ time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vec
 
 	timeEnd = clock.now();
 
-	cout << endl << "Heap 팝 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Heap : " << workloadNum << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
 	cout << endl << "Heap 소멸자 측정 시작" << endl;
 	return clock.now();
@@ -615,7 +601,7 @@ time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTe
 	time_point<steady_clock> timeEnd;
 	duration<double> timeDiff;
 
-	cout << endl << "priority_queue 복사 푸시 측정 시작" << endl;
+	cout << endl << "[priority_queue 복사 푸시 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -630,13 +616,11 @@ time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTe
 
 	timeEnd = clock.now();
 
-	cout << endl << "priority_queue 복사 푸시 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << speedTestRepeat << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "priority_queue : " << speedTestRepeat << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "priority_queue 이동 푸시 측정 시작" << endl;
+	cout << endl << "[priority_queue 이동 푸시 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -651,13 +635,11 @@ time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTe
 
 	timeEnd = clock.now();
 
-	cout << endl << "priority_queue 이동 푸시 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << speedTestRepeat << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "priority_queue : " << speedTestRepeat << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "priority_queue 팝 측정 시작" << endl;
+	cout << endl << "[priority_queue 팝 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -676,12 +658,10 @@ time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTe
 
 	timeEnd = clock.now();
 
-	cout << endl << "priority_queue 팝 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << speedTestRepeat << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "priority_queue : " << speedTestRepeat << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "priority_queue 소멸자 측정 시작" << endl;
+	cout << endl << "[priority_queue 소멸자 측정 시작]" << endl;
 	return clock.now();
 }

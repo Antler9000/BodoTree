@@ -2,9 +2,10 @@
 #define HEAP_H
 
 #include "../Common/Debug.h"	//정의한 로그 출력 매크로를 사용함
+#include <iostream>				//콘솔 출력을 사용함
 #include <memory>				//유니크 포인터를 사용함
 #include <utility>				//이동 시맨틱을 사용함
-using namespace std;
+using namespace std;			//..
 
 template <typename DataType>
 class Heap;
@@ -22,10 +23,12 @@ class HeapNode
 
 	//MinHeap과 MaxHeap 까지만 구현할 예정이므로, 굳이 추가클래스 구현에 열려있을 필요가 없어 여기에 friend를 일일이 선언하는 방식을 사용했음
 	friend class MinHeap<DataType>;
-
 	friend class MaxHeap<DataType>;
 
-public:
+	//unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 한다
+	friend struct default_delete<HeapNode<DataType>[]>;
+
+private:
 
 	HeapNode() : m_key(0), m_data()
 	{
@@ -84,8 +87,8 @@ public:
 
 private:
 	
-	int m_key;
-	DataType m_data;
+	int			m_key;
+	DataType	m_data;
 };
 
 template <typename DataType>
@@ -365,8 +368,7 @@ protected:
 	}
 
 	virtual bool IsNotOrdered(int parentIndex, int childIndex) = 0;					//상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
-
-	virtual bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex) = 0;	//상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
+	virtual bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex) = 0;
 
 protected:
 
@@ -381,14 +383,10 @@ class MinHeap : public Heap<DataType>
 public:
 
 	MinHeap() = default;
-
 	MinHeap(const MinHeap& sourceMinHeap) = default;
-
-	MinHeap(MinHeap&& sourceMinHeap) noexcept = default;
-
+	MinHeap(MinHeap&& sourceMinHeap) = default;
 	MinHeap& operator = (const MinHeap& sourceMinHeap) = default;
-
-	MinHeap& operator = (MinHeap&& sourceMinHeap) noexcept = default;
+	MinHeap& operator = (MinHeap&& sourceMinHeap) = default;
 
 private:
 
@@ -423,14 +421,10 @@ class MaxHeap : public Heap<DataType>
 public:
 
 	MaxHeap() = default;
-
 	MaxHeap(const MaxHeap& sourceMaxHeap) = default;
-
-	MaxHeap(MaxHeap&& sourceMaxHeap) noexcept = default;
-
+	MaxHeap(MaxHeap&& sourceMaxHeap) = default;
 	MaxHeap& operator = (const MaxHeap& sourceMaxHeap) = default;
-
-	MaxHeap& operator = (MaxHeap&& sourceMaxHeap) noexcept = default;
+	MaxHeap& operator = (MaxHeap&& sourceMaxHeap) = default;
 
 private:
 

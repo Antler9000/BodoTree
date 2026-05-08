@@ -29,23 +29,19 @@ private:
 		delete m_pRightChild;
 	}
 
-	//쓰이지 않는 노드 생성 방식
+	//쓰이지 않는 노드 생성, 할당 방식
 	BstNode() = delete;
-
 	BstNode(const BstNode& sourceNode) = delete;
-	
 	BstNode(BstNode&& sourceNode) = delete;
-
 	BstNode& operator = (const BstNode& sourceNode) = delete;
-
 	BstNode& operator = (BstNode&& sourceNode) = delete;
 
 private:
 
-	int	m_key;
-	DataType m_data;
-	BstNode<DataType>* m_pLeftChild;
-	BstNode<DataType>* m_pRightChild;
+	int					m_key;
+	DataType			m_data;
+	BstNode<DataType>*	m_pLeftChild;
+	BstNode<DataType>*	m_pRightChild;
 };
 
 template <typename DataType>

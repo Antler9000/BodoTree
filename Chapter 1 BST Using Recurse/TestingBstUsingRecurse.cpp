@@ -4,6 +4,8 @@
 //#define TREE_WARNING
 
 #include "BstUsingRecurse.h"	//정의한 Bst를 테스팅함
+#include "iostream"				//콘솔 출력을 위해 사용함
+#include <iomanip>				//소숫점 출력을 위해 사용함
 #include <chrono>;				//속도 테스트를 위해 사용함
 #include <string>;				//..
 #include <numeric>;				//..
@@ -29,7 +31,7 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	cout << endl << "testing 1 : Bst<int>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 1/3 : Bst<int>--------------------------------------------------------------------------" << endl;
 
 	Bst<int> intTestBst;
 
@@ -96,7 +98,7 @@ int main()
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
 	intExplicitCopyTestBst.PreorderPrint();
 
-	cout << endl << "testing 2 : Bst<float>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 2/3 : Bst<float>--------------------------------------------------------------------------" << endl;
 
 	Bst<float> floatTestBst;
 
@@ -163,7 +165,7 @@ int main()
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
 	floatExplicitCopyTestBst.PreorderPrint();
 
-	cout << endl << "testing 3 : Bst<string>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 3/3 : : Bst<string>--------------------------------------------------------------------------" << endl;
 
 	Bst<string> stringTestBst;
 
@@ -232,7 +234,9 @@ int main()
 #endif
 
 #ifndef _DEBUG
-	cout << endl << "testing 4 : Random Workload Speed Test---------------------------------------------------------" << endl;
+	cout << fixed << setprecision(2);
+
+	cout << endl << "릴리즈 구성 테스트 1/2 : 랜덤 워크로드 속도 테스트---------------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		randomWorkloadNum 횟수만큼 복사 삽입(트리 A), 이동 삽입(트리 B), 검색(트리 A), 삭제(트리 A)와 소멸(트리 B)을 수행함
@@ -260,7 +264,7 @@ int main()
 	const int randomWorkloadPerDataLen = 30;
 	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
-	cout << endl << "testing 5 : Linear Workload Safety Test--------------------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 2/2 : 선형 워크로드 안전성 테스트--------------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
@@ -286,7 +290,7 @@ int main()
 	LinearWorkloadSafetyTest(linearWorkloadNum, linearWorkloadPerDataLen);
 #endif
 
-	cout << endl << "testing ended----------------------------------------------------------------------------------" << endl;
+	cout << endl << "테스트 종료----------------------------------------------------------------------------------" << endl;
 
 	return 0;
 }
@@ -333,11 +337,9 @@ void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "Bst 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Bst : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Bst : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
 	cout << endl << "-----------------------------------------------------------" << endl;
 
@@ -346,11 +348,9 @@ void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "map 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "map : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "map : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 }
 
 void LinearWorkloadSafetyTest(int workloadNum, int workloadPerDataLen)
@@ -382,11 +382,9 @@ void LinearWorkloadSafetyTest(int workloadNum, int workloadPerDataLen)
 
 	timeEnd = clock.now();
 
-	cout << endl << "Bst 소멸자 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Bst : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Bst : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 }
 
 time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload)
@@ -398,7 +396,7 @@ time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vect
 	time_point<steady_clock> timeEnd;
 	duration<double> timeDiff;
 
-	cout << endl << "Bst 복사 삽입 측정 시작" << endl;
+	cout << endl << "[Bst 복사 삽입 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -413,13 +411,11 @@ time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vect
 
 	timeEnd = clock.now();
 
-	cout << endl << "Bst 복사 삽입 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Bst : " << workloadNum << "번의 복사 삽입 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Bst : " << workloadNum << "번의 복사 삽입 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "Bst 이동 삽입 측정 시작" << endl;
+	cout << endl << "[Bst 이동 삽입 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -434,15 +430,13 @@ time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vect
 
 	timeEnd = clock.now();
 
-	cout << endl << "Bst 이동 삽입 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Bst : " << workloadNum << "번의 이동 삽입 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Bst : " << workloadNum << "번의 이동 삽입 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
 	string retrievedData;
 
-	cout << endl << "Bst 검색 측정 시작" << endl;
+	cout << endl << "[Bst 검색 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -458,13 +452,11 @@ time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vect
 
 	timeEnd = clock.now();
 
-	cout << endl << "Bst 검색 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Bst : " << workloadNum << "번의 검색 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Bst : " << workloadNum << "번의 검색 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "Bst 삭제 측정 시작" << endl;
+	cout << endl << "[Bst 삭제 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -479,13 +471,11 @@ time_point<steady_clock> SpeedTestBst(steady_clock& clock, int workloadNum, vect
 
 	timeEnd = clock.now();
 
-	cout << endl << "Bst 삭제 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Bst : " << workloadNum << "번의 삭제 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "Bst : " << workloadNum << "번의 삭제 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "Bst 소멸자 측정 시작" << endl;
+	cout << endl << "[Bst 소멸자 측정 시작]" << endl;
 	return clock.now();
 }
 
@@ -498,7 +488,7 @@ time_point<steady_clock> SpeedTestMap(steady_clock& clock, int speedTestRepeat, 
 	time_point<steady_clock> timeEnd;
 	duration<double> timeDiff;
 
-	cout << endl << "map 복사 삽입 측정 시작" << endl;
+	cout << endl << "[map 복사 삽입 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -513,13 +503,11 @@ time_point<steady_clock> SpeedTestMap(steady_clock& clock, int speedTestRepeat, 
 
 	timeEnd = clock.now();
 
-	cout << endl << "map 복사 삽입 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "map : " << speedTestRepeat << "번의 삽입 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "map : " << speedTestRepeat << "번의 삽입 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "map 이동 삽입 측정 시작" << endl;
+	cout << endl << "[map 이동 삽입 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -534,13 +522,11 @@ time_point<steady_clock> SpeedTestMap(steady_clock& clock, int speedTestRepeat, 
 
 	timeEnd = clock.now();
 
-	cout << endl << "map 이동 삽입 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "map : " << speedTestRepeat << "번의 이동 삽입 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "map : " << speedTestRepeat << "번의 이동 삽입 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "map 검색 측정 시작" << endl;
+	cout << endl << "[map 검색 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -556,13 +542,11 @@ time_point<steady_clock> SpeedTestMap(steady_clock& clock, int speedTestRepeat, 
 
 	timeEnd = clock.now();
 
-	cout << endl << "map 검색 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "map : " << speedTestRepeat << "번의 검색 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "map : " << speedTestRepeat << "번의 검색 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "map 삭제 측정 시작" << endl;
+	cout << endl << "[map 삭제 측정 시작]" << endl;
 	cout << endl << "|------------------|" << endl;
 
 	timeBegin = clock.now();
@@ -577,12 +561,10 @@ time_point<steady_clock> SpeedTestMap(steady_clock& clock, int speedTestRepeat, 
 
 	timeEnd = clock.now();
 
-	cout << endl << "map 삭제 측정 종료" << endl;
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "map : " << speedTestRepeat << "번의 삭제 동안 흐른 시간은 : " << timeDiff.count() << endl;
+	cout << endl << "map : " << speedTestRepeat << "번의 삭제 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "map 소멸자 측정 시작" << endl;
+	cout << endl << "[map 소멸자 측정 시작]" << endl;
 	return clock.now();
 }
