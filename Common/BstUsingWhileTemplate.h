@@ -18,47 +18,47 @@ public:
 		LogPrint("empty constructor");
 	}
 
-	BstTemplate(const BstTemplate<NodeType, DataType>& sourceBst) : m_pHead(nullptr)
+	BstTemplate(const BstTemplate<NodeType, DataType>& sourceTree) : m_pHead(nullptr)
 	{
 		LogPrint("copy constructor");
 
-		CopyTree(sourceBst);
+		CopyTree(sourceTree);
 	}
 
-	BstTemplate(BstTemplate<NodeType, DataType>&& sourceBst) noexcept : m_pHead(sourceBst.m_pHead)
+	BstTemplate(BstTemplate<NodeType, DataType>&& sourceTree) noexcept : m_pHead(sourceTree.m_pHead)
 	{
 		LogPrint("move constructor");
 
-		sourceBst.m_pHead = nullptr;
+		sourceTree.m_pHead = nullptr;
 	}
 
-	BstTemplate<NodeType, DataType>& operator = (const BstTemplate<NodeType, DataType>& sourceBst)
+	BstTemplate<NodeType, DataType>& operator = (const BstTemplate<NodeType, DataType>& sourceTree)
 	{
 		LogPrint("copy assignment");
 
-		if (this == &sourceBst)
+		if (this == &sourceTree)
 		{
 			return *this;
 		}
 
-		CopyTree(sourceBst);
+		CopyTree(sourceTree);
 
 		return *this;
 	}
 
-	BstTemplate<NodeType, DataType>& operator = (BstTemplate<NodeType, DataType>&& sourceBst) noexcept
+	BstTemplate<NodeType, DataType>& operator = (BstTemplate<NodeType, DataType>&& sourceTree) noexcept
 	{
 		LogPrint("move assignment");
 
-		if (this == &sourceBst)
+		if (this == &sourceTree)
 		{
 			return *this;
 		}
 
 		RemoveTree();
 
-		m_pHead = sourceBst.m_pHead;
-		sourceBst.m_pHead = nullptr;
+		m_pHead = sourceTree.m_pHead;
+		sourceTree.m_pHead = nullptr;
 
 		return *this;
 	}
@@ -196,6 +196,8 @@ template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
 inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& method, ArgumentType&& argument)
 {
+	LogPrint("generic search method (not const method)");
+
 	if (m_pHead == nullptr)
 	{
 		return (this->*forward<MethodType>(method))(m_pHead, forward<ArgumentType>(argument));
@@ -206,29 +208,29 @@ inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& 
 	}
 	else
 	{
-		NodeType<DataType>* pSearch = m_pHead;
+		NodeType<DataType>* pSearchNode = m_pHead;
 		while (true)
 		{
-			if (targetKey < pSearch->m_key)
+			if (targetKey < pSearchNode->m_key)
 			{
-				if (pSearch->m_pLeftChild == nullptr || pSearch->m_pLeftChild->m_key == targetKey)
+				if (pSearchNode->m_pLeftChild == nullptr || pSearchNode->m_pLeftChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearch->m_pLeftChild, forward<ArgumentType>(argument));
+					return (this->*forward<MethodType>(method))(pSearchNode->m_pLeftChild, forward<ArgumentType>(argument));
 				}
 				else
 				{
-					pSearch = pSearch->m_pLeftChild;
+					pSearchNode = pSearchNode->m_pLeftChild;
 				}
 			}
 			else
 			{
-				if (pSearch->m_pRightChild == nullptr || pSearch->m_pRightChild->m_key == targetKey)
+				if (pSearchNode->m_pRightChild == nullptr || pSearchNode->m_pRightChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearch->m_pRightChild, forward<ArgumentType>(argument));
+					return (this->*forward<MethodType>(method))(pSearchNode->m_pRightChild, forward<ArgumentType>(argument));
 				}
 				else
 				{
-					pSearch = pSearch->m_pRightChild;
+					pSearchNode = pSearchNode->m_pRightChild;
 				}
 			}
 		}
@@ -239,6 +241,8 @@ template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
 inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& method, ArgumentType&& argument) const
 {
+	LogPrint("generic search method (const method)");
+
 	if (m_pHead == nullptr)
 	{
 		return (this->*forward<MethodType>(method))(m_pHead, forward<ArgumentType>(argument));
@@ -249,29 +253,29 @@ inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& 
 	}
 	else
 	{
-		NodeType<DataType>* pSearch = m_pHead;
+		NodeType<DataType>* pSearchNode = m_pHead;
 		while (true)
 		{
-			if (targetKey < pSearch->m_key)
+			if (targetKey < pSearchNode->m_key)
 			{
-				if (pSearch->m_pLeftChild == nullptr || pSearch->m_pLeftChild->m_key == targetKey)
+				if (pSearchNode->m_pLeftChild == nullptr || pSearchNode->m_pLeftChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearch->m_pLeftChild, forward<ArgumentType>(argument));
+					return (this->*forward<MethodType>(method))(pSearchNode->m_pLeftChild, forward<ArgumentType>(argument));
 				}
 				else
 				{
-					pSearch = pSearch->m_pLeftChild;
+					pSearchNode = pSearchNode->m_pLeftChild;
 				}
 			}
 			else
 			{
-				if (pSearch->m_pRightChild == nullptr || pSearch->m_pRightChild->m_key == targetKey)
+				if (pSearchNode->m_pRightChild == nullptr || pSearchNode->m_pRightChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearch->m_pRightChild, forward<ArgumentType>(argument));
+					return (this->*forward<MethodType>(method))(pSearchNode->m_pRightChild, forward<ArgumentType>(argument));
 				}
 				else
 				{
-					pSearch = pSearch->m_pRightChild;
+					pSearchNode = pSearchNode->m_pRightChild;
 				}
 			}
 		}
@@ -282,21 +286,23 @@ template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
 inline void BstTemplate<NodeType, DataType>::PreorderTraverse(MethodType&& method, ArgumentType&& argument) const
 {
-	NodeType<DataType>* pTraverse = nullptr;
+	LogPrint("generic preorder traverse method");
+
+	NodeType<DataType>* pTraverseNode = nullptr;
 	Stack<NodeType<DataType>*> rightChildStack;
 	rightChildStack.Push(this->m_pHead);
-	while (rightChildStack.Pop(pTraverse) == true)
+	while (rightChildStack.Pop(pTraverseNode) == true)
 	{
-		while (pTraverse != nullptr)
+		while (pTraverseNode != nullptr)
 		{
-			(this->*forward<MethodType>(method))(pTraverse, forward<ArgumentType>(argument));
+			(this->*forward<MethodType>(method))(pTraverseNode, forward<ArgumentType>(argument));
 
-			if (pTraverse->m_pRightChild != nullptr)
+			if (pTraverseNode->m_pRightChild != nullptr)
 			{
-				rightChildStack.Push(pTraverse->m_pRightChild);
+				rightChildStack.Push(pTraverseNode->m_pRightChild);
 			}
 
-			pTraverse = pTraverse->m_pLeftChild;
+			pTraverseNode = pTraverseNode->m_pLeftChild;
 		}
 	}
 }
@@ -305,25 +311,27 @@ template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
 inline void BstTemplate<NodeType, DataType>::InorderTraverse(MethodType&& method, ArgumentType&& argument) const
 {
-	NodeType<DataType>* pTraverse = m_pHead;
+	LogPrint("generic inorder traverse method");
+
+	NodeType<DataType>* pTraverseNode = m_pHead;
 	Stack<NodeType<DataType>*> rightSideAncestorStack;
-	while (pTraverse != nullptr)
+	while (pTraverseNode != nullptr)
 	{
-		rightSideAncestorStack.Push(pTraverse);
-		pTraverse = pTraverse->m_pLeftChild;
+		rightSideAncestorStack.Push(pTraverseNode);
+		pTraverseNode = pTraverseNode->m_pLeftChild;
 	}
-	while (rightSideAncestorStack.Pop(pTraverse) == true)
+	while (rightSideAncestorStack.Pop(pTraverseNode) == true)
 	{
-		(this->*forward<MethodType>(method))(pTraverse, forward<ArgumentType>(argument));
+		(this->*forward<MethodType>(method))(pTraverseNode, forward<ArgumentType>(argument));
 
-		if (pTraverse->m_pRightChild != nullptr)
+		if (pTraverseNode->m_pRightChild != nullptr)
 		{
-			pTraverse = pTraverse->m_pRightChild;
+			pTraverseNode = pTraverseNode->m_pRightChild;
 
-			while (pTraverse != nullptr)
+			while (pTraverseNode != nullptr)
 			{
-				rightSideAncestorStack.Push(pTraverse);
-				pTraverse = pTraverse->m_pLeftChild;
+				rightSideAncestorStack.Push(pTraverseNode);
+				pTraverseNode = pTraverseNode->m_pLeftChild;
 			}
 		}
 	}
@@ -333,6 +341,8 @@ template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
 inline void BstTemplate<NodeType, DataType>::PostorderTraverse(MethodType&& method, ArgumentType&& argument) const
 {
+	LogPrint("generic postorder traverse method");
+
 	struct Record
 	{
 		enum NodeJob
@@ -376,6 +386,8 @@ inline void BstTemplate<NodeType, DataType>::PostorderTraverse(MethodType&& meth
 template <template <typename> class NodeType, typename DataType>
 inline bool BstTemplate<NodeType, DataType>::InsertNode(NodeType<DataType>*& pInsertPosition, unique_ptr<NodeType<DataType>> upNewNode)
 {
+	LogPrint("insert node task method");
+
 	if (pInsertPosition != nullptr)
 	{
 		WarningPrint("cannot insert because there is same key in tree already!");
@@ -391,6 +403,8 @@ inline bool BstTemplate<NodeType, DataType>::InsertNode(NodeType<DataType>*& pIn
 template <template <typename> class NodeType, typename DataType>
 inline bool BstTemplate<NodeType, DataType>::RetrieveNode(const NodeType<DataType>* pTargetNode, DataType& outData) const
 {
+	LogPrint("retrieve node task method");
+
 	if (pTargetNode == nullptr)
 	{
 		WarningPrint("cannot retrieve because there is no same key in tree!");
@@ -406,6 +420,8 @@ inline bool BstTemplate<NodeType, DataType>::RetrieveNode(const NodeType<DataTyp
 template <template <typename> class NodeType, typename DataType>
 inline bool BstTemplate<NodeType, DataType>::RemoveNode(NodeType<DataType>*& pTargetNode, void* pDummyParameter)
 {
+	LogPrint("remove node task method");
+
 	if (pTargetNode == nullptr)
 	{
 		WarningPrint("cannot remove because there is no same key in tree!");
@@ -445,6 +461,8 @@ inline bool BstTemplate<NodeType, DataType>::RemoveNode(NodeType<DataType>*& pTa
 template <template <typename> class NodeType, typename DataType>
 inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode)
 {
+	LogPrint("replace with inorder predecessor");
+
 	if (pTargetNode->m_pLeftChild->m_pRightChild == nullptr)
 	{
 		NodeType<DataType>* pInorderPredecessor = pTargetNode->m_pLeftChild;
@@ -474,6 +492,8 @@ inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderPredecessor(NodeT
 template <template <typename> class NodeType, typename DataType>
 inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode)
 {
+	LogPrint("replace with inorder successor");
+
 	if (pTargetNode->m_pRightChild->m_pLeftChild == nullptr)
 	{
 		NodeType<DataType>* pInorderSuccessor = pTargetNode->m_pRightChild;
@@ -503,6 +523,8 @@ inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderSuccessor(NodeTyp
 template <template <typename> class NodeType, typename DataType>
 inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const
 {
+	LogPrint("copy node task method");
+
 	unique_ptr<NodeType<DataType>> upCopiedNode = unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(*pSourceNode));
 	pDestBst->Search(pSourceNode->m_key, &BstTemplate::InsertNode, move(upCopiedNode));
 }
@@ -510,12 +532,16 @@ inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* 
 template <template <typename> class NodeType, typename DataType>
 inline void BstTemplate<NodeType, DataType>::PrintTargetNode(const NodeType<DataType>* pTargetNode, void* pDummyParameter) const
 {
+	LogPrint("print node task method");
+
 	cout << *pTargetNode << endl;
 }
 
 template <template <typename> class NodeType, typename DataType>
 inline void BstTemplate<NodeType, DataType>::RemovingBstByRotationRR() noexcept
 {
+	LogPrint("removing bst by using Right Right rotation");
+
 	while (m_pHead != nullptr)
 	{
 		if (m_pHead->m_pRightChild != nullptr)

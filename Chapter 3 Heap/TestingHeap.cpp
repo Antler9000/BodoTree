@@ -5,7 +5,7 @@
 
 #include "heap.h"				//정의한 힙을 테스팅함
 #include "iostream"				//콘솔 출력을 위해 사용함
-#include <iomanip>				//소숫점 출력을 위해 사용함
+#include <iomanip>				//소숫점 출력 지정을 위해 사용함
 #include <chrono>;				//속도 테스트를 위해 사용함
 #include <string>;				//..
 #include <numeric>;				//..

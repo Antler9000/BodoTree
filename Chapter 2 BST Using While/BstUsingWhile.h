@@ -60,10 +60,10 @@ class Bst : public BstTemplate<BstNode, DataType>
 public:
 
 	Bst() = default;
-	Bst(const Bst<DataType>& sourceBst) = default;
-	Bst(Bst<DataType>&& sourceBst) = default;
-	Bst<DataType>& operator = (const Bst<DataType>& sourceBst) = default;
-	Bst<DataType>& operator = (Bst<DataType>&& sourceBst) = default;
+	Bst(const Bst<DataType>& sourceTree) = default;
+	Bst(Bst<DataType>&& sourceTree) = default;
+	Bst<DataType>& operator = (const Bst<DataType>& sourceTree) = default;
+	Bst<DataType>& operator = (Bst<DataType>&& sourceTree) = default;
 	~Bst() = default;
 };
 

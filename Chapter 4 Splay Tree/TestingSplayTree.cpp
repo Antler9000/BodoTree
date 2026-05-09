@@ -1,3 +1,8 @@
+//로그 출력문들을 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
+#define TREE_LOG	
+//#define TREE_ERROR
+//#define TREE_WARNING
+
 #include "SplayTree.h"
 
 int main()
@@ -14,27 +19,28 @@ int main()
 	testTree.PreorderPrint();
 
 	cout << endl << "Retrieve test 8" << endl;
-	testTree.Retrieve(8);
+	int retrievedData = 0;
+	testTree.Retrieve(8, retrievedData);
 	testTree.PreorderPrint();
 
 	cout << endl << "Retrieve test 4" << endl;
-	testTree.Retrieve(4);
+	testTree.Retrieve(4, retrievedData);
 	testTree.PreorderPrint();
 
 	cout << endl << "Retrieve test 3" << endl;
-	testTree.Retrieve(3);
+	testTree.Retrieve(3, retrievedData);
 	testTree.PreorderPrint();
 
 	cout << endl << "Retrieve test 3" << endl;
-	testTree.Retrieve(3);
+	testTree.Retrieve(3, retrievedData);
 	testTree.PreorderPrint();
 
 	cout << endl << "Retrieve test 7" << endl;
-	testTree.Retrieve(7);
+	testTree.Retrieve(7, retrievedData);
 	testTree.PreorderPrint();
 
 	cout << endl << "Retrieve test 5" << endl;
-	testTree.Retrieve(5);
+	testTree.Retrieve(5, retrievedData);
 	testTree.PreorderPrint();
 
 	SplayTree<int> copied_test_tree;

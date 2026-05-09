@@ -9,20 +9,19 @@ class Stack
 {
 public:
 
-	Stack()
-		: m_pData(nullptr), m_size(0), m_capacity(0)
+	Stack() : m_pDatum(nullptr), m_size(0), m_capacity(0)
 	{
 
 	}
 
-	Stack(const Stack& sourceStack)
+	Stack(const Stack& sourceStack) : m_pDatum(nullptr), m_size(0), m_capacity(0)
 	{
 		CopyStack(sourceStack);
 	}
 
-	Stack(Stack&& sourceStack) noexcept : m_pData(sourceStack.m_pData), m_size(sourceStack.m_size), m_capacity(sourceStack.m_capacity)
+	Stack(Stack&& sourceStack) noexcept : m_pDatum(sourceStack.m_pDatum), m_size(sourceStack.m_size), m_capacity(sourceStack.m_capacity)
 	{
-		sourceStack.m_pData = nullptr;
+		sourceStack.m_pDatum = nullptr;
 		sourceStack.m_size = 0;
 		sourceStack.m_capacity = 0;
 	}
@@ -43,10 +42,10 @@ public:
 
 		RemoveStack();
 
-		m_pData = sourceStack.m_pData;
+		m_pDatum = sourceStack.m_pDatum;
 		m_size = sourceStack.m_size;
 		m_capacity = sourceStack.m_capacity;
-		sourceStack.m_pData = nullptr;
+		sourceStack.m_pDatum = nullptr;
 		sourceStack.m_size = 0;
 		sourceStack.m_capacity = 0;
 
@@ -58,12 +57,12 @@ public:
 		RemoveStack();
 	}
 
-	template <typename InsertDataType = DataType>
-	void Push(InsertDataType&& data)
+	template <typename PushDataType = DataType>
+	void Push(PushDataType&& newData)
 	{
 		if (m_capacity == 0)
 		{
-			m_pData = DBG_NEW DataType[1];
+			m_pDatum = DBG_NEW DataType[1];
 			m_capacity = 1;
 		}
 		else if (m_capacity == m_size)
@@ -71,15 +70,15 @@ public:
 			unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[2 * m_capacity]);
 			for (int i = 0; i < m_size; i++)
 			{
-				upNewData[i] = m_pData[i];	//DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
+				upNewData[i] = m_pDatum[i];	//DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
 			}
 
-			delete[] m_pData;
-			m_pData = upNewData.release();
+			delete[] m_pDatum;
+			m_pDatum = upNewData.release();
 			m_capacity *= 2;
 		}
 		
-		m_pData[m_size] = forward<InsertDataType>(data);
+		m_pDatum[m_size] = forward<PushDataType>(newData);
 		m_size++;
 	}
 
@@ -91,15 +90,15 @@ public:
 			return false;
 		}
 
-		outData = m_pData[m_size - 1];
+		outData = m_pDatum[m_size - 1];
 		m_size--;
 
 		if (m_size <= (m_capacity / 2))
 		{
 			if (m_capacity / 2 == 0)
 			{
-				delete[] m_pData;
-				m_pData = nullptr;
+				delete[] m_pDatum;
+				m_pDatum = nullptr;
 				m_capacity = 0;
 			}
 			else
@@ -107,11 +106,11 @@ public:
 				unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity / 2]);
 				for (int i = 0; i < m_size; i++)
 				{
-					upNewData[i] = m_pData[i];	//DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
+					upNewData[i] = m_pDatum[i];	//DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
 				}
 
-				delete[] m_pData;
-				m_pData = upNewData.release();
+				delete[] m_pDatum;
+				m_pDatum = upNewData.release();
 				m_capacity /= 2;
 			}
 		}
@@ -127,7 +126,7 @@ public:
 			return false;
 		}
 
-		outData = m_pData[m_size - 1];
+		outData = m_pDatum[m_size - 1];
 
 		return true;
 	}
@@ -146,8 +145,8 @@ public:
 
 	void RemoveStack() noexcept
 	{
-		delete[] m_pData;
-		m_pData = nullptr;
+		delete[] m_pDatum;
+		m_pDatum = nullptr;
 		m_size = 0;
 		m_capacity = 0;
 	}
@@ -162,12 +161,12 @@ public:
 
 		RemoveStack();
 
-		m_pData = DBG_NEW DataType[sourceStack.m_capacity];
+		m_pDatum = DBG_NEW DataType[sourceStack.m_capacity];
 		m_size = sourceStack.m_size;
 		m_capacity = sourceStack.m_capacity;
 		for (int i = 0; i < m_size; i++)
 		{
-			m_pData[i] = sourceStack.m_pData[i];
+			m_pDatum[i] = sourceStack.m_pDatum[i];
 		}
 
 		return true;
@@ -175,7 +174,7 @@ public:
 
 private:
 
-	DataType* m_pData;
+	DataType* m_pDatum;
 	int m_size;
 	int m_capacity;
 };
