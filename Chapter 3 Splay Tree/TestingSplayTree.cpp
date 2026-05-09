@@ -1,5 +1,5 @@
 //로그 출력문들을 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
-#define TREE_LOG	
+//#define TREE_LOG	
 //#define TREE_ERROR
 //#define TREE_WARNING
 
