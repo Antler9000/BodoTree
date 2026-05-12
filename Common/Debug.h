@@ -1,7 +1,9 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <iostream>		//콘솔 출력을 사용함
+#include <iostream>		//std::cout, std::endl
+#include <crtdbg.h>		//new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+
 using namespace std;
 
 #ifdef TREE_LOG
@@ -10,16 +12,16 @@ using namespace std;
 	#define LogPrint(statement)
 #endif
 
-#ifdef TREE_ERROR
-	#define ErrorPrint(statement) cout << "(Error : " << __func__ << ") " << statement << endl
-#else
-	#define ErrorPrint(statement)
-#endif
-
 #ifdef TREE_WARNING
 	#define WarningPrint(statement) cout << "(Warning : " << __func__ << ") " << statement << endl
 #else
 	#define WarningPrint(statement)
+#endif
+
+#ifdef TREE_ERROR
+	#define ErrorPrint(statement) cout << "(Error : " << __func__ << ") " << statement << endl
+#else
+	#define ErrorPrint(statement)
 #endif
 
 //메모리 누수로 이어진 new 할당을 추적하기 위해선 기존 new가 아니라 오버로딩된 특별한 new를 사용하여야 함

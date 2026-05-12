@@ -1,10 +1,11 @@
 #ifndef BST_USING_WHILE_H
 #define BST_USING_WHILE_H
 
-#include "../Common/BstUsingWhileTemplate.h"		//정의한 이진 탐색 트리 템플릿을 사용함
-#include <iostream>									//콘솔 출력을 사용함
-#include <utility>									//이동 시맨틱을 사용함
-using namespace std;								//..	
+#include "../Common/BstUsingWhileTemplate.h"		//직접 정의한 BstUsingWhileTemplate
+#include <iostream>									//std::cout, std::ostream
+#include <utility>									//std::move, std::forward
+
+using namespace std;
 
 template <typename DataType>
 class BstNode

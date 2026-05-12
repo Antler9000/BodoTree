@@ -1,12 +1,13 @@
 #ifndef SplayTree_H
 #define SplayTree_H
 
-#include "../Common/BstUsingWhileTemplate.h"	//정의한 이진 탐색 트리 템플릿을 사용함
-#include "../Common/Stack.h"					//정의한 스택을 사용함
-#include "../Common/Debug.h"					//정의한 로그 출력 매크로를 사용함
-#include <iostream>								//콘솔 출력을 사용함
-#include <utility>								//이동 시맨틱을 사용함
-using namespace std;							//..	
+#include "../Common/BstUsingWhileTemplate.h"	//직접 정의한 BstUsingWhileTemplate
+#include "../Common/Debug.h"					//직접 정의한 LogPrint, WarningPrint
+#include "../Common/Stack.h"					//직접 정의한 Stack
+#include <iostream>								//std::cout, std::ostream
+#include <utility>								//std::move, std::forward
+
+using namespace std;
 
 template <typename DataType>
 class SplayTree;

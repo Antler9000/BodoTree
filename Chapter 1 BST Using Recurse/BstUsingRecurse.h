@@ -1,10 +1,11 @@
 #ifndef BST_USING_RECURSE_H
 #define BST_USING_RECURSE_H
 
-#include "../Common/Debug.h"		//정의한 로구 출력 매크로를 사용함
-#include <iostream>					//콘솔 출력을 사용함
-#include <utility>					//이동 시맨틱을 사용함
-using namespace std;				//..
+#include "../Common/Debug.h"		//직접 정의한 LogPrint, WarningPrint
+#include <iostream>					//std::cout, std::ostream
+#include <utility>					//std::move, std::forward
+
+using namespace std;
 
 template <typename DataType>
 class Bst;

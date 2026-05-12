@@ -1,17 +1,21 @@
 //로그 출력문들을 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
 //#define TREE_LOG	
-//#define TREE_ERROR
 //#define TREE_WARNING
+//#define TREE_ERROR
 
-#include "BstUsingWhile.h"		//정의한 Bst를 테스팅함
-#include "iostream"				//콘솔 출력을 위해 사용함
-#include <iomanip>				//소숫점 출력 지정을 위해 사용함
-#include <chrono>;				//속도 테스트를 위해 사용함
-#include <string>;				//..
-#include <numeric>;				//..
-#include <random>;				//..
-#include <map>;					//..
-using namespace chrono;			//..
+#include "BstUsingWhile.h"		//직접 정의한 Bst
+#include "iostream"				//std::cout, std::endl
+#include <iomanip>				//std::fixed, std::setprecision
+#include <chrono>;				//chrono::clock, chrono::time_point, chrono::steady_clock, chrono::duration, chrono::duration::count
+#include <string>;				//std::string
+#include <numeric>;				//std::iota
+#include <random>;				//std::mt19937
+#include <algorithm>			//std::shuffle
+#include <map>;					//std::map
+#include <utility>				//std::move
+
+using namespace std;
+using namespace chrono;
 
 template <typename DataType>
 void PrintKeyAndData(int key, const DataType& retrievedData);
