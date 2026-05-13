@@ -6,7 +6,7 @@
 #include <memory>				//std::unique_ptr
 #include <utility>				//std::move, std::forward
 
-using namespace std;			//
+using namespace std;
 
 template <typename DataType>
 class Heap;
@@ -36,6 +36,7 @@ private:
 
 	}
 
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(forward<NewDataType>(data))
 	{
@@ -165,6 +166,7 @@ public:
 		m_capacity = 0;
 	}
 
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename PushDataType = DataType>
 	void Push(int newKey, PushDataType&& newData)
 	{
@@ -233,6 +235,7 @@ public:
 		}
 	}
 
+	//Heap의 소멸자에서 사용되므로 예외를 던지는 경우가 없도록 하였음
 	void RemoveHeap() noexcept
 	{
 		LogPrint("remove heap");

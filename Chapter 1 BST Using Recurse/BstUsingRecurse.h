@@ -17,6 +17,7 @@ class BstNode
 
 private:
 
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -102,7 +103,7 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : newKey와 같은 키의 노드가 이미 존재하는 경우
-	//newData가 lvalue 참조와 rvalue 참조인 경우를 각각 다르게 처리하기 위해서 참조 붕괴를 사용했음
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
 	bool Insert(int newKey, InsertDataType&& newData)
 	{
@@ -161,7 +162,7 @@ public:
 		}
 	}
 
-	//트리의 소멸자와 이동 할당 연산자에 사용되므로 실패를 반환하거나 예외를 던지는 경우가 없도록 하였음
+	//트리의 소멸자와 이동 할당 연산자에 사용되므로 예외를 던지는 경우가 없도록 하였음
 	void RemoveTree() noexcept
 	{
 		LogPrint("remove tree");
@@ -225,6 +226,7 @@ public:
 
 private:
 
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
 	bool InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, InsertDataType&& newData);
 

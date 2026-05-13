@@ -32,6 +32,7 @@ class SplayNode
 
 private:
 
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	SplayNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -70,9 +71,9 @@ public:
 
 	SplayTree() = default;
 	SplayTree(const SplayTree& sourceTree) = default;
-	SplayTree(SplayTree&& sourceTree) noexcept = default;
+	SplayTree(SplayTree&& sourceTree) = default;
 	SplayTree& operator = (const SplayTree& sourceTree) = default;
-	SplayTree& operator = (SplayTree&& sourceTree) noexcept = default;
+	SplayTree& operator = (SplayTree&& sourceTree) = default;
 
 	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
 	bool Retrieve(int targetKey, DataType& outData)
@@ -218,7 +219,7 @@ private:
 	}
 
 	//ZIG는 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용함
-	void ZigL(SplayNode<DataType>*& pFatherOfTarget, SplayNode<DataType>* pTarget) noexcept
+	void ZigL(SplayNode<DataType>*& pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig left");
 
@@ -227,7 +228,7 @@ private:
 		pFatherOfTarget = pTarget;
 	}
 
-	void ZigR(SplayNode<DataType>*& pFatherOfTarget, SplayNode<DataType>* pTarget) noexcept
+	void ZigR(SplayNode<DataType>*& pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig right");
 
@@ -276,7 +277,7 @@ private:
 		pGrandFatherOfTarget = pTarget;
 	}
 
-	void ZigZigRR(SplayNode<DataType>*& pGrandFatherOfTarget, SplayNode<DataType>* pFatherOfTarget, SplayNode<DataType>* pTarget) noexcept
+	void ZigZigRR(SplayNode<DataType>*& pGrandFatherOfTarget, SplayNode<DataType>* pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig zig right right");
 

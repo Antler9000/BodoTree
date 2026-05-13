@@ -24,6 +24,7 @@ class BstNode
 
 private:
 
+	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
