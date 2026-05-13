@@ -22,6 +22,8 @@ void PrintKeyAndData(int key, const DataType& retrievedData);
 
 void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
 
+void RandomLocalWorkloadSpeedTest(int workloadNum, int workloadPerDataLen, int localBlockSize);
+
 void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
 
 void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
@@ -242,74 +244,125 @@ int main()
 #ifndef _DEBUG
 	cout << fixed << setprecision(2);
 
-	cout << endl << "릴리즈 구성 테스트 1/3 : 랜덤 워크로드 속도 테스트---------------------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 1/4 : 랜덤 워크로드 속도 테스트---------------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		randomWorkloadNum 횟수만큼 복사 삽입(트리 A), 이동 삽입(트리 B), 검색(트리 A), 삭제(트리 A)와 소멸(트리 B)을 수행함
-		키는 [0,randomWorkloadNum-1] 의 중복되지 않는 키 값들을 랜덤하게 셔플해놓고 사용함
+		키는 [0,randomWorkloadNum-1] 의 중복되지 않는 키 값들을 랜덤하게 셔플해놓고 사용함(삽입, 검색, 삭제의 키 값들은 각각 독립으로 셔플됨)
 		데이터는 randomWorkloadPerDataLen 으로 지정된 길이의 string 객체를 randomWorkloadNum 개 만들어놓고 사용함
 	*/
 
 	/*	(테스팅 결과)
-		[randomWorkloadNum = 1,000,000  |  randomWorkloadPerDataLen = 30]
-		복사 삽입	: SplayTree = 0.80초	|	std::map = 0.79초
-		이동 삽입	: SplayTree = 0.74초	|	std::map = 0.72초
-		검색		: SplayTree = 67.1초	|	std::map = 0.94초
-		삭제		: SplayTree = 88.2초	|	std::map = 1.02초
-		소멸		: SplayTree = 0.29초	|	std::map = 0.27초
+		[randomWorkloadNum			= 100,000]
+		[randomWorkloadPerDataLen	= 30]
+		복사 삽입	: SplayTree = 0.02초	|	std::map = 0.03초
+		이동 삽입	: SplayTree = 0.02초	|	std::map = 0.03초
+		검색		: SplayTree = 0.65초	|	std::map = 0.04초
+		삭제		: SplayTree = 0.64초	|	std::map = 0.03초
+		소멸		: SplayTree = 0.02초	|	std::map = 0.02초
 	*/
 
 	/*	(테스팅 해석)
-		SplayTree는 이전 단원과 달리 반복문으로 구현되었기에, 컴파일러의 최적화에 상관없이 재귀 호출은 일어나지 않았음
-		다만 빌드된 어셈블리 코드를 보았을 때 삽입, 삭제 메소드에서 하위 작업 메소드 호출이 인라이닝되지 못하고 있는 것이 우선 원인으로 추정됨
+		현재 구현에서는 splay가 검색 메소드에서 1~2 높이로만 적용되고 있음
+
+		조정이 구현되지 않은 삭제 메소드 측정에서 느린 속도가 나타난 것으로 보아,
+		앞선 검색 메소드 수행 과정이 트리를 편향시켜서 속도를 느리게 하는 것으로 추정함
+
+		따라서, 우선은 편향 문제가 해결하기 위해서 검색 과정에 splay를 보다 온전히 적용해보고자 함
+		그리고 만일 편향 문제가 해결되어 삭제 메소드의 속도는 개선되었지만 여전히 검색 메소드가 느리다면, stack 삽입 과정을 최적화해볼 예정
+		마지막으로, 삽입과 삭제에도 splay가 적용되도록 하고서 측정을 통해 추가 개선이 필요한지 여부를 확인할 예정
 	*/
 
-	const int randomWorkloadNum = 1000000;
+	const int randomWorkloadNum = 100000;
 	const int randomWorkloadPerDataLen = 30;
 	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
-	cout << endl << "릴리즈 구성 테스트 2/3 : 선형 증가 워크로드 속도 테스트----------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 2/4 : 랜덤 로컬 워크로드 속도 테스트---------------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
-		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
+		앞선 1번 랜덤 워크로드 테스트와 비슷하나, 키 값들이 localBlockSize 단위로 내부에서 선형 증가 연속성을 가지도록 하였음
 	*/
 
 	/*	(테스팅 결과)
-		[linearIncreaseWorkloadNum = 100,000  |  linearIncreaseWorkloadPerDataLen = 앞선 테스트와 동일]
-		복사 삽입	: SplayTree = 18.7초	|	std::map = 0.02초
-		이동 삽입	: SplayTree = 19.1초	|	std::map = 0.01초
+		[randomLocalWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[randomLocalWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[localBlockSize					= 10]
+
+		복사 삽입	: SplayTree = 0.02초	|	std::map = 0.02초
+		이동 삽입	: SplayTree = 0.02초	|	std::map = 0.02초
+		검색		: SplayTree = 19.1초	|	std::map = 0.02초
+		삭제		: SplayTree = 18.4초	|	std::map = 0.02초
+		소멸		: SplayTree = 0.02초	|	std::map = 0.01초
+	*/
+
+	/*	(테스팅 해석)
+		localBlockSize가 1이면 앞선 1번의 랜덤 워크로드 테스트의 결과가 나오고
+		localBlockSize가 randomLocalWorkloadNum이면 3번의 선형 증가 워크로드 테스트의 결과가 나옴
+
+		localBlockSize가 그 둘 사이의 크기면 3번 선형 증가 워크로드 테스트에서 매우 느린 삭제 메소드와 비슷한 속도로
+		검색과 삭제를 수행하는 결과가 나옴
+
+		삽입에서의 속도보다 검색의 속도가 느리다는 점, 그리고 검색 이후 삭제 메소드에서도 속도가 느려졌다는 점 등을 보았을 때,
+		앞선 랜덤 워크로드 테스트와 마찬가지로 검색 메소드 중 수행하는 splay 조정이 트리를 편향시키는 것으로 추정함
+
+		그리고 그러한 트리의 모양이 3번 선형 증가 워크로드에서 검색 이후 트리의 상태처럼 좌하향 편향 트리에 비슷한 모양이 되기에
+		3번 선형 증가 워크로드에서의 삭제 메소드의 속도와 비슷한 속도로 현 테스트에서 검색과 삭제가 이뤄지는 것으로 추정함
+		
+		다만 3번 선형 증가 워크로드에 테스트와 알리 검색에서도 느린 속도가 나타나는 이유는
+		삽입과 검색의 키가 동일한 3번 테스트와 달리 현 테스트는 삽입과 검색 메소드가 각각 셔플되기에 검색 대상 노드가 루트에 미리 대기하지 못하기 때문으로 추정함
+	*/
+
+	const int randomLocalWorkloadNum = randomWorkloadNum;
+	const int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
+	const int localBlockSize = 10;
+	RandomLocalWorkloadSpeedTest(randomLocalWorkloadNum, randomLocalWorkloadPerDataLen, localBlockSize);
+
+	cout << endl << "릴리즈 구성 테스트 3/4 : 선형 증가 워크로드 속도 테스트----------------------------------------------" << endl;
+
+	/*	(테스팅 방법)
+		앞선 1번 랜덤 워크로드 테스트와 비슷하나, 키값들을 뒤섞지 않고 선형 그대로 사용함
+	*/
+
+	/*	(테스팅 결과)
+		[linearIncreaseWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[linearIncreaseWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
+
+		복사 삽입	: SplayTree = 18.4초	|	std::map = 0.02초
+		이동 삽입	: SplayTree = 17.9초	|	std::map = 0.01초
 		검색		: SplayTree = 0.01초	|	std::map = 0.01초
-		삭제		: SplayTree = 15.0초	|	std::map = 0.01초
+		삭제		: SplayTree = 14.3초	|	std::map = 0.01초
 		소멸		: SplayTree = 0.01초	|	std::map = 0.01초
 	*/
 
 	/*	(테스팅 해석)
-		트리 균형이 유지되는 std::map과 달리, 여기서 구현된 SplayTree는 균형을 유지하지 않으므로,
-		테스트에 nlog(n)의 시간복잡도를 가지는 std::map과 달리, SplayTree는 n^2의 시간 복잡도가 걸리기에 큰 차이가 남
-		다만 SplayTree의 삭제는 헤드에서 바로 삭제가 일어나기에 트리의 높이에 영향을 받지 않으므로 빠른 속도를 보임
+		검색에서는 splay로 인해 다음 검색 대상이 항상 루트의 자식 노드로 오게 되므로 매우 빠른 속도를 보임
+		반대로 삭제는 앞선 검색으로 인해 트리가 조정되어 삭제할 노드가 루트 노드에 위치하지 않게 되므로 느려진 것으로 추정
+		삭제 메소드에도 검색처럼 splay 조정을 수행하도록 할 시 속도가 개선될 거라 생각함
 	*/
 
-	const int linearIncreaseWorkloadNum = 100000;
-	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	const int linearIncreaseWorkloadNum = randomLocalWorkloadNum;
+	const int linearIncreaseWorkloadPerDataLen = randomLocalWorkloadPerDataLen;
 	LinearIncreaseWorkloadSpeedTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
-	cout << endl << "릴리즈 구성 테스트 3/3 : 선형 감소 워크로드 속도 테스트----------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 4/4 : 선형 감소 워크로드 속도 테스트----------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
-		앞선 테스트와 동일하나 키를 역순으로 사용함
+		앞선 3번 선형 증가 워크로드 테스트와 비슷하나, 키를 역순으로 사용함
 	*/
 
 	/*	(테스팅 결과)
-		[linearDecreaseWorkloadNum = 앞선 테스트와 동일  |  linearDecreaseWorkloadPerDataLen = 앞선 테스트와 동일]
-		복사 삽입	: SplayTree = 19.2초	|	std::map = 0.02초
-		이동 삽입	: SplayTree = 18.1초	|	std::map = 0.01초
+		[linearDecreaseWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[linearDecreaseWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
+
+		복사 삽입	: SplayTree = 18.8초	|	std::map = 0.01초
+		이동 삽입	: SplayTree = 17.6초	|	std::map = 0.01초
 		검색		: SplayTree = 0.01초	|	std::map = 0.01초
-		삭제		: SplayTree = 14.4초	|	std::map = 0.01초
+		삭제		: SplayTree = 14.2초	|	std::map = 0.01초
 		소멸		: SplayTree = 0.01초	|	std::map = 0.01초
 	*/
 
 	/*	(테스팅 해석)
-		앞선 테스트와 동일
+		앞선 3번 선형 증가 워크로드 테스트와 동일
 	*/
 
 	const int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
@@ -378,6 +431,84 @@ void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "map : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+}
+
+void RandomLocalWorkloadSpeedTest(int workloadNum, int workloadPerDataLen, int localBlockSize)
+{
+	cout << endl << "랜덤 로컬 워크로드 준비 중...." << endl;
+
+	vector<string> insertTestDatum;
+	insertTestDatum.reserve(workloadNum);
+	for (int i = 0; i < workloadNum; i++)
+	{
+		insertTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+	}
+
+	vector<int> insertTestKeyBlocks(workloadNum/localBlockSize);
+	iota(insertTestKeyBlocks.begin(), insertTestKeyBlocks.end(), 0);
+	mt19937 insertTestRng(123456);
+	shuffle(insertTestKeyBlocks.begin(), insertTestKeyBlocks.end(), insertTestRng);
+	vector<int> insertTestKeys;
+	for (int blockIndex = 0; blockIndex < insertTestKeyBlocks.size(); blockIndex++)
+	{
+		for (int offset = 0; offset < localBlockSize; offset++)
+		{
+			insertTestKeys.push_back(insertTestKeyBlocks[blockIndex] * localBlockSize + offset);
+		}
+	}
+
+	vector<int> retrieveTestKeyBlocks(workloadNum / localBlockSize);
+	iota(retrieveTestKeyBlocks.begin(), retrieveTestKeyBlocks.end(), 0);
+	mt19937 retrieveTestRng(654321);
+	shuffle(retrieveTestKeyBlocks.begin(), retrieveTestKeyBlocks.end(), retrieveTestRng);
+	vector<int> retrieveTestKeys;
+	for (int blockIndex = 0; blockIndex < retrieveTestKeyBlocks.size(); blockIndex++)
+	{
+		for (int offset = 0; offset < localBlockSize; offset++)
+		{
+			retrieveTestKeys.push_back(retrieveTestKeyBlocks[blockIndex] * localBlockSize + offset);
+		}
+	}
+
+	vector<int> removeTestKeyBlocks(workloadNum / localBlockSize);
+	iota(removeTestKeyBlocks.begin(), removeTestKeyBlocks.end(), 0);
+	mt19937 removeTestRng(162534);
+	shuffle(removeTestKeyBlocks.begin(), removeTestKeyBlocks.end(), removeTestRng);
+	vector<int> removeTestKeys;
+	for (int blockIndex = 0; blockIndex < removeTestKeyBlocks.size(); blockIndex++)
+	{
+		for (int offset = 0; offset < localBlockSize; offset++)
+		{
+			removeTestKeys.push_back(removeTestKeyBlocks[blockIndex] * localBlockSize + offset);
+		}
+	}
+
+	steady_clock clock;
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	int realWorkloadNum = (workloadNum / localBlockSize) * localBlockSize;
+
+	cout << endl << "랜덤 로컬 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestSplayTree(clock, realWorkloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
+
+	timeEnd = clock.now();
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "SplayTree : " << realWorkloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+
+	cout << endl << "-----------------------------------------------------------" << endl;
+
+	cout << endl << "랜덤 로컬 워크로드 복사 중...." << endl;
+	timeBegin = SpeedTestMap(clock, realWorkloadNum, insertTestDatum, insertTestKeys, retrieveTestKeys, removeTestKeys);
+
+	timeEnd = clock.now();
+
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "map : " << realWorkloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 }
 
 void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
