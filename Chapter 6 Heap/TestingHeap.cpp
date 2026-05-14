@@ -18,16 +18,18 @@ using namespace chrono;
 template <typename DataType>
 void PrintData(const DataType& poppedData);
 
-void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
+void RandomWorkloadTest(int workloadNum, int workloadPerDataLen);
 
-void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
+void RandomLocalWorkloadTest(int workloadNum, int workloadPerDataLen, int localBlockSize);
 
-void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
+void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
+
+void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
 //pushDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Heap와 priority_queue에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
-time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
+time_point<steady_clock> TestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
 
-time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
+time_point<steady_clock> TestPriorityQueue(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
 
 int main()
 {
@@ -35,7 +37,7 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	cout << endl << "디버그 구성 테스트 1/3 : MinHeap<int>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 1/3 : MinHeap<int>---------------------------------------------------------------" << endl;
 
 	MinHeap<int> intTestHeap;
 
@@ -113,7 +115,7 @@ int main()
 	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
 	intExplicitCopyTestHeap.PrintHeap();
 
-	cout << endl << "디버그 구성 테스트 2/3 : MinHeap<float>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 2/3 : MinHeap<float>-------------------------------------------------------------" << endl;
 
 	MinHeap<float> floatTestHeap;
 
@@ -191,7 +193,7 @@ int main()
 	cout << endl << "복사한 힙는 원본과 독립적임 (힙 B)" << endl;
 	floatExplicitCopyTestHeap.PrintHeap();
 
-	cout << endl << "디버그 구성 테스트 3/3 : MinHeap<string>--------------------------------------------------------------------------" << endl;
+	cout << endl << "디버그 구성 테스트 3/3 : MinHeap<string>------------------------------------------------------------" << endl;
 
 	MinHeap<string> stringTestHeap;
 
@@ -273,81 +275,123 @@ int main()
 #ifndef _DEBUG
 	cout << fixed << setprecision(2);
 
-	cout << endl << "릴리즈 구성 테스트 1/3 : 랜덤 워크로드 속도 테스트---------------------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 1/4 : 랜덤 워크로드 테스트-------------------------------------------------------" << endl;
 	
 	/*	(테스팅 방법)
 		randomWorkloadNum 횟수만큼 복사 푸시(힙 A), 이동 푸시(힙 B), 팝(힙 A), 소멸(힙 B)을 수행함
-		키는 [0,randomWorkloadNum-1] 의 중복되지 않는 키 값들을 랜덤하게 셔플해놓고 사용함
+		키는 [0,randomWorkloadNum-1] 의 중복되지 않는 키 값들을 랜덤하게 셔플해놓고 사용함(삽입, 검색, 삭제의 키 값들은 각각 독립으로 셔플됨)
 		데이터는 randomWorkloadPerDataLen 으로 지정된 길이의 string 객체를 randomWorkloadNum 개 만들어놓고 사용함
 	*/
 
 	/*	(테스팅 결과)
-		[randomWorkloadNum = 10,000,000  |  randomWorkloadPerDataLen = 30]
-		복사 푸시	: Heap = 2.1초	|	std::priority_queue = 1.2초
-		이동 푸시	: Heap = 1.5초	|	std::priority_queue = 0.7초
-		팝			: Heap = 12.7초	|	std::priority_queue = 13.2초
-		소멸		: Heap = 1.2초	|	std::priority_queue = 0.6초
+		[randomWorkloadNum			= 10,000,000]
+		[randomWorkloadPerDataLen	= 30]
+
+		복사 푸시	: Heap =  2.25초	|	std::priority_queue =  1.25초
+		이동 푸시	: Heap =  1.61초	|	std::priority_queue =  1.04초
+		팝			: Heap = 13.41초	|	std::priority_queue = 14.47초
+		소멸		: Heap =  1.37초	|	std::priority_queue =  0.75초
 	*/
 
 	/*	(테스팅 해석)
-		우선순위큐가 pop(..)과 top(..)을 나누어 호출해주는 과정에서 페널티를 지님에도, 힙의 Pop(..)과 거의 차이가 안 남
-		즉 전반적으로 힙의 최적화 수준이 우선순위큐에 비해 크게 떨어짐
+		리프에 삽입되어서 부모와 대소 관계를 비교해 루트노드까지 거슬러 올라가는 푸시와 달리,
+		팝은 루트노드에서 시작해서 자식 둘과 모두 비교를 수행하며 내려가기에 속도가 느린 것으로 추정함
+
+		직접 정의한 힙이 stl의 우선순위 큐보다 팝은 다소 빠르게 나타났으나,
+		우선순위큐는 힙의 팝에 직접 대응되는 메소드가 없어 pop(..)과 top(..)을 나누어 호출했음을 감안하면 사실 거의 비긴셈임
+
+		푸시 메소드에선 우선순위 큐가 직접 정의한 힙보다 훨씬 빠른 속도를 보이고 있음.
+		우선 폴리몰피즘을 사용한 현재 힙의 구현 방식을 좀 더 단단한 방식으로 개선해서 속도를 올릴 필요가 있음.
 	*/
 
 	const int randomWorkloadNum = 10000000;
 	const int randomWorkloadPerDataLen = 30;
-	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
+	RandomWorkloadTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
-	cout << endl << "릴리즈 구성 테스트 2/3 : 선형 증가 워크로드 속도 테스트----------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 2/4 : 랜덤 로컬 워크로드 테스트--------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
-		앞선 테스트와 비슷하나,키값들을 뒤섞지 않고 선형 그대로 사용함
+		앞선 1번 랜덤 워크로드 테스트와 비슷하나, 키 값들이 localBlockSize 단위로 내부에서 선형 증가 연속성을 가지도록 하였음
 	*/
 
 	/*	(테스팅 결과)
-		[linearIncreaseWorkloadNum = 앞선 테스트와 동일  |  linearIncreaseWorkloadPerDataLen = 앞선 테스트와 동일]
-		복사 푸시	: Heap = 1.4초	|	std::priority_queue = 1.0초
-		이동 푸시	: Heap = 1.0초	|	std::priority_queue = 0.6초
-		팝			: Heap = 2.8초	|	std::priority_queue = 1.6초
-		소멸		: Heap = 0.9초	|	std::priority_queue = 0.4초
+		[randomLocalWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[randomLocalWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[localBlockSize					= 10]
+
+		복사 푸시	: Heap =  2.06초	|	std::priority_queue =  1.19초
+		이동 푸시	: Heap =  1.44초	|	std::priority_queue =  0.68초
+		팝			: Heap =  9.28초	|	std::priority_queue =  8.40초
+		소멸		: Heap =  1.49초	|	std::priority_queue =  0.83초
 	*/
 
 	/*	(테스팅 해석)
-		힙과 우선순위큐 둘 다 오름차순에서 푸시가 팝보다 더 빠르고, 내림차순에서는 반대로 팝이 푸시보다 더 빠름
-		-오름차순으로 푸시되면, 최소힙은 별다른 조정을 해줄 필요가 없기 때문에 최선의 시간이 걸리게 됨
-		-반면 푸시 과정에서 조정이 일어나지 않았으므로, 항상 힙의 마지막 요소가 최대값이 존재하여서 팝 과정에서는 최악의 시간이 걸리게 됨
+		블럭 안의 지역성이 캐시 히트율을 높여주어 앞선 1번 랜덤 워크로드 테스트보다 전반적으로 빠른 속도가 나온 것으로 보임.
+	*/
+
+	const int randomLocalWorkloadNum = randomWorkloadNum;
+	const int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
+	const int localBlockSize = 10;
+	RandomLocalWorkloadTest(randomLocalWorkloadNum, randomLocalWorkloadPerDataLen, localBlockSize);
+
+	cout << endl << "릴리즈 구성 테스트 3/4 : 선형 증가 워크로드 테스트--------------------------------------------------" << endl;
+
+	/*	(테스팅 방법)
+		앞선 1번 랜덤 워크로드 테스트와 비슷하나, 키값들을 뒤섞지 않고 선형 그대로 사용함
+	*/
+
+	/*	(테스팅 결과)
+		[linearIncreaseWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[linearIncreaseWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
+
+		복사 푸시	: Heap =  1.48초	|	std::priority_queue =  1.14초
+		이동 푸시	: Heap =  1.03초	|	std::priority_queue =  0.66초
+		팝			: Heap =  2.78초	|	std::priority_queue =  1.63초
+		소멸		: Heap =  0.94초	|	std::priority_queue =  0.41초
+	*/
+
+	/*	(테스팅 해석)
+		힙과 우선순위큐 둘 다 선형 증가 워크로드에서 푸시가 팝보다 더 빠른 속도를 보임
+		오름차순으로 푸시되면, 최소힙은 별다른 조정을 해줄 필요가 없기 때문에 최선의 시간이 걸리게 되기에 이런 결과가 나오는 듯함
 		
 		이러한 공통적인 경향성을 지니지만, 여전히 Heap의 최적화 수준은 우선수위큐에 비해 크게 떨어짐
+		앞서 1번 랜덤 워크로드 테스트에서 말했듯이 현재 힙의 구현에 사용된 폴리몰피즘 방식부터 탈피하고서 최적화를 해나갸아할 듯함
 	*/
 
 	const int linearIncreaseWorkloadNum = randomWorkloadNum;
 	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
-	LinearIncreaseWorkloadSpeedTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
+	LinearIncreaseWorkloadTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
-	cout << endl << "릴리즈 구성 테스트 3/3 : 선형 감소 워크로드 속도 테스트----------------------------------------------" << endl;
+	cout << endl << "릴리즈 구성 테스트 4/4 : 선형 감소 워크로드 테스트--------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
-		앞선 테스트와 동일하나 키를 역순으로 사용함
+		앞선 3번 선형 증가 워크로드 테스트와 비슷하나, 키를 역순으로 사용함
 	*/
 
 	/*	(테스팅 결과)
-		[linearDecreaseWorkloadNum = 앞선 테스트와 동일  |  linearDecreaseWorkloadPerDataLen = 앞선 테스트와 동일]
-		복사 푸시	: Heap = 3.5초	|	std::priority_queue = 1.5초
-		이동 푸시	: Heap = 3.0초	|	std::priority_queue = 1.0초
-		팝			: Heap = 2.1초	|	std::priority_queue = 0.9초
-		소멸		: Heap = 1.2초	|	std::priority_queue = 0.5초
+		[linearDecreaseWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
+		[linearDecreaseWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
+
+		복사 푸시	: Heap =  3.59초	|	std::priority_queue =  1.50초
+		이동 푸시	: Heap =  3.01초	|	std::priority_queue =  1.01초
+		팝			: Heap =  1.99초	|	std::priority_queue =  0.95초
+		소멸		: Heap =  1.05초	|	std::priority_queue =  0.55초
 	*/
 
 	/*	(테스팅 해석)
-		앞선 테스트와 동일
+		선형 감소 워크로드에서는 앞선 3번 선형 증가 워크로드와 반대로 팝이 푸시보다 더 빠른 속도를 보임
+		푸시 과정에서 조정이 일어나지 않았으므로, 항상 힙의 마지막 요소가 최대값이 존재하여서 팝 과정에서는 최악의 시간이 걸리게 되는 듯함
+	
+		이러한 공통적인 경향성을 지니지만, 여전히 Heap의 최적화 수준은 우선수위큐에 비해 크게 떨어짐
+		앞서 1번 랜덤 워크로드 테스트에서 말했듯이 현재 힙의 구현에 사용된 폴리몰피즘 방식부터 탈피하고서 최적화를 해나갸아할 듯함
 	*/
 
 	const int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
 	const int linearDecreaseWorkloadPerDataLen = linearIncreaseWorkloadPerDataLen;
-	LinearDecreaseWorkloadSpeedTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
+	LinearDecreaseWorkloadTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 #endif
 
-	cout << endl << "테스트 종료----------------------------------------------------------------------------------" << endl;
+	cout << endl << "테스트 종료-----------------------------------------------------------------------------------------" << endl;
 
 	return 0;
 }
@@ -358,31 +402,21 @@ void PrintData(const DataType& poppedData)
 	cout << "팝 된 데이터 : " << poppedData << endl;
 }
 
-void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
+void RandomWorkloadTest(int workloadNum, int workloadPerDataLen)
 {
 	cout << endl << "랜덤 워크로드 준비 중...." << endl;
 
-	vector<string> pushTestDatum;
-	pushTestDatum.reserve(workloadNum);
+	vector<string> pushDataWorkload;
+	pushDataWorkload.reserve(workloadNum);
 	for (int i = 0; i < workloadNum; i++)
 	{
-		pushTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+		pushDataWorkload.emplace_back(string(workloadPerDataLen, 'A'));
 	}
 
-	vector<int> pushTestKeys(workloadNum);
-	iota(pushTestKeys.begin(), pushTestKeys.end(), 0);
+	vector<int> pushKeyWorkload(workloadNum);
+	iota(pushKeyWorkload.begin(), pushKeyWorkload.end(), 0);
 	mt19937 pushTestRng(123456);
-	shuffle(pushTestKeys.begin(), pushTestKeys.end(), pushTestRng);
-
-	vector<int> retrieveTestKeys(workloadNum);
-	iota(retrieveTestKeys.begin(), retrieveTestKeys.end(), 0);
-	mt19937 retrieveTestRng(654321);
-	shuffle(retrieveTestKeys.begin(), retrieveTestKeys.end(), retrieveTestRng);
-
-	vector<int> removeTestKeys(workloadNum);
-	iota(removeTestKeys.begin(), removeTestKeys.end(), 0);
-	mt19937 removeTestRng(162534);
-	shuffle(removeTestKeys.begin(), removeTestKeys.end(), removeTestRng);
+	shuffle(pushKeyWorkload.begin(), pushKeyWorkload.end(), pushTestRng);
 
 	steady_clock clock;
 	time_point<steady_clock> timeBegin;
@@ -390,43 +424,91 @@ void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 	duration<double> timeDiff;
 
 	cout << endl << "랜덤 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestHeap(clock, workloadNum, pushTestDatum, pushTestKeys);
+	timeBegin = TestHeap(clock, workloadNum, pushDataWorkload, pushKeyWorkload);
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "-----------------------------------------------------------" << endl;
+	cout << endl << "---------------------------------------------------------------------------" << endl;
 
 	cout << endl << "랜덤 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestPriorityQueue(clock, workloadNum, pushTestDatum, pushTestKeys);
+	timeBegin = TestPriorityQueue(clock, workloadNum, pushDataWorkload, pushKeyWorkload);
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+
+	cout << endl << endl << endl << endl << endl;
 }
 
-void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
+void RandomLocalWorkloadTest(int workloadNum, int workloadPerDataLen, int localBlockSize)
+{
+	cout << endl << "랜덤 로컬 워크로드 준비 중...." << endl;
+
+	vector<string> pushDataWorkload;
+	pushDataWorkload.reserve(workloadNum);
+	for (int i = 0; i < workloadNum; i++)
+	{
+		pushDataWorkload.emplace_back(string(workloadPerDataLen, 'A'));
+	}
+
+	vector<int> pushKeyWorkload(workloadNum / localBlockSize);
+	iota(pushKeyWorkload.begin(), pushKeyWorkload.end(), 0);
+	mt19937 insertTestRng(123456);
+	shuffle(pushKeyWorkload.begin(), pushKeyWorkload.end(), insertTestRng);
+	vector<int> insertKeyWorkload;
+	for (int blockIndex = 0; blockIndex < pushKeyWorkload.size(); blockIndex++)
+	{
+		for (int offset = 0; offset < localBlockSize; offset++)
+		{
+			insertKeyWorkload.push_back(pushKeyWorkload[blockIndex] * localBlockSize + offset);
+		}
+	}
+
+	steady_clock clock;
+	time_point<steady_clock> timeBegin;
+	time_point<steady_clock> timeEnd;
+	duration<double> timeDiff;
+
+	int realWorkloadNum = (workloadNum / localBlockSize) * localBlockSize;
+
+	cout << endl << "랜덤 로컬 워크로드 복사 중...." << endl;
+	timeBegin = TestHeap(clock, realWorkloadNum, pushDataWorkload, insertKeyWorkload);
+
+	timeEnd = clock.now();
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "Heap : " << realWorkloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+
+	cout << endl << "---------------------------------------------------------------------------" << endl;
+
+	cout << endl << "랜덤 로컬 워크로드 복사 중...." << endl;
+	timeBegin = TestPriorityQueue(clock, realWorkloadNum, pushDataWorkload, insertKeyWorkload);
+
+	timeEnd = clock.now();
+	timeDiff = timeEnd - timeBegin;
+
+	cout << endl << "priority_queue : " << realWorkloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+
+	cout << endl << endl << endl << endl << endl;
+}
+
+void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen)
 {
 	cout << endl << "선형 증가 워크로드 준비 중...." << endl;
 
-	vector<string> pushTestDatum;
-	pushTestDatum.reserve(workloadNum);
+	vector<string> pushDataWorkload;
+	pushDataWorkload.reserve(workloadNum);
 	for (int i = 0; i < workloadNum; i++)
 	{
-		pushTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+		pushDataWorkload.emplace_back(string(workloadPerDataLen, 'A'));
 	}
 
-	vector<int> pushTestKeys(workloadNum);
-	iota(pushTestKeys.begin(), pushTestKeys.end(), 0);
-
-	vector<int> retrieveTestKeys = pushTestKeys;
-
-	vector<int> removeTestKeys = pushTestKeys;
+	vector<int> pushKeyWorkload(workloadNum);
+	iota(pushKeyWorkload.begin(), pushKeyWorkload.end(), 0);
 
 	steady_clock clock;
 	time_point<steady_clock> timeBegin;
@@ -434,43 +516,39 @@ void LinearIncreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 	duration<double> timeDiff;
 
 	cout << endl << "선형 증가 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestHeap(clock, workloadNum, pushTestDatum, pushTestKeys);
+	timeBegin = TestHeap(clock, workloadNum, pushDataWorkload, pushKeyWorkload);
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "-----------------------------------------------------------" << endl;
+	cout << endl << "---------------------------------------------------------------------------" << endl;
 
 	cout << endl << "선형 증가 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestPriorityQueue(clock, workloadNum, pushTestDatum, pushTestKeys);
+	timeBegin = TestPriorityQueue(clock, workloadNum, pushDataWorkload, pushKeyWorkload);
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+
+	cout << endl << endl << endl << endl << endl;
 }
 
-void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
+void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen)
 {
 	cout << endl << "선형 감소 워크로드 준비 중...." << endl;
 
-	vector<string> pushTestDatum;
-	pushTestDatum.reserve(workloadNum);
+	vector<string> pushDataWorkload;
+	pushDataWorkload.reserve(workloadNum);
 	for (int i = 0; i < workloadNum; i++)
 	{
-		pushTestDatum.emplace_back(string(workloadPerDataLen, 'A'));
+		pushDataWorkload.emplace_back(string(workloadPerDataLen, 'A'));
 	}
 
-	vector<int> pushTestKeys(workloadNum);
-	iota(pushTestKeys.rbegin(), pushTestKeys.rend(), 0);
-
-	vector<int> retrieveTestKeys = pushTestKeys;
-
-	vector<int> removeTestKeys = pushTestKeys;
+	vector<int> pushKeyWorkload(workloadNum);
+	iota(pushKeyWorkload.rbegin(), pushKeyWorkload.rend(), 0);
 
 	steady_clock clock;
 	time_point<steady_clock> timeBegin;
@@ -478,27 +556,27 @@ void LinearDecreaseWorkloadSpeedTest(int workloadNum, int workloadPerDataLen)
 	duration<double> timeDiff;
 
 	cout << endl << "선형 감소 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestHeap(clock, workloadNum, pushTestDatum, pushTestKeys);
+	timeBegin = TestHeap(clock, workloadNum, pushDataWorkload, pushKeyWorkload);
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "Heap : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
 
-	cout << endl << "-----------------------------------------------------------" << endl;
+	cout << endl << "---------------------------------------------------------------------------" << endl;
 
 	cout << endl << "선형 감소 워크로드 복사 중...." << endl;
-	timeBegin = SpeedTestPriorityQueue(clock, workloadNum, pushTestDatum, pushTestKeys);
+	timeBegin = TestPriorityQueue(clock, workloadNum, pushDataWorkload, pushKeyWorkload);
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
 	cout << endl << "priority_queue : " << workloadNum << "번의 소멸자 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+
+	cout << endl << endl << endl << endl << endl;
 }
 
-time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload)
+time_point<steady_clock> TestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload)
 {
 	MinHeap<string> copyPushTestHeap;
 	MinHeap<string> movePushTestHeap;
@@ -508,52 +586,103 @@ time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vec
 	duration<double> timeDiff;
 
 	cout << endl << "[Heap 복사 푸시 측정 시작]" << endl;
-	cout << endl << "|------------------|" << endl;
+	cout << endl << "|------------------------------------------------|" << endl;
 
 	timeBegin = clock.now();
 
 	for (int i = 0; i < workloadNum; i++)
 	{
-		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
+		if (i % (workloadNum / 50) == 0)
+		{
+			cout << "*";
+		}
+
+		if (i % 10000 == 0)
+		{
+			timeEnd = clock.now();
+			timeDiff = timeEnd - timeBegin;
+			if (timeDiff.count() > 50)
+			{
+				break;
+			}
+		}
 
 		copyPushTestHeap.Push(pushKeyWorkload[i], pushDataWorkload[i]);
 	}
 	cout << endl;
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	if (timeDiff.count() < 50)
+	{
+		cout << endl << "Heap : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	}
+	else
+	{
+		cout << endl << "Heap : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : 50+ 초(시간 초과)" << endl;
+	}
 
 	cout << endl << "[Heap 이동 푸시 측정 시작]" << endl;
-	cout << endl << "|------------------|" << endl;
+	cout << endl << "|------------------------------------------------|" << endl;
 
 	timeBegin = clock.now();
 
 	for (int i = 0; i < workloadNum; i++)
 	{
-		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
+		if (i % (workloadNum / 50) == 0)
+		{
+			cout << "*";
+		}
+
+		if (i % 10000 == 0)
+		{
+			timeEnd = clock.now();
+			timeDiff = timeEnd - timeBegin;
+			if (timeDiff.count() > 50)
+			{
+				break;
+			}
+		}
 
 		movePushTestHeap.Push(pushKeyWorkload[i], move(pushDataWorkload[i]));
 	}
 	cout << endl;
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	if (timeDiff.count() < 50)
+	{
+		cout << endl << "Heap : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	}
+	else
+	{
+		cout << endl << "Heap : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : 50+ 초(시간 초과)" << endl;
+	}
 
 	cout << endl << "[Heap 팝 측정 시작]" << endl;
-	cout << endl << "|------------------|" << endl;
+	cout << endl << "|------------------------------------------------|" << endl;
 
 	timeBegin = clock.now();
 
 	string retrievedData;
 	for (int i = 0; i < workloadNum; i++)
 	{
-		if (i % ((workloadNum / 20) + 1) == 0) cout << "*";
+		if (i % (workloadNum / 50) == 0)
+		{
+			cout << "*";
+		}
+
+		if (i % 10000 == 0)
+		{
+			timeEnd = clock.now();
+			timeDiff = timeEnd - timeBegin;
+			if (timeDiff.count() > 50)
+			{
+				break;
+			}
+		}
 
 		copyPushTestHeap.Pop(retrievedData);
 		retrievedData += 'a';			//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
@@ -561,16 +690,22 @@ time_point<steady_clock> SpeedTestHeap(steady_clock& clock, int workloadNum, vec
 	cout << endl;
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "Heap : " << workloadNum << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	if (timeDiff.count() < 50)
+	{
+		cout << endl << "Heap : " << workloadNum << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	}
+	else
+	{
+		cout << endl << "Heap : " << workloadNum << "번의 팝 동안 흐른 시간은 : 50+ 초(시간 초과)" << endl;
+	}
 
 	cout << endl << "Heap 소멸자 측정 시작" << endl;
 	return clock.now();
 }
 
-time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTestRepeat, vector<string> pushTestDatum, const vector<int>& pushTestKeys)
+time_point<steady_clock> TestPriorityQueue(steady_clock& clock, int workloadNum, vector<string> pushTestDatum, const vector<int>& pushTestKeys)
 {
 	struct PriorityQueueNode
 	{
@@ -604,52 +739,103 @@ time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTe
 	duration<double> timeDiff;
 
 	cout << endl << "[priority_queue 복사 푸시 측정 시작]" << endl;
-	cout << endl << "|------------------|" << endl;
+	cout << endl << "|------------------------------------------------|" << endl;
 
 	timeBegin = clock.now();
 
-	for (int i = 0; i < speedTestRepeat; i++)
+	for (int i = 0; i < workloadNum; i++)
 	{
-		if (i % ((speedTestRepeat / 20) + 1) == 0) cout << "*";
+		if (i % (workloadNum / 50) == 0)
+		{
+			cout << "*";
+		}
+
+		if (i % 10000 == 0)
+		{
+			timeEnd = clock.now();
+			timeDiff = timeEnd - timeBegin;
+			if (timeDiff.count() > 50)
+			{
+				break;
+			}
+		}
 
 		copyPushTestPriorityQueue.emplace( pushTestKeys[i], pushTestDatum[i] );
 	}
 	cout << endl;
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << speedTestRepeat << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	if (timeDiff.count() < 50)
+	{
+		cout << endl << "priority_queue : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	}
+	else
+	{
+		cout << endl << "priority_queue : " << workloadNum << "번의 복사 푸시 동안 흐른 시간은 : 50+ 초(시간 초과)" << endl;
+	}
 
 	cout << endl << "[priority_queue 이동 푸시 측정 시작]" << endl;
-	cout << endl << "|------------------|" << endl;
+	cout << endl << "|------------------------------------------------|" << endl;
 
 	timeBegin = clock.now();
 
-	for (int i = 0; i < speedTestRepeat; i++)
+	for (int i = 0; i < workloadNum; i++)
 	{
-		if (i % ((speedTestRepeat / 20) + 1) == 0) cout << "*";
+		if (i % (workloadNum / 50) == 0)
+		{
+			cout << "*";
+		}
+
+		if (i % 10000 == 0)
+		{
+			timeEnd = clock.now();
+			timeDiff = timeEnd - timeBegin;
+			if (timeDiff.count() > 50)
+			{
+				break;
+			}
+		}
 
 		movePushTestPriorityQueue.emplace(pushTestKeys[i], move(pushTestDatum[i]));
 	}
 	cout << endl;
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << speedTestRepeat << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	if (timeDiff.count() < 50)
+	{
+		cout << endl << "priority_queue : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	}
+	else
+	{
+		cout << endl << "priority_queue : " << workloadNum << "번의 이동 푸시 동안 흐른 시간은 : 50+ 초(시간 초과)" << endl;
+	}
 
 	cout << endl << "[priority_queue 팝 측정 시작]" << endl;
-	cout << endl << "|------------------|" << endl;
+	cout << endl << "|------------------------------------------------|" << endl;
 
 	timeBegin = clock.now();
 
 	string retrievedData;
-	for (int i = 0; i < speedTestRepeat; i++)
+	for (int i = 0; i < workloadNum; i++)
 	{
-		if (i % ((speedTestRepeat / 20) + 1) == 0) cout << "*";
+		if (i % (workloadNum / 50) == 0)
+		{
+			cout << "*";
+		}
+
+		if (i % 10000 == 0)
+		{
+			timeEnd = clock.now();
+			timeDiff = timeEnd - timeBegin;
+			if (timeDiff.count() > 50)
+			{
+				break;
+			}
+		}
 
 		//priority_queue는 pop 메소드가 top 아이템을 반환하지 않기 때문에, 동일한 기능을 수행하는 시간을 비교하기 위해 top()과 pop()을 연달아 호출하도록 함
 		retrievedData = copyPushTestPriorityQueue.top().m_data;
@@ -659,10 +845,16 @@ time_point<steady_clock> SpeedTestPriorityQueue(steady_clock& clock, int speedTe
 	cout << endl;
 
 	timeEnd = clock.now();
-
 	timeDiff = timeEnd - timeBegin;
 
-	cout << endl << "priority_queue : " << speedTestRepeat << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	if (timeDiff.count() < 50)
+	{
+		cout << endl << "priority_queue : " << workloadNum << "번의 팝 동안 흐른 시간은 : " << timeDiff.count() << " 초" << endl;
+	}
+	else
+	{
+		cout << endl << "priority_queue : " << workloadNum << "번의 팝 동안 흐른 시간은 : 50+ 초(시간 초과)" << endl;
+	}
 
 	cout << endl << "[priority_queue 소멸자 측정 시작]" << endl;
 	return clock.now();
