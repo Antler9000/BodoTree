@@ -1,8 +1,8 @@
 #ifndef BST_USING_WHILE_TEMPLATE_H
 #define BST_USING_WHILE_TEMPLATE_H
 
-#include "../Common/Debug.h"		//직접 정의한 LogPrint, WarningPrint
-#include "../Common/Stack.h"		//직접 정의한 Stack
+#include "../Common/Debug.h"		//직접 정의한 매크로 LogPrint, WarningPrint, DBG_NEW
+#include "../Common/Stack.h"		//직접 정의한 클래스 Stack
 #include <iostream>					//std::cout, std::endl
 #include <memory>					//std::unique_ptr
 #include <utility>					//std::move, std::forward
@@ -72,7 +72,8 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : newKey와 같은 키의 노드가 이미 존재하는 경우
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename InsertDataType = DataType>
 	bool Insert(int newKey, InsertDataType&& newData)
 	{
@@ -108,7 +109,7 @@ public:
 
 	//트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
 	//복사를 통한 인자 전달은 성능에도 안 좋고, 게다가 복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
-	void CopyTree(const BstTemplate& sourceBst)
+	void CopyTree(const BstTemplate<NodeType, DataType>& sourceBst)
 	{
 		LogPrint("copy tree");
 
@@ -117,6 +118,7 @@ public:
 		*this = move(tempTree);
 	}
 
+	//디버깅용 퍼블릭 메소드들임
 	void PreorderPrint() const
 	{
 		LogPrint("preorder print");
@@ -141,11 +143,12 @@ public:
 protected:	//제너릭 메소드들
 
 	//특정 target_key를 가진 노드의 위치에 대해 수행할 작업을 넘겨주는 제너릭 메소드임
-	//메소드나 인자가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	//상위 메소드와 하위 작업 메소드가 const 메소드인 경우를 지원하기 위한 const 버전의 제너릭 메소드 버전도 같이 있음
 	//TODO : InsertNode(..) 하위 작업 메소드의 호출이 인라이닝될 수 있도록 제너릭 프로그래밍 방식을 개선하기
 	//TODO : const 여부에 상관없는 하나의 제너릭 메소드로 통합할 수 있도록 제너릭 프로그래밍 방식을 개선하기
 	//TODO : 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
+	//TODO : 단순한 인자 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename MethodType, typename ArgumentType>
 	bool Search(int targetKey, MethodType&& method, ArgumentType&& argument);
 
@@ -153,9 +156,10 @@ protected:	//제너릭 메소드들
 	bool Search(int targetKey, MethodType&& method, ArgumentType&& argument) const;
 
 	//전위순회로 돌면서 각 노드에 수행할 작업을 수행하는 제너릭 메소드임
-	//메소드나 인자가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	//트리 복사의 소스 트리에서 실행되거나, 순회 출력 메소드에서만 사용되므로 const 메소드로 선언하였음
 	//TODO : 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
+	//TODO : 단순한 인자 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename MethodType, typename ArgumentType>
 	void PreorderTraverse(MethodType&& method, ArgumentType&& argument) const;
 

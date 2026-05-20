@@ -1,7 +1,7 @@
 #ifndef BST_USING_RECURSE_H
 #define BST_USING_RECURSE_H
 
-#include "../Common/Debug.h"		//직접 정의한 LogPrint, WarningPrint
+#include "../Common/Debug.h"		//직접 정의한 매크로 LogPrint, WarningPrint, DBG_NEW
 #include <iostream>					//std::cout, std::ostream
 #include <utility>					//std::move, std::forward
 
@@ -17,7 +17,8 @@ class BstNode
 
 private:
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -103,7 +104,8 @@ public:
 	}
 
 	//bool 반환값이 false인 경우 : newKey와 같은 키의 노드가 이미 존재하는 경우
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename InsertDataType = DataType>
 	bool Insert(int newKey, InsertDataType&& newData)
 	{
@@ -182,6 +184,7 @@ public:
 		*this = move(tempTree);
 	}
 
+	//디버깅용 퍼블릭 메소드들임
 	void PreorderPrint() const
 	{
 		LogPrint("preorder print");
@@ -226,7 +229,8 @@ public:
 
 private:
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename InsertDataType = DataType>
 	bool InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, InsertDataType&& newData);
 

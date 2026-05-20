@@ -1,8 +1,11 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <utility>					//이동 시맨틱을 사용함
-using namespace std;				//..
+#include "Debug.h"					//직접 정의한 매크로 DBG_NEW
+#include <memory>					//std::unique_ptr
+#include <utility>					//std::move, std::forward
+
+using namespace std;
 
 template <class DataType>
 class Stack
@@ -57,7 +60,8 @@ public:
 		RemoveStack();
 	}
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename PushDataType = DataType>
 	void Push(PushDataType&& newData)
 	{

@@ -3,8 +3,9 @@
 //#define TREE_WARNING
 //#define TREE_ERROR
 
-#include "BstUsingWhile.h"		//직접 정의한 Bst
-#include "iostream"				//std::cout, std::endl
+#include "BstUsingWhile.h"		//직접 정의한 클래스 
+#include <crtdbg.h>				//_CrtSetDbgFlagBst
+#include <iostream>				//std::cout, std::endl
 #include <iomanip>				//std::fixed, std::setprecision
 #include <chrono>;				//chrono::clock, chrono::time_point, chrono::steady_clock, chrono::duration, chrono::duration::count
 #include <string>;				//std::string

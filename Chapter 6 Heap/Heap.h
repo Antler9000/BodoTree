@@ -1,7 +1,7 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-#include "../Common/Debug.h"	//직접 정의한 LogPrint, WarningPrint
+#include "../Common/Debug.h"	//직접 정의한 매크로 LogPrint, WarningPrint, DBG_NEW
 #include <iostream>				//std::cout, std::endl
 #include <memory>				//std::unique_ptr
 #include <utility>				//std::move, std::forward
@@ -36,7 +36,8 @@ private:
 
 	}
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename NewDataType = DataType>
 	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(forward<NewDataType>(data))
 	{
@@ -166,7 +167,8 @@ public:
 		m_capacity = 0;
 	}
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename PushDataType = DataType>
 	void Push(int newKey, PushDataType&& newData)
 	{
@@ -263,7 +265,7 @@ public:
 		m_size = sourceHeap.m_size;
 	}
 
-	//디버깅용 메소드임
+	//디버깅용 퍼블릭 메소드임
 	void PrintHeap()
 	{
 		LogPrint("print heap");
@@ -404,9 +406,10 @@ public:
 
 	MinHeap() = default;
 	MinHeap(const MinHeap& sourceTree) = default;
-	MinHeap(MinHeap&& sourceTree) = default;
+	MinHeap(MinHeap&& sourceTree) noexcept = default;
 	MinHeap& operator = (const MinHeap& sourceTree) = default;
-	MinHeap& operator = (MinHeap&& sourceTree) = default;
+	MinHeap& operator = (MinHeap&& sourceTree) noexcept = default;
+	~MinHeap() noexcept = default;
 
 private:
 
@@ -446,9 +449,10 @@ public:
 
 	MaxHeap() = default;
 	MaxHeap(const MaxHeap& sourceTree) = default;
-	MaxHeap(MaxHeap&& sourceTree) = default;
+	MaxHeap(MaxHeap&& sourceTree) noexcept = default;
 	MaxHeap& operator = (const MaxHeap& sourceTree) = default;
-	MaxHeap& operator = (MaxHeap&& sourceTree) = default;
+	MaxHeap& operator = (MaxHeap&& sourceTree) noexcept = default;
+	~MaxHeap() noexcept = default;
 
 private:
 

@@ -1,9 +1,9 @@
 #ifndef SplayTree_H
 #define SplayTree_H
 
-#include "../Common/BstUsingWhileTemplate.h"	//직접 정의한 BstUsingWhileTemplate
-#include "../Common/Debug.h"					//직접 정의한 LogPrint, WarningPrint
-#include "../Common/Stack.h"					//직접 정의한 Stack
+#include "../Common/BstUsingWhileTemplate.h"	//직접 정의한 클래스 BstUsingWhileTemplate
+#include "../Common/Debug.h"					//직접 정의한 매크로 LogPrint, WarningPrint
+#include "../Common/Stack.h"					//직접 정의한 클래스 Stack
 #include <iostream>								//std::cout, std::ostream
 #include <utility>								//std::move, std::forward
 
@@ -32,7 +32,8 @@ class SplayNode
 
 private:
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename NewDataType = DataType>
 	SplayNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -71,9 +72,10 @@ public:
 
 	SplayTree() = default;
 	SplayTree(const SplayTree& sourceTree) = default;
-	SplayTree(SplayTree&& sourceTree) = default;
+	SplayTree(SplayTree&& sourceTree) noexcept = default;
 	SplayTree& operator = (const SplayTree& sourceTree) = default;
-	SplayTree& operator = (SplayTree&& sourceTree) = default;
+	SplayTree& operator = (SplayTree&& sourceTree) noexcept = default;
+	~SplayTree() noexcept = default;
 
 	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
 	bool Retrieve(int targetKey, DataType& outData)

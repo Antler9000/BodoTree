@@ -1,7 +1,7 @@
 #ifndef BST_USING_WHILE_H
 #define BST_USING_WHILE_H
 
-#include "../Common/BstUsingWhileTemplate.h"		//직접 정의한 BstUsingWhileTemplate
+#include "../Common/BstUsingWhileTemplate.h"		//직접 정의한 클래스 BstUsingWhileTemplate
 #include <iostream>									//std::cout, std::ostream
 #include <utility>									//std::move, std::forward
 
@@ -24,7 +24,8 @@ class BstNode
 
 private:
 
-	//데이터가 lvalue 참조인 경우와 rvalue 참조인 경우를 모두 받을 수 있도록 포워딩을 사용함
+	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -63,10 +64,10 @@ public:
 
 	Bst() = default;
 	Bst(const Bst<DataType>& sourceTree) = default;
-	Bst(Bst<DataType>&& sourceTree) = default;
+	Bst(Bst<DataType>&& sourceTree) noexcept = default;
 	Bst<DataType>& operator = (const Bst<DataType>& sourceTree) = default;
-	Bst<DataType>& operator = (Bst<DataType>&& sourceTree) = default;
-	~Bst() = default;
+	Bst<DataType>& operator = (Bst<DataType>&& sourceTree) noexcept = default;
+	~Bst() noexcept = default;
 };
 
 #endif //BST_USING_WHILE_H
