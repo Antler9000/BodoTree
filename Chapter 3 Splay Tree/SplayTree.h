@@ -12,7 +12,7 @@ using namespace std;
 template <typename DataType>
 class SplayTree;
 
-//BstNode와 구성이 동일하지만, 단원의 구분을 위해서 SplayNode를 별도로 정의했음
+//note : BstNode와 구성이 동일하지만, 단원의 구분을 위해서 SplayNode를 별도로 정의했음
 template <typename DataType>
 class SplayNode
 {
@@ -20,7 +20,7 @@ class SplayNode
 
 	friend class BstTemplate<SplayNode, DataType>;
 
-	//unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
+	//specifier : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
 	friend struct default_delete<SplayNode<DataType>>;
 
 	friend ostream& operator <<(ostream& out, const SplayNode<DataType>& printedNode)
@@ -32,8 +32,8 @@ class SplayNode
 
 private:
 
-	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//parameter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename NewDataType = DataType>
 	SplayNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -45,13 +45,13 @@ private:
 
 	}
 
-	//이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
+	//note : 이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
 	~SplayNode() noexcept
 	{
 
 	}
 
-	//쓰이지 않는 노드 생성, 할당 방식들
+	//note : 쓰이지 않는 노드 생성, 할당 방식들
 	SplayNode() = delete;
 	SplayNode(SplayNode&& sourceNode) = delete;
 	SplayNode& operator = (const SplayNode& sourceNode) = delete;
@@ -77,7 +77,7 @@ public:
 	SplayTree& operator = (SplayTree&& sourceTree) noexcept = default;
 	~SplayTree() noexcept = default;
 
-	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
+	//return : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우에 false를 반환함
 	bool Retrieve(int targetKey, DataType& outData)
 	{
 		LogPrint("retrieve with splay");
@@ -100,7 +100,7 @@ public:
 			{
 				outData = pSearchNode->m_data;
 
-				//todo : 반복문으로 루트 노드까지 올리도록 로직을 수정하기(+삽입, 삭제에도 splay를 적용하기)
+				//todo	: 반복문으로 루트 노드까지 올리도록 로직을 수정하기(+삽입, 삭제에도 splay를 적용하기)
 				SplayNode<DataType>* pParentOfSearchNode = nullptr;
 				SplayNode<DataType>* pGrandParentOfSearchNode = nullptr;
 				SplayNode<DataType>* pGreatGrandParentOfSearchNode = nullptr;
@@ -120,7 +120,7 @@ public:
 
 private:
 
-	//조건문이 깊고 코드의 반복이 많아 좋지 못한 코드지만, 아래처럼 조정을 분기하고 하위 조정 메소드에 첫 매개변수를 레퍼런스로 전달하는 것이 최선이라고 판단함
+	//note : 조건문이 깊고 코드의 반복이 많아 좋지 못한 코드지만, 아래처럼 조정을 분기하고 하위 조정 메소드에 첫 매개변수를 레퍼런스로 전달하는 것이 최선이라고 판단함
 	void SplayTarget(SplayNode<DataType>* pGreatGrandParentOfTarget, SplayNode<DataType>* pGrandParentOfTarget, SplayNode<DataType>* pParentOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("splay target");
@@ -220,7 +220,7 @@ private:
 		}
 	}
 
-	//ZIG는 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용함
+	//paramter : ZIG는 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용함
 	void ZigL(SplayNode<DataType>*& pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig left");
@@ -239,7 +239,7 @@ private:
 		pFatherOfTarget = pTarget;
 	}
 
-	//ZIG_ZIG나 ZIG_ZAG와 같이 조부까지 변화가 일어나는 경우를 위해, 조부를 가리키는 증조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용하였다.
+	//parameter : ZIG_ZIG나 ZIG_ZAG와 같이 조부까지 변화가 일어나는 경우를 위해, 조부를 가리키는 증조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용하였다.
 	void ZigZigLL(SplayNode<DataType>*& pGrandFatherOfTarget, SplayNode<DataType>* pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig zig left left");

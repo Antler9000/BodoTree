@@ -27,14 +27,14 @@ void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
 void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
-//pushDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Heap와 priority_queue에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
+//paramter : pushDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Heap와 priority_queue에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
 time_point<steady_clock> TestHeap(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
 
 time_point<steady_clock> TestPriorityQueue(steady_clock& clock, int workloadNum, vector<string> pushDataWorkload, const vector<int>& pushKeyWorkload);
 
 int main()
 {
-	//디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
+	//note : 디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -686,7 +686,7 @@ time_point<steady_clock> TestHeap(steady_clock& clock, int workloadNum, vector<s
 		}
 
 		copyPushTestHeap.Pop(retrievedData);
-		retrievedData += 'a';			//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		retrievedData += 'a';			//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 
@@ -838,10 +838,10 @@ time_point<steady_clock> TestPriorityQueue(steady_clock& clock, int workloadNum,
 			}
 		}
 
-		//priority_queue는 pop 메소드가 top 아이템을 반환하지 않기 때문에, 동일한 기능을 수행하는 시간을 비교하기 위해 top()과 pop()을 연달아 호출하도록 함
+		//note : priority_queue는 pop 메소드가 top 아이템을 반환하지 않기 때문에, 동일한 기능을 수행하는 시간을 비교하기 위해 top()과 pop()을 연달아 호출하도록 함
 		retrievedData = copyPushTestPriorityQueue.top().m_data;
 		copyPushTestPriorityQueue.pop();
-		retrievedData += 'a';		//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		retrievedData += 'a';		//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 

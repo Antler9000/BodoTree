@@ -24,8 +24,8 @@ using namespace std;
 	#define ErrorPrint(statement)
 #endif
 
-//메모리 누수로 이어진 new 할당을 추적하기 위해선 기존 new가 아니라 오버로딩된 특별한 new를 사용하여야 함
-//이를 명시적으로 사용하여야 하므로, make_unique를 사용하지 말고 unique_ptr<T>(DBG_NEW T(argument))와 같은 방식을 사용하기로 함
+//note :	메모리 누수로 이어진 new 할당을 추적하기 위해선 기존 new가 아니라 오버로딩된 특별한 new를 사용하여야 함
+//			이를 명시적으로 사용하여야 하므로, make_unique를 사용하지 말고 unique_ptr<T>(DBG_NEW T(argument))와 같은 방식을 사용하기로 함
 #ifdef _DEBUG
 	#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
 #else

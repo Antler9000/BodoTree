@@ -12,7 +12,7 @@ class BstNode
 {
 	friend class BstTemplate<BstNode, DataType>;
 
-	//unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
+	//specifier : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
 	friend struct default_delete<BstNode<DataType>>;
 
 	friend ostream& operator <<(ostream& out, const BstNode<DataType>& printedNode)
@@ -24,8 +24,8 @@ class BstNode
 
 private:
 
-	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//parameter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -37,13 +37,13 @@ private:
 
 	}
 
-	//이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
+	//note : 이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
 	~BstNode() noexcept
 	{
 
 	}
 
-	//쓰이지 않는 노드 생성, 할당 방식들
+	//note : 쓰이지 않는 노드 생성, 할당 방식들
 	BstNode() = delete;
 	BstNode(BstNode&& sourceNode) = delete;
 	BstNode& operator = (const BstNode& sourceNode) = delete;

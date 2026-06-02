@@ -71,35 +71,35 @@ public:
 		RemoveTree();
 	}
 
-	//bool 반환값이 false인 경우 : newKey와 같은 키의 노드가 이미 존재하는 경우
-	//데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//TODO : 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//return	: newKey와 같은 키의 노드가 이미 존재하는 경우 false를 반환함
+	//parameter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename InsertDataType = DataType>
 	bool Insert(int newKey, InsertDataType&& newData)
 	{
 		LogPrint("insert");
 		
 		unique_ptr<NodeType<DataType>> upNewNode = unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(newKey, forward<InsertDataType>(newData)));
-		return Search(newKey, &BstTemplate::InsertNode, move(upNewNode));
+		return GenericSearch(newKey, &BstTemplate::InsertNode, move(upNewNode));
 	}
 
-	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
+	//return : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
 	bool Retrieve(int targetKey, DataType& outData) const
 	{
 		LogPrint("retrieve");
 
-		return Search(targetKey, &BstTemplate::RetrieveNode, outData);
+		return GenericSearch(targetKey, &BstTemplate::RetrieveNode, outData);
 	}
 
-	//bool 반환값이 false인 경우 : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우
+	//return : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
 	bool Remove(int targetKey)
 	{
 		LogPrint("remove one item");
 
-		return Search(targetKey, &BstTemplate::RemoveNode, nullptr);
+		return GenericSearch(targetKey, &BstTemplate::RemoveNode, nullptr);
 	}
 
-	//트리의 소멸자와 이동 할당 연산자에 사용되므로 예외를 던지는 경우가 없도록 하였음
+	//specifier : 트리의 소멸자와 이동 할당 연산자에 사용되므로 예외를 던지는 경우가 없도록 하였음
 	void RemoveTree() noexcept
 	{
 		LogPrint("remove tree");
@@ -107,78 +107,76 @@ public:
 		RemovingBstByRotationRR();
 	}
 
-	//트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
-	//복사를 통한 인자 전달은 성능에도 안 좋고, 게다가 복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
+	//parameter	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
+	//				복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
 	void CopyTree(const BstTemplate<NodeType, DataType>& sourceBst)
 	{
 		LogPrint("copy tree");
 
 		BstTemplate<NodeType, DataType> tempTree;
-		sourceBst.PreorderTraverse(&BstTemplate::CopyNode, &tempTree);
+		sourceBst.GenericPreorderTraverse(&BstTemplate::CopyNode, &tempTree);
 		*this = move(tempTree);
 	}
 
-	//디버깅용 퍼블릭 메소드들임
+	//note : 디버깅용 퍼블릭 메소드들임
 	void PreorderPrint() const
 	{
 		LogPrint("preorder print");
 
-		PreorderTraverse(&BstTemplate::PrintTargetNode, nullptr);
+		GenericPreorderTraverse(&BstTemplate::PrintTargetNode, nullptr);
 	}
 
 	void InorderPrint() const
 	{
 		LogPrint("inorder print");
 
-		InorderTraverse(&BstTemplate::PrintTargetNode, nullptr);
+		GenericInorderTraverse(&BstTemplate::PrintTargetNode, nullptr);
 	}
 
 	void PostorderPrint() const
 	{
 		LogPrint("postorder print");
 
-		PostorderTraverse(&BstTemplate::PrintTargetNode, nullptr);
+		GenericPostorderTraverse(&BstTemplate::PrintTargetNode, nullptr);
 	}
 
 protected:	//제너릭 메소드들
 
-	//특정 target_key를 가진 노드의 위치에 대해 수행할 작업을 넘겨주는 제너릭 메소드임
-	//메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//상위 메소드와 하위 작업 메소드가 const 메소드인 경우를 지원하기 위한 const 버전의 제너릭 메소드 버전도 같이 있음
-	//TODO : InsertNode(..) 하위 작업 메소드의 호출이 인라이닝될 수 있도록 제너릭 프로그래밍 방식을 개선하기
-	//TODO : const 여부에 상관없는 하나의 제너릭 메소드로 통합할 수 있도록 제너릭 프로그래밍 방식을 개선하기
-	//TODO : 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
-	//TODO : 단순한 인자 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//parameter	: 메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//specifier	: 상위 메소드와 하위 작업 메소드가 const 메소드인 경우를 지원하기 위한 const 버전의 제너릭 메소드 버전도 같이 있음
+	//todo		: InsertNode(..) 하위 작업 메소드의 호출이 인라이닝될 수 있도록 제너릭 프로그래밍 방식을 개선하기
+	//todo		: const 여부에 상관없는 하나의 제너릭 메소드로 통합할 수 있도록 제너릭 프로그래밍 방식을 개선하기
+	//todo		: 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
+	//todo		: 단순한 인자 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename MethodType, typename ArgumentType>
-	bool Search(int targetKey, MethodType&& method, ArgumentType&& argument);
+	bool GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument);
 
 	template <typename MethodType, typename ArgumentType>
-	bool Search(int targetKey, MethodType&& method, ArgumentType&& argument) const;
+	bool GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument) const;
 
-	//전위순회로 돌면서 각 노드에 수행할 작업을 수행하는 제너릭 메소드임
-	//메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//트리 복사의 소스 트리에서 실행되거나, 순회 출력 메소드에서만 사용되므로 const 메소드로 선언하였음
-	//TODO : 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
-	//TODO : 단순한 인자 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//parameter	: 메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
+	//specifier	: 트리 복사의 소스 트리에서 실행되거나, 순회 출력 메소드에서만 사용되므로 const 메소드로 선언하였음
+	//todo		: 하위 작업 메소드에 전달되는 매개변수 개수를 유동적으로 템플릿할 수 있도록 제너릭 프로그래밍 방식을 개선하기
+	//todo		: 단순한 인자 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
 	template <typename MethodType, typename ArgumentType>
-	void PreorderTraverse(MethodType&& method, ArgumentType&& argument) const;
-
-	template <typename MethodType, typename ArgumentType>
-	void InorderTraverse(MethodType&& method, ArgumentType&& argument) const;
+	void GenericPreorderTraverse(MethodType&& method, ArgumentType&& argument) const;
 
 	template <typename MethodType, typename ArgumentType>
-	void PostorderTraverse(MethodType&& method, ArgumentType&& argument) const;
+	void GenericInorderTraverse(MethodType&& method, ArgumentType&& argument) const;
+
+	template <typename MethodType, typename ArgumentType>
+	void GenericPostorderTraverse(MethodType&& method, ArgumentType&& argument) const;
 
 protected:	//제너릭 메소드에 전달되는 하위 작업 메소드들
 
-	//삽입 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
+	//parameter	: 삽입 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
 	bool InsertNode(NodeType<DataType>*& pInsertPosition, unique_ptr<NodeType<DataType>> upNewNode);
 
 	bool RetrieveNode(const NodeType<DataType>* pTargetNode, DataType& outData) const;
 
-	//삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
-	//TODO : 제너릭 메소드들에 전달되는 매개변수의 개수가 유동적으로 조정될 수 있게 되면 더미 매개변수를 지우기
-	//TODO : 하위 메소드 호출이 인라이닝화 될 수 있도록 로직 개선하기
+	//paramerter	: 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
+	//todo			: 제너릭 메소드들에 전달되는 매개변수의 개수가 유동적으로 조정될 수 있게 되면 더미 매개변수를 지우기
+	//todo			: 하위 메소드 호출이 인라이닝화 될 수 있도록 로직 개선하기
 	bool RemoveNode(NodeType<DataType>*& pTargetNode, void* pDummyParameter);
 
 	void ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode);
@@ -187,12 +185,12 @@ protected:	//제너릭 메소드에 전달되는 하위 작업 메소드들
 
 	void CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const;
 
-	//TODO : 제너릭 메소드들에 전달되는 매개변수의 개수가 유동적으로 조정될 수 있게 되면 더미 매개변수를 지우기
+	//todo : 제너릭 메소드들에 전달되는 매개변수의 개수가 유동적으로 조정될 수 있게 되면 더미 매개변수를 지우기
 	void PrintTargetNode(const NodeType<DataType>* pTargetNode, void* pDummyParameter) const;
 
 protected:	//논 제너릭 하위 메소드
 
-	//트리의 소멸자와 이동 할당 연산자의 하위 메소드로 사용되므로 예외를 던지는 경우가 없도록 하였음
+	//specifier	: 트리의 소멸자와 이동 할당 연산자의 하위 메소드로 사용되므로 예외를 던지는 경우가 없도록 하였음
 	void RemovingBstByRotationRR() noexcept;
 
 protected:
@@ -202,7 +200,7 @@ protected:
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& method, ArgumentType&& argument)
+inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument)
 {
 	LogPrint("generic search method (not const method)");
 
@@ -247,7 +245,7 @@ inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& 
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& method, ArgumentType&& argument) const
+inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument) const
 {
 	LogPrint("generic search method (const method)");
 
@@ -292,7 +290,7 @@ inline bool BstTemplate<NodeType, DataType>::Search(int targetKey, MethodType&& 
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline void BstTemplate<NodeType, DataType>::PreorderTraverse(MethodType&& method, ArgumentType&& argument) const
+inline void BstTemplate<NodeType, DataType>::GenericPreorderTraverse(MethodType&& method, ArgumentType&& argument) const
 {
 	LogPrint("generic preorder traverse method");
 
@@ -317,7 +315,7 @@ inline void BstTemplate<NodeType, DataType>::PreorderTraverse(MethodType&& metho
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline void BstTemplate<NodeType, DataType>::InorderTraverse(MethodType&& method, ArgumentType&& argument) const
+inline void BstTemplate<NodeType, DataType>::GenericInorderTraverse(MethodType&& method, ArgumentType&& argument) const
 {
 	LogPrint("generic inorder traverse method");
 
@@ -347,7 +345,7 @@ inline void BstTemplate<NodeType, DataType>::InorderTraverse(MethodType&& method
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline void BstTemplate<NodeType, DataType>::PostorderTraverse(MethodType&& method, ArgumentType&& argument) const
+inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(MethodType&& method, ArgumentType&& argument) const
 {
 	LogPrint("generic postorder traverse method");
 
@@ -437,7 +435,7 @@ inline bool BstTemplate<NodeType, DataType>::RemoveNode(NodeType<DataType>*& pTa
 		return false;
 	}
 
-	//중위선행자와 중위후속자가 둘 다 있는 경우에는 균형 유지에 조금이나마 도움이 되기 위해서 대체할 대상을 다소 무작위적으로 선택함
+	//note : 중위선행자와 중위후속자가 둘 다 있는 경우에는 균형 유지에 조금이나마 도움이 되기 위해서 대체할 대상을 다소 무작위적인 홀짱 방식으로 선택함
 	if (pTargetNode->m_pLeftChild != nullptr && pTargetNode->m_pRightChild != nullptr)
 	{
 		if (pTargetNode->m_key % 2 == 0)
@@ -534,7 +532,7 @@ inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* 
 	LogPrint("copy node task method");
 
 	unique_ptr<NodeType<DataType>> upCopiedNode = unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(*pSourceNode));
-	pDestBst->Search(pSourceNode->m_key, &BstTemplate::InsertNode, move(upCopiedNode));
+	pDestBst->GenericSearch(pSourceNode->m_key, &BstTemplate::InsertNode, move(upCopiedNode));
 }
 
 template <template <typename> class NodeType, typename DataType>

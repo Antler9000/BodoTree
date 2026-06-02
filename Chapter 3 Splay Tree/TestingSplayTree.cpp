@@ -29,14 +29,14 @@ void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
 void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
-//insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 SplayTree와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
+//paramter : insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 SplayTree와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
 time_point<steady_clock> TestSplayTree(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 int main()
 {
-	//디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
+	//note : 디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -711,7 +711,7 @@ time_point<steady_clock> TestSplayTree(steady_clock& clock, int workloadNum, vec
 		}
 
 		copyInsertTestSplayTree.Retrieve(insertKeyWorkload[i], retrievedData);
-		retrievedData += 'a';			//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		retrievedData += 'a';			//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 
@@ -874,7 +874,7 @@ time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<st
 		}
 
 		auto iterator = copyInsertTestMap.find(retrieveKeyWorkload[i]);
-		iterator->second += 'a';			//컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		iterator->second += 'a';			//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 
