@@ -1,10 +1,10 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-#include "../Common/Debug.h"	//직접 정의한 매크로 LogPrint, WarningPrint, DBG_NEW
-#include <iostream>				//std::cout, std::endl
-#include <memory>				//std::unique_ptr
-#include <utility>				//std::move, std::forward
+#include "../Common/Debug.h"
+#include <iostream>
+#include <memory>
+#include <utility>
 
 using namespace std;
 
@@ -22,11 +22,11 @@ class HeapNode
 {
 	friend class Heap <DataType>;
 
-	//specifier : MinHeap과 MaxHeap 까지만 구현할 예정이므로, 굳이 추가클래스 구현에 열려있을 필요가 없어 여기에 friend를 일일이 선언하는 방식을 사용했음
+	//NOTE : MinHeap과 MaxHeap 까지만 구현할 예정이므로, 여기에 friend를 일일이 선언하는 방식을 사용했음
 	friend class MinHeap<DataType>;
 	friend class MaxHeap<DataType>;
 
-	//specifier : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 한다
+	//NOTE : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
 	friend struct default_delete<HeapNode<DataType>[]>;
 
 private:
@@ -36,8 +36,7 @@ private:
 
 	}
 
-	//paramter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(forward<NewDataType>(data))
 	{
@@ -78,7 +77,7 @@ private:
 		m_data = move(sourceNode.m_data);
 
 		sourceNode.m_key = 0;
-		//note : source 측의 m_data는 DataType의 이동 생성자를 통해 이미 빈 상태가 되었다고 가정함
+		//NOTE : source 측의 m_data는 DataType의 이동 생성자를 통해 이미 빈 상태가 되었다고 가정함
 
 		return *this;
 	}
@@ -167,8 +166,7 @@ public:
 		m_capacity = 0;
 	}
 
-	//paramter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//PARAMTER : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename PushDataType = DataType>
 	void Push(int newKey, PushDataType&& newData)
 	{
@@ -185,7 +183,7 @@ public:
 		ReorderByPromoting();
 	}
 
-	//return : 힙이 비어져 있는 경우 false를 반환함
+	//RETURN : 힙이 비어져 있는 경우 false를 반환함
 	bool Pop(DataType& outData)
 	{
 		LogPrint("pop");
@@ -197,16 +195,16 @@ public:
 			return false;
 		}
 
-		outData = m_pNodes[0].m_data;		//note : DataType의 이동 생성자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
+		outData = move(m_pNodes[0].m_data);
 
-		m_pNodes[0] = m_pNodes[m_size-1];
+		m_pNodes[0] = m_pNodes[m_size-1];	//NOTE : 노드 내부에 저장되는 DataType의 이동 할당자가 noexcept임이 보장되지 않아 move(..)를 사용하지 않았음
 		m_size--;
 		ReorderByDemoting();
 
 		return true;
 	}
 
-	//return : 힙이 비어져 있는 경우 false를 반환함
+	//RETURN : 힙이 비어져 있는 경우 false를 반환함
 	bool GetTop(DataType& outData)
 	{
 		LogPrint("get top");
@@ -223,7 +221,7 @@ public:
 		return true;
 	}
 
-	//return : 힙에 하나의 데이터라도 있으면 false를 반환함
+	//RETURN : 힙에 하나의 데이터라도 있으면 false를 반환함
 	bool IsEmpty()
 	{
 		LogPrint("is empty?");
@@ -238,7 +236,7 @@ public:
 		}
 	}
 
-	//specifier : Heap의 소멸자에서 사용되므로 예외를 던지는 경우가 없도록 하였음
+	//NOTE : Heap의 소멸자에서 사용되므로 예외를 던지는 경우가 없도록 하였음
 	void RemoveHeap() noexcept
 	{
 		LogPrint("remove heap");
@@ -266,7 +264,7 @@ public:
 		m_size = sourceHeap.m_size;
 	}
 
-	//note : 디버깅용 퍼블릭 메소드임
+	//NOTE : 디버깅용
 	void PrintHeap()
 	{
 		LogPrint("print heap");
@@ -277,7 +275,7 @@ public:
 		}
 	}
 
-protected:
+private:
 
 	void GiveLargerMemorySpace()
 	{
@@ -288,7 +286,7 @@ protected:
 
 		for (int i = 0; i < m_size; i++)
 		{
-			upTempData[i] = m_pNodes[i];	//note : DataType의 이동 생성자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았다
+			upTempData[i] = m_pNodes[i];	//NOTE : 노드 내부에 저장되는 DataType의 이동 할당자가 noexcept임이 보장되지 않아 move(..)를 사용하지 않았음
 		}
 
 		delete[] m_pNodes;
@@ -296,7 +294,7 @@ protected:
 		m_capacity = newCapacity;
 	}
 
-	//note : Swap(..)으로부터 올라오는 예외에 안전하지 못한 구현이지만, 더 나은 방식이 생각나지 않아 그대로 두려고 함
+	//NOTE : Swap(..)으로부터 올라오는 예외에 안전하지 못한 구현이지만, 더 나은 방식이 생각나지 않아 그대로 두려고 함
 	void ReorderByPromoting()
 	{
 		LogPrint("reorder by promoting");
@@ -313,7 +311,7 @@ protected:
 		}
 	}
 
-	//note : Swap(..)으로부터 올라오는 예외에 안전하지 못한 구현이지만, 더 나은 방식이 생각나지 않아 그대로 두려고 함
+	//NOTE : Swap(..)으로부터 올라오는 예외에 안전하지 못한 구현이지만, 더 나은 방식이 생각나지 않아 그대로 두려고 함
 	void ReorderByDemoting()
 	{
 		LogPrint("reorder by demoting");
@@ -356,17 +354,13 @@ protected:
 		}
 	}
 
-protected:
-
-	//specifier	: 데이터 타입의 이동 할당 연산자가 noexcept임이 보장되지 않기에, Swap(..)에 noexcept를 붙이지 않았다
-	//note		: 같은 이유로 Swap(..) 내부도 예외 안전성이 강하지 못하나, 더 나은 방식이 생각나지 않아 이대로 두려고 한다
 	void Swap(HeapNode<DataType>& nodeA, HeapNode<DataType>& nodeB)
 	{
 		LogPrint("swap");
 
-		HeapNode<DataType> temp = move(nodeA);
-		nodeA = move(nodeB);
-		nodeB = move(temp);
+		HeapNode<DataType> temp = nodeA;	//NOTE : 노드 내부에 저장되는 DataType의 이동 할당자가 noexcept임이 보장되지 않아 move(..)를 사용하지 않았음
+		nodeA = nodeB;						//NOTE : 여기부터 예외가 올라오면 nodeA나 nodeB가 훼손된 채로 끝나게 된다는 문제점이 있으나, 더 나은 방식을 생각해내지 못함
+		nodeB = temp;
 	}
 
 	int GetLeftChildIndex(int dataIndex)
@@ -390,7 +384,9 @@ protected:
 		return ((dataIndex - 1) / 2);
 	}
 
-	virtual bool IsNotOrdered(int parentIndex, int childIndex) = 0;					//note : 상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
+	//NOTE : 상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
+	//TODO : 동적 폴리몰피즘을 사용하지 않고 정적인 방식으로 구현하자
+	virtual bool IsNotOrdered(int parentIndex, int childIndex) = 0;
 	virtual bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex) = 0;
 
 protected:

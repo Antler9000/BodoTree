@@ -3,17 +3,17 @@
 //#define TREE_ERROR
 //#define TREE_WARNING
 
-#include "BstUsingRecurse.h"	//직접 정의한 클래스 Bst
-#include <crtdbg.h>				//_CrtSetDbgFlag
-#include <iostream>				//std::cout, std::endl
-#include <iomanip>				//std::fixed, std::setprecision
-#include <chrono>;				//chrono::clock, chrono::time_point, chrono::steady_clock, chrono::duration, chrono::duration::count
-#include <string>;				//std::string
-#include <numeric>;				//std::iota
-#include <random>;				//std::mt19937
-#include <algorithm>			//std::shuffle
-#include <map>;					//std::map
-#include <utility>				//std::move
+#include "BstUsingRecurse.h"
+#include <crtdbg.h>
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <string>
+#include <numeric>
+#include <random>
+#include <algorithm>
+#include <map>
+#include <utility>
 
 using namespace std;
 using namespace chrono;
@@ -29,14 +29,14 @@ void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
 void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
-//paramter : insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Bst와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
+//NOTE : insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Bst와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
 time_point<steady_clock> TestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 int main()
 {
-	//note : 디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
+	//NOTE : 디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -594,7 +594,6 @@ void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen)
 	cout << endl << endl << endl << endl << endl;
 }
 
-
 time_point<steady_clock> TestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload)
 {
 	Bst<string> copyInsertTestBst;
@@ -705,7 +704,7 @@ time_point<steady_clock> TestBst(steady_clock& clock, int workloadNum, vector<st
 		}
 
 		copyInsertTestBst.Retrieve(insertKeyWorkload[i], retrievedData);
-		retrievedData += 'a';			//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		retrievedData += 'a';			//NOTE : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 
@@ -868,7 +867,7 @@ time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<st
 		}
 
 		auto iterator = copyInsertTestMap.find(retrieveKeyWorkload[i]);
-		iterator->second += 'a';			//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		iterator->second += 'a';			//NOTE : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 

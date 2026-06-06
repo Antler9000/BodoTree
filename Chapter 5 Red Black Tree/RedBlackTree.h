@@ -159,7 +159,7 @@ private:
 		}
 	}
 
-	//회전으로 인해 조부 노드의 위치가 변하면, 증조부 노드의 자식 포인터도 그에 맞게 업데이트해줘야 한다.
+	//회전으로 인해 조부 노드의 위치가 변하면, 증조부 노드의 자식 포인터도 그에 맞게 업데이트해줘야 함
 	//따라서 조부 노드의 경우에는 단순히 해당 노드의 포인터를 값으로 받아오지 않고, 증조부 노드의 자식 포인터의 레퍼런스 인자로 받아왔다.
 	void SelectProperRotation(bool isDoubleRed, RedBlackNode<DataType>* pTarget, RedBlackNode<DataType>* pParent, RedBlackNode<DataType>*& pGrandParent)
 	{

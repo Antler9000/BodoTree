@@ -1,9 +1,9 @@
 #ifndef BST_USING_RECURSE_H
 #define BST_USING_RECURSE_H
 
-#include "../Common/Debug.h"		//직접 정의한 매크로 LogPrint, WarningPrint, DBG_NEW
-#include <iostream>					//std::cout, std::ostream
-#include <utility>					//std::move, std::forward
+#include "../Common/Debug.h"
+#include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -17,8 +17,7 @@ class BstNode
 
 private:
 
-	//parameter : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -31,7 +30,8 @@ private:
 		delete m_pRightChild;
 	}
 
-	//note : 쓰이지 않는 노드 생성, 할당 방식들
+
+	//NOTE : 쓰이지 않는 노드 생성, 할당 방식들
 	BstNode() = delete;
 	BstNode(const BstNode& sourceNode) = delete;
 	BstNode(BstNode&& sourceNode) = delete;
@@ -103,9 +103,8 @@ public:
 		RemoveTree();
 	}
 
-	//return	: newKey와 같은 키의 노드가 이미 존재하는 경우 false를 반환함
-	//parameter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//RETURN	: newKey와 같은 키의 노드가 이미 존재하는 경우 false를 반환함
+	//NOTE		: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
 	bool Insert(int newKey, InsertDataType&& newData)
 	{
@@ -123,7 +122,7 @@ public:
 		}
 	}
 
-	//return : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
+	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
 	bool Retrieve(int targetKey, DataType& outData) const
 	{
 		LogPrint("retrieve");
@@ -138,7 +137,7 @@ public:
 		return RetrieveRecurse(m_pHead, targetKey, outData);
 	}
 
-	//return : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
+	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
 	bool Remove(int targetKey)
 	{
 		LogPrint("remove one item");
@@ -164,7 +163,7 @@ public:
 		}
 	}
 
-	//specifier : 트리의 소멸자와 이동 할당 연산자에 사용되므로 예외를 던지는 경우가 없도록 하였음
+	//NOTE : 트리의 소멸자와 이동 할당 연산자에 사용되므로 예외를 던지는 경우가 없도록 하였음
 	void RemoveTree() noexcept
 	{
 		LogPrint("remove tree");
@@ -173,8 +172,8 @@ public:
 		m_pHead = nullptr;
 	}
 
-	//parameter	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
-	//				복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
+	//NOTE	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
+	//			복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
 	void CopyTree(const Bst<DataType>& sourceTree)
 	{
 		LogPrint("copy tree");
@@ -184,7 +183,7 @@ public:
 		*this = move(tempTree);
 	}
 
-	//note : 디버깅용 퍼블릭 메소드들임
+	//NOTE : 디버깅용
 	void PreorderPrint() const
 	{
 		LogPrint("preorder print");
@@ -229,8 +228,7 @@ public:
 
 private:
 
-	//parameter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		:단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
 	bool InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, InsertDataType&& newData);
 
@@ -238,7 +236,7 @@ private:
 
 	bool RemoveRecurse(BstNode<DataType>* pSearchNode, int targetKey);
 
-	//paramter : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
+	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
 	void RemoveTarget(BstNode<DataType>*& pTargetNode);
 
 	void ReplaceWithInorderPredecessor(BstNode<DataType>*& pTargetNode);
@@ -385,7 +383,7 @@ inline void Bst<DataType>::RemoveTarget(BstNode<DataType>*& pTargetNode)
 {
 	LogPrint("remove target");
 
-	//note : 중위선행자와 중위후속자가 둘 다 있는 경우에는 균형 유지에 조금이나마 도움이 되기 위해서 대체할 대상을 다소 무작위적인 홀짝 방식으로 선택함
+	//NOTE : 중위선행자와 중위후속자가 둘 다 있는 경우에는 균형 유지에 조금이나마 도움이 되기 위해서 대체할 대상을 다소 무작위적인 홀짝 방식으로 선택함
 	if (pTargetNode->m_pLeftChild != nullptr && pTargetNode->m_pRightChild != nullptr)
 	{
 		if (pTargetNode->m_key % 2 == 0)

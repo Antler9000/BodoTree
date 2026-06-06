@@ -1,13 +1,13 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include "Debug.h"					//직접 정의한 매크로 DBG_NEW
-#include <memory>					//std::unique_ptr
-#include <utility>					//std::move, std::forward
+#include "Debug.h"
+#include <memory>
+#include <utility>
 
 using namespace std;
 
-template <class DataType>
+template <typename DataType>
 class Stack
 {
 public:
@@ -60,8 +60,7 @@ public:
 		RemoveStack();
 	}
 
-	//parameter : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename PushDataType = DataType>
 	void Push(PushDataType&& newData)
 	{
@@ -72,10 +71,10 @@ public:
 		}
 		else if (m_capacity == m_size)
 		{
-			unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[2 * m_capacity]);
+			unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity * 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
 			for (int i = 0; i < m_size; i++)
 			{
-				upNewData[i] = m_pDatum[i];		//note : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
+				upNewData[i] = m_pDatum[i];		//NOTE : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
 			}
 
 			delete[] m_pDatum;
@@ -87,7 +86,7 @@ public:
 		m_size++;
 	}
 
-	//return : 내부에 데이터가 하나도 없는 경우 false를 반환
+	//RETURN : 내부에 데이터가 하나도 없는 경우 false를 반환
 	bool Pop(DataType& outData)
 	{
 		if (m_size == 0)
@@ -108,10 +107,10 @@ public:
 			}
 			else
 			{
-				unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity / 2]);
+				unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity / 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
 				for (int i = 0; i < m_size; i++)
 				{
-					upNewData[i] = m_pDatum[i];	//note : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
+					upNewData[i] = m_pDatum[i];		//NOTE : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
 				}
 
 				delete[] m_pDatum;
@@ -123,7 +122,7 @@ public:
 		return true;
 	}
 
-	//return : 내부에 데이터가 하나도 없는 경우 false를 반환함
+	//RETURN : 내부에 데이터가 하나도 없는 경우 false를 반환함
 	bool GetTop(DataType& outData)
 	{
 		if (m_size == 0)
@@ -156,7 +155,7 @@ public:
 		m_capacity = 0;
 	}
 
-	//return : 내부에 데이터가 하나도 없는 경우 false를 반환함
+	//RETURN : 내부에 데이터가 하나도 없는 경우 false를 반환함
 	bool CopyStack(const Stack<DataType>& sourceStack)
 	{
 		if (sourceStack.m_size == 0)

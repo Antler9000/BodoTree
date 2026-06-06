@@ -3,16 +3,15 @@
 //#define TREE_ERROR
 //#define TREE_WARNING
 
-#include "heap.h"				//직접 정의한 클래스 Heap
-#include <crtdbg.h>				//_CrtSetDbgFlag
-#include <iostream>				//std::cout, std::endl
-#include <iomanip>				//std::fixed, std::setprecision
-#include <chrono>;				//chrono::clock, chrono::time_point, chrono::steady_clock, chrono::duration, chrono::duration::count
-#include <string>;				//std::string
-#include <numeric>;				//std::iota
-#include <random>;				//std::mt19937
-#include <algorithm>			//std::shuffle
-#include <queue>;				//std::priority_queue
+#include "heap.h"
+#include <crtdbg.h>
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <numeric>
+#include <random>
+#include <algorithm>
+#include <queue>
 
 using namespace chrono;
 
@@ -34,7 +33,7 @@ time_point<steady_clock> TestPriorityQueue(steady_clock& clock, int workloadNum,
 
 int main()
 {
-	//note : 디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
+	//NOTE : 디버깅 실행이 종료될 시점에도 해제되지 않은 동적 메모리 누수가 존재할 시, Visual Studio의 하단의 출력창(output)에 해당 누수에 대한 정보가 출력됨
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -686,7 +685,7 @@ time_point<steady_clock> TestHeap(steady_clock& clock, int workloadNum, vector<s
 		}
 
 		copyPushTestHeap.Pop(retrievedData);
-		retrievedData += 'a';			//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		retrievedData += 'a';			//NOTE : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 
@@ -838,10 +837,10 @@ time_point<steady_clock> TestPriorityQueue(steady_clock& clock, int workloadNum,
 			}
 		}
 
-		//note : priority_queue는 pop 메소드가 top 아이템을 반환하지 않기 때문에, 동일한 기능을 수행하는 시간을 비교하기 위해 top()과 pop()을 연달아 호출하도록 함
+		//NOTE : priority_queue는 pop 메소드가 top 아이템을 반환하지 않기 때문에, 동일한 기능을 수행하는 시간을 비교하기 위해 top()과 pop()을 연달아 호출하도록 함
 		retrievedData = copyPushTestPriorityQueue.top().m_data;
 		copyPushTestPriorityQueue.pop();
-		retrievedData += 'a';		//note : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
+		retrievedData += 'a';		//NOTE : 컴파일, 링킹 최적화로 테스트 중의 검색 메소드 호출이 건너뛰어지는 경우가 없도록 하기 위한 추가 명령문임
 	}
 	cout << endl;
 

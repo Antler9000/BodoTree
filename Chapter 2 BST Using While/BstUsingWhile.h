@@ -1,9 +1,9 @@
 #ifndef BST_USING_WHILE_H
 #define BST_USING_WHILE_H
 
-#include "../Common/BstUsingWhileTemplate.h"		//직접 정의한 클래스 BstUsingWhileTemplate
-#include <iostream>									//std::cout, std::ostream
-#include <utility>									//std::move, std::forward
+#include "../Common/BstUsingWhileTemplate.h"
+#include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -12,7 +12,7 @@ class BstNode
 {
 	friend class BstTemplate<BstNode, DataType>;
 
-	//specifier : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
+	//NOTE : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
 	friend struct default_delete<BstNode<DataType>>;
 
 	friend ostream& operator <<(ostream& out, const BstNode<DataType>& printedNode)
@@ -24,8 +24,7 @@ class BstNode
 
 private:
 
-	//parameter	: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
-	//todo		: 단순한 데이터 타입에 대해선 참조가 아니라 값복사 사용하기
+	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
 	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
@@ -37,13 +36,13 @@ private:
 
 	}
 
-	//note : 이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
+	//NOTE : 이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
 	~BstNode() noexcept
 	{
 
 	}
 
-	//note : 쓰이지 않는 노드 생성, 할당 방식들
+	//NOTE : 쓰이지 않는 노드 생성, 할당 방식들
 	BstNode() = delete;
 	BstNode(BstNode&& sourceNode) = delete;
 	BstNode& operator = (const BstNode& sourceNode) = delete;
