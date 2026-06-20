@@ -7,8 +7,6 @@
 #include <memory>
 #include <utility>
 
-using namespace std;	
-
 template <template <typename> class NodeType, typename DataType>
 class BstTemplate
 {
@@ -78,7 +76,7 @@ public:
 	{
 		LogPrint("insert");
 		
-		unique_ptr<NodeType<DataType>> upNewNode = unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(newKey, forward<InsertDataType>(newData)));
+		std::unique_ptr<NodeType<DataType>> upNewNode = std::unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(newKey, std::forward<InsertDataType>(newData)));
 		return GenericSearch(newKey, &BstTemplate::InsertNode, move(upNewNode));
 	}
 
@@ -114,7 +112,7 @@ public:
 
 		BstTemplate<NodeType, DataType> tempTree;
 		sourceBst.GenericPreorderTraverse(&BstTemplate::CopyNode, &tempTree);
-		*this = move(tempTree);
+		*this = std::move(tempTree);
 	}
 
 	//NOTE : 디버깅용
@@ -163,15 +161,13 @@ protected:	//NOTE : 제너릭 메소드들
 protected:	//NOTE : 제너릭 메소드에 전달되는 하위 작업 메소드들
 
 	//NOTE : 삽입 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
-	bool InsertNode(NodeType<DataType>*& pInsertPosition, unique_ptr<NodeType<DataType>> upNewNode);
+	bool InsertNode(NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode);
 
 	bool RetrieveNode(const NodeType<DataType>* pTargetNode, DataType& outData) const;
 
 	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
 	bool RemoveNode(NodeType<DataType>*& pTargetNode, void* pDummyParameter);
-
 	void ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode);
-
 	void ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode);
 
 	void CopyNode(const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const;
@@ -196,11 +192,11 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 
 	if (m_pHead == nullptr)
 	{
-		return (this->*forward<MethodType>(method))(m_pHead, forward<ArgumentType>(argument));
+		return (this->*std::forward<MethodType>(method))(m_pHead, std::forward<ArgumentType>(argument));
 	}
 	else if (targetKey == m_pHead->m_key)
 	{
-		return (this->*forward<MethodType>(method))(m_pHead, forward<ArgumentType>(argument));
+		return (this->*std::forward<MethodType>(method))(m_pHead, std::forward<ArgumentType>(argument));
 	}
 	else
 	{
@@ -211,7 +207,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 			{
 				if (pSearchNode->m_pLeftChild == nullptr || pSearchNode->m_pLeftChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearchNode->m_pLeftChild, forward<ArgumentType>(argument));
+					return (this->*std::forward<MethodType>(method))(pSearchNode->m_pLeftChild, std::forward<ArgumentType>(argument));
 				}
 				else
 				{
@@ -222,7 +218,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 			{
 				if (pSearchNode->m_pRightChild == nullptr || pSearchNode->m_pRightChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearchNode->m_pRightChild, forward<ArgumentType>(argument));
+					return (this->*std::forward<MethodType>(method))(pSearchNode->m_pRightChild, std::forward<ArgumentType>(argument));
 				}
 				else
 				{
@@ -241,11 +237,11 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 
 	if (m_pHead == nullptr)
 	{
-		return (this->*forward<MethodType>(method))(m_pHead, forward<ArgumentType>(argument));
+		return (this->*std::forward<MethodType>(method))(m_pHead, std::forward<ArgumentType>(argument));
 	}
 	else if (targetKey == m_pHead->m_key)
 	{
-		return (this->*forward<MethodType>(method))(m_pHead, forward<ArgumentType>(argument));
+		return (this->*std::forward<MethodType>(method))(m_pHead, std::forward<ArgumentType>(argument));
 	}
 	else
 	{
@@ -256,7 +252,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 			{
 				if (pSearchNode->m_pLeftChild == nullptr || pSearchNode->m_pLeftChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearchNode->m_pLeftChild, forward<ArgumentType>(argument));
+					return (this->*std::forward<MethodType>(method))(pSearchNode->m_pLeftChild, std::forward<ArgumentType>(argument));
 				}
 				else
 				{
@@ -267,7 +263,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 			{
 				if (pSearchNode->m_pRightChild == nullptr || pSearchNode->m_pRightChild->m_key == targetKey)
 				{
-					return (this->*forward<MethodType>(method))(pSearchNode->m_pRightChild, forward<ArgumentType>(argument));
+					return (this->*std::forward<MethodType>(method))(pSearchNode->m_pRightChild, std::forward<ArgumentType>(argument));
 				}
 				else
 				{
@@ -291,7 +287,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPreorderTraverse(MethodType&
 	{
 		while (pTraverseNode != nullptr)
 		{
-			(this->*forward<MethodType>(method))(pTraverseNode, forward<ArgumentType>(argument));
+			(this->*std::forward<MethodType>(method))(pTraverseNode, std::forward<ArgumentType>(argument));
 
 			if (pTraverseNode->m_pRightChild != nullptr)
 			{
@@ -318,7 +314,7 @@ inline void BstTemplate<NodeType, DataType>::GenericInorderTraverse(MethodType&&
 	}
 	while (rightSideAncestorStack.Pop(pTraverseNode) == true)
 	{
-		(this->*forward<MethodType>(method))(pTraverseNode, forward<ArgumentType>(argument));
+		(this->*std::forward<MethodType>(method))(pTraverseNode, std::forward<ArgumentType>(argument));
 
 		if (pTraverseNode->m_pRightChild != nullptr)
 		{
@@ -372,7 +368,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(MethodType
 		}
 		else if (traverseRecord.nodeJob == Record::DO_TODO)
 		{
-			(this->*forward<MethodType>(method))(traverseRecord.pNode, forward<ArgumentType>(argument));
+			(this->*std::forward<MethodType>(method))(traverseRecord.pNode, std::forward<ArgumentType>(argument));
 		}
 	}
 
@@ -380,7 +376,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(MethodType
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline bool BstTemplate<NodeType, DataType>::InsertNode(NodeType<DataType>*& pInsertPosition, unique_ptr<NodeType<DataType>> upNewNode)
+inline bool BstTemplate<NodeType, DataType>::InsertNode(NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode)
 {
 	LogPrint("insert node task method");
 
@@ -521,7 +517,7 @@ inline void BstTemplate<NodeType, DataType>::CopyNode(const NodeType<DataType>* 
 {
 	LogPrint("copy node task method");
 
-	unique_ptr<NodeType<DataType>> upCopiedNode = unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(*pSourceNode));
+	std::unique_ptr<NodeType<DataType>> upCopiedNode = std::unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(*pSourceNode));
 	pDestBst->GenericSearch(pSourceNode->m_key, &BstTemplate::InsertNode, move(upCopiedNode));
 }
 
@@ -530,7 +526,7 @@ inline void BstTemplate<NodeType, DataType>::PrintTargetNode(const NodeType<Data
 {
 	LogPrint("print node task method");
 
-	cout << *pTargetNode << endl;
+	std::cout << *pTargetNode << std::endl;
 }
 
 template <template <typename> class NodeType, typename DataType>

@@ -7,7 +7,7 @@
 enum NodeColor { RED, BLACK };
 
 //여러 번역 단위에 include되는 헤더 파일에다가 함수 정의를 했을 때 생기는 중복 정의 문제를 피하기 위해 inline 키워드를 사용함
-inline ostream& operator <<(ostream& out, NodeColor color)
+inline std::ostream& operator <<(std::ostream& out, NodeColor color)
 {
 	if (color == RED)
 	{
@@ -17,7 +17,7 @@ inline ostream& operator <<(ostream& out, NodeColor color)
 	{
 		out << "BLACK";
 	}
-
+	
 	return out;
 }
 
@@ -28,10 +28,9 @@ template <typename DataType>
 class RedBlackNode
 {
 	friend class BstTemplate<RedBlackNode, DataType>;
-
 	friend class RedBlackTree<DataType>;
 
-	friend ostream& operator <<(ostream& out, const RedBlackNode<DataType>& targetNode)
+	friend std::ostream& operator <<(std::ostream& out, const RedBlackNode<DataType>& targetNode)
 	{
 		out << "키 : " << targetNode.m_key << " / 데이터 : " << targetNode.m_data << " / 컬러 : " << targetNode.m_color;
 
@@ -39,12 +38,6 @@ class RedBlackNode
 	}
 
 private:
-
-	int m_key;
-	DataType m_data;
-	NodeColor m_color;
-	RedBlackNode* m_pLeftChild;
-	RedBlackNode* m_pRightChild;
 
 	RedBlackNode(int newKey, DataType newData)
 	{
@@ -64,16 +57,143 @@ private:
 		m_pRightChild = nullptr;
 	}
 
-	void PrintNode()
-	{
-		cout << "node newKey : " << m_key << " / node newData : " << m_data << " / node m_color : " << m_color << endl;
-	}
+private:
+
+	int m_key;
+	DataType m_data;
+	NodeColor m_color;
+	RedBlackNode* m_pLeftChild;
+	RedBlackNode* m_pRightChild;
 };
 
 template <typename DataType>
 class RedBlackTree : public BstTemplate<RedBlackNode, DataType>
 {
+public:
+
+	RedBlackTree() : BstTemplate<RedBlackNode, DataType>() {}
+
+	void Insert(int newKey, DataType newData)
+	{
+		if (this->m_pHead == NULL)
+		{
+			this->m_pHead = new RedBlackNode<DataType>(newKey, newData);
+
+			return;
+		}
+
+		RedBlackNode<DataType>* pTraverse = this->m_pHead;
+		Stack<RedBlackNode<DataType>*> pRouteStack;
+		while (true)
+		{
+			pRouteStack.Push(pTraverse);
+			CheckAndResolve4NodesWhileDescent(&pRouteStack);
+
+			if (newKey < pTraverse->m_key)
+			{
+				if (pTraverse->m_pLeftChild != NULL)
+				{
+					pTraverse = pTraverse->m_pLeftChild;
+				}
+				else
+				{
+					pTraverse->m_pLeftChild = new RedBlackNode<DataType>(newKey, newData);
+					pTraverse->m_pLeftChild->m_color = RED;
+					pRouteStack.Push(pTraverse->m_pLeftChild);
+					CheckAndResolve4NodesOnDestination(&pRouteStack);
+
+					return;
+				}
+			}
+			else if (pTraverse->m_key < newKey)
+			{
+				if (pTraverse->m_pRightChild != NULL)
+				{
+					pTraverse = pTraverse->m_pRightChild;
+				}
+				else
+				{
+					pTraverse->m_pRightChild = new RedBlackNode<DataType>(newKey, newData);
+					pTraverse->m_pRightChild->m_color = RED;
+					pRouteStack.Push(pTraverse->m_pRightChild);
+					CheckAndResolve4NodesOnDestination(&pRouteStack);
+
+					return;
+				}
+			}
+			else
+			{
+				std::cout << "Cannot Insert node to tree! There are same newKey node already!" << std::endl;
+
+				return;
+			}
+		}
+	}
+
+	void Remove(int targetKey)
+	{
+		Stack<RedBlackNode<DataType>*> pRouteStack;
+
+		if (this->m_pHead->m_key == targetKey)
+		{
+			pRouteStack.Push(this->m_pHead);
+			RemoveTarget(this->m_pHead, &pRouteStack);
+
+			return;
+		}
+
+		RedBlackNode<DataType>* pTraverse = this->m_pHead;
+		while (true)
+		{
+			if (targetKey < pTraverse->m_key)
+			{
+				if (pTraverse->m_pLeftChild != NULL)
+				{
+					pRouteStack.Push(pTraverse);
+					pTraverse = pTraverse->m_pLeftChild;
+				}
+				else
+				{
+					std::cout << "Cannot Remove! Cannot find such target node!" << std::endl;
+
+					return;
+				}
+			}
+			else if (pTraverse->m_key < targetKey)
+			{
+				if (pTraverse->m_pRightChild != NULL)
+				{
+					pRouteStack.Push(pTraverse);
+					pTraverse = pTraverse->m_pRightChild;
+				}
+				else
+				{
+					std::cout << "Cannot Remove! Cannot find such target node!" << std::endl;
+
+					return;
+				}
+			}
+			else
+			{
+				RedBlackNode<DataType>* pParent = nullptr;
+				pRouteStack.GetTop(pParent);
+				pRouteStack.Push(pTraverse);
+				if (pParent->m_pLeftChild == pTraverse)
+				{
+					RemoveTarget(pParent->m_pLeftChild, &pRouteStack);
+				}
+				else
+				{
+					RemoveTarget(pParent->m_pRightChild, &pRouteStack);
+				}
+
+				return;
+			}
+		}
+	}
+
 private:
+
 	//삽입 메소드에서 삽입 위치를 찾기 위해 빈 리프노드 자리로 탐색하는 과정에서 매번 호출되는 메소드다.
 	//4노드가 있으면 이를 쪼개놓고 내려가는 로직을 수행한다.
 	void CheckAndResolve4NodesWhileDescent(Stack<RedBlackNode<DataType>*>* pRouteStack)
@@ -411,7 +531,7 @@ private:
 				}
 				else
 				{
-					cout << "Cannot be here! The pParent should be one of pGrandParent's childs" << endl;
+					std::cout << "Cannot be here! The pParent should be one of pGrandParent's childs" << std::endl;
 
 					return;
 				}
@@ -433,7 +553,7 @@ private:
 				}
 				else
 				{
-					cout << "Cannot be here! The pBrother should be one of pParent's childs" << endl;
+					std::cout << "Cannot be here! The pBrother should be one of pParent's childs" << std::endl;
 
 					return;
 				}
@@ -458,7 +578,7 @@ private:
 				}
 				else
 				{
-					cout << "Cannot be here! The pBrother should be one of pParent's childs" << endl;
+					std::cout << "Cannot be here! The pBrother should be one of pParent's childs" << std::endl;
 
 					return;
 				}
@@ -645,131 +765,9 @@ private:
 		}
 		else
 		{
-			cout << "Cannot be here! The pBrother should be one of ParentOfTarget's childs" << endl;
+			std::cout << "Cannot be here! The pBrother should be one of ParentOfTarget's childs" << std::endl;
 
 			return;
-		}
-	}
-
-public :
-	RedBlackTree() : BstTemplate<RedBlackNode, DataType>() {}
-
-	void Insert(int newKey, DataType newData)
-	{
-		if (this->m_pHead == NULL)
-		{
-			this->m_pHead = new RedBlackNode<DataType>(newKey, newData);
-
-			return;
-		}
-
-		RedBlackNode<DataType>* pTraverse = this->m_pHead;
-		Stack<RedBlackNode<DataType>*> pRouteStack;
-		while (true)
-		{
-			pRouteStack.Push(pTraverse);
-			CheckAndResolve4NodesWhileDescent(&pRouteStack);
-
-			if (newKey < pTraverse->m_key)
-			{
-				if (pTraverse->m_pLeftChild != NULL)
-				{
-					pTraverse = pTraverse->m_pLeftChild;
-				}
-				else
-				{
-					pTraverse->m_pLeftChild = new RedBlackNode<DataType>(newKey, newData);
-					pTraverse->m_pLeftChild->m_color = RED;
-					pRouteStack.Push(pTraverse->m_pLeftChild);
-					CheckAndResolve4NodesOnDestination(&pRouteStack);
-
-					return;
-				}
-			}
-			else if (pTraverse->m_key < newKey)
-			{
-				if (pTraverse->m_pRightChild != NULL)
-				{
-					pTraverse = pTraverse->m_pRightChild;
-				}
-				else
-				{
-					pTraverse->m_pRightChild = new RedBlackNode<DataType>(newKey, newData);
-					pTraverse->m_pRightChild->m_color = RED;
-					pRouteStack.Push(pTraverse->m_pRightChild);
-					CheckAndResolve4NodesOnDestination(&pRouteStack);
-
-					return;
-				}
-			}
-			else
-			{
-				cout << "Cannot Insert node to tree! There are same newKey node already!" << endl;
-
-				return;
-			}
-		}
-	}
-
-	void Remove(int targetKey)
-	{
-		Stack<RedBlackNode<DataType>*> pRouteStack;
-
-		if (this->m_pHead->m_key == targetKey)
-		{
-			pRouteStack.Push(this->m_pHead);
-			RemoveTarget(this->m_pHead, &pRouteStack);
-
-			return;
-		}
-
-		RedBlackNode<DataType>* pTraverse = this->m_pHead;
-		while (true)
-		{
-			if (targetKey < pTraverse->m_key)
-			{
-				if (pTraverse->m_pLeftChild != NULL)
-				{
-					pRouteStack.Push(pTraverse);
-					pTraverse = pTraverse->m_pLeftChild;
-				}
-				else
-				{
-					cout << "Cannot Remove! Cannot find such target node!" << endl;
-
-					return;
-				}
-			}
-			else if (pTraverse->m_key < targetKey)
-			{
-				if (pTraverse->m_pRightChild != NULL)
-				{
-					pRouteStack.Push(pTraverse);
-					pTraverse = pTraverse->m_pRightChild;
-				}
-				else
-				{
-					cout << "Cannot Remove! Cannot find such target node!" << endl;
-
-					return;
-				}
-			}
-			else
-			{
-				RedBlackNode<DataType>* pParent = nullptr;
-				pRouteStack.GetTop(pParent);
-				pRouteStack.Push(pTraverse);
-				if (pParent->m_pLeftChild == pTraverse)
-				{
-					RemoveTarget(pParent->m_pLeftChild, &pRouteStack);
-				}
-				else
-				{
-					RemoveTarget(pParent->m_pRightChild, &pRouteStack);
-				}
-
-				return;
-			}
 		}
 	}
 };

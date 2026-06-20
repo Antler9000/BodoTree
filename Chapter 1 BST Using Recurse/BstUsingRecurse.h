@@ -5,8 +5,6 @@
 #include <iostream>
 #include <utility>
 
-using namespace std;
-
 template <typename DataType>
 class Bst;
 
@@ -19,7 +17,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}
@@ -112,7 +110,7 @@ public:
 
 		if (m_pHead == nullptr)
 		{
-			m_pHead = DBG_NEW BstNode<DataType>(newKey, forward<InsertDataType>(newData));
+			m_pHead = DBG_NEW BstNode<DataType>(newKey, std::forward<InsertDataType>(newData));
 
 			return true;
 		}
@@ -180,7 +178,7 @@ public:
 
 		Bst<DataType> tempTree;
 		tempTree.CopyTreeRecurse(sourceTree.m_pHead);
-		*this = move(tempTree);
+		*this = std::move(tempTree);
 	}
 
 	//NOTE : 디버깅용
@@ -238,17 +236,13 @@ private:
 
 	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
 	void RemoveTarget(BstNode<DataType>*& pTargetNode);
-
 	void ReplaceWithInorderPredecessor(BstNode<DataType>*& pTargetNode);
-
 	void ReplaceWithInorderSuccessor(BstNode<DataType>*& pTargetNode);
 
 	void CopyTreeRecurse(const BstNode<DataType>* pSourceNode);
 
 	void PreorderPrintRecurse(const BstNode<DataType>* pTraverseNode) const;
-
 	void InorderPrintRecurse(const BstNode<DataType>* pTraverseNode) const;
-
 	void PostorderPrintRecurse(const BstNode<DataType>* pTraverseNode) const;
 
 private:
@@ -266,26 +260,26 @@ bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, In
 	{
 		if (pSearchNode->m_pLeftChild == nullptr)
 		{
-			pSearchNode->m_pLeftChild = DBG_NEW BstNode<DataType>(newKey, forward<InsertDataType>(newData));
+			pSearchNode->m_pLeftChild = DBG_NEW BstNode<DataType>(newKey, std::forward<InsertDataType>(newData));
 
 			return true;
 		}
 		else
 		{
-			return InsertRecurse(pSearchNode->m_pLeftChild, newKey, forward<InsertDataType>(newData));
+			return InsertRecurse(pSearchNode->m_pLeftChild, newKey, std::forward<InsertDataType>(newData));
 		}
 	}
 	else if (pSearchNode->m_key < newKey)
 	{
 		if (pSearchNode->m_pRightChild == nullptr)
 		{
-			pSearchNode->m_pRightChild = DBG_NEW BstNode<DataType>(newKey, forward<InsertDataType>(newData));
+			pSearchNode->m_pRightChild = DBG_NEW BstNode<DataType>(newKey, std::forward<InsertDataType>(newData));
 
 			return true;
 		}
 		else
 		{
-			return InsertRecurse(pSearchNode->m_pRightChild, newKey, forward<InsertDataType>(newData));
+			return InsertRecurse(pSearchNode->m_pRightChild, newKey, std::forward<InsertDataType>(newData));
 		}
 	}
 	else
@@ -501,7 +495,7 @@ void Bst<DataType>::PreorderPrintRecurse(const BstNode<DataType>* pTargetNode) c
 {
 	LogPrint("preorder print recurse");
 
-	cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << endl;
+	std::cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << std::endl;
 	if (pTargetNode->m_pLeftChild != nullptr) PreorderPrintRecurse(pTargetNode->m_pLeftChild);
 	if (pTargetNode->m_pRightChild != nullptr) PreorderPrintRecurse(pTargetNode->m_pRightChild);
 }
@@ -512,7 +506,7 @@ void Bst<DataType>::InorderPrintRecurse(const BstNode<DataType>* pTargetNode) co
 	LogPrint("inorder print recurse");
 
 	if (pTargetNode->m_pLeftChild != nullptr) InorderPrintRecurse(pTargetNode->m_pLeftChild);
-	cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << endl;
+	std::cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << std::endl;
 	if (pTargetNode->m_pRightChild != nullptr) InorderPrintRecurse(pTargetNode->m_pRightChild);
 }
 
@@ -523,7 +517,7 @@ void Bst<DataType>::PostorderPrintRecurse(const BstNode<DataType>* pTargetNode) 
 
 	if (pTargetNode->m_pLeftChild != nullptr) PostorderPrintRecurse(pTargetNode->m_pLeftChild);
 	if (pTargetNode->m_pRightChild != nullptr) PostorderPrintRecurse(pTargetNode->m_pRightChild);
-	cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << endl;
+	std::cout << "키 : " << pTargetNode->m_key << " / 데이터 : " << pTargetNode->m_data << std::endl;
 }
 
 #endif //BST_USING_RECURSE_H

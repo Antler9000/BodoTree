@@ -6,12 +6,12 @@
 #include "BstUsingWhile.h"
 #include <crtdbg.h>
 #include <iostream>
-#include <iomanip>
 #include <chrono>
 #include <string>
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include <vector>
 #include <map>
 #include <utility>
 
@@ -22,16 +22,12 @@ template <typename DataType>
 void PrintKeyAndData(int key, const DataType& retrievedData);
 
 void RandomWorkloadSpeedTest(int workloadNum, int workloadPerDataLen);
-
 void RandomLocalWorkloadTest(int workloadNum, int workloadPerDataLen, int localBlockSize);
-
 void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
-
 void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
 //NOTE	: insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Bst와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
 time_point<steady_clock> TestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
-
 time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 int main()

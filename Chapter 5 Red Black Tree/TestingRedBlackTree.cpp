@@ -1,5 +1,7 @@
 #include "RedBlackTree.h"
 
+using namespace std;
+
 int main()
 {
 	cout << "----------------------------------1st tree insert-----------------------------" << endl;

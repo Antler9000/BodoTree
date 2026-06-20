@@ -6,8 +6,6 @@
 #include <memory>
 #include <utility>
 
-using namespace std;
-
 template <typename DataType>
 class Heap;
 
@@ -20,14 +18,13 @@ class MaxHeap;
 template <typename DataType>
 class HeapNode
 {
-	friend class Heap <DataType>;
-
 	//NOTE : MinHeap과 MaxHeap 까지만 구현할 예정이므로, 여기에 friend를 일일이 선언하는 방식을 사용했음
+	friend class Heap <DataType>;
 	friend class MinHeap<DataType>;
 	friend class MaxHeap<DataType>;
 
 	//NOTE : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
-	friend struct default_delete<HeapNode<DataType>[]>;
+	friend struct std::default_delete<HeapNode<DataType>[]>;
 
 private:
 
@@ -38,7 +35,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(forward<NewDataType>(data))
+	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(std::forward<NewDataType>(data))
 	{
 
 	}
@@ -48,7 +45,7 @@ private:
 
 	}
 
-	HeapNode(HeapNode&& sourceHeapNode) noexcept : m_key(sourceHeapNode.m_key), m_data(move(sourceHeapNode.m_data))
+	HeapNode(HeapNode&& sourceHeapNode) noexcept : m_key(sourceHeapNode.m_key), m_data(std::move(sourceHeapNode.m_data))
 	{
 
 	}
@@ -74,7 +71,7 @@ private:
 		}
 
 		m_key = sourceNode.m_key;
-		m_data = move(sourceNode.m_data);
+		m_data = std::move(sourceNode.m_data);
 
 		sourceNode.m_key = 0;
 		//NOTE : source 측의 m_data는 DataType의 이동 생성자를 통해 이미 빈 상태가 되었다고 가정함
@@ -177,7 +174,7 @@ public:
 			GiveLargerMemorySpace();
 		}
 
-		m_pNodes[m_size] = HeapNode<DataType>(newKey, forward<PushDataType>(newData));
+		m_pNodes[m_size] = HeapNode<DataType>(newKey, std::forward<PushDataType>(newData));
 		m_size++;
 
 		ReorderByPromoting();
@@ -195,7 +192,7 @@ public:
 			return false;
 		}
 
-		outData = move(m_pNodes[0].m_data);
+		outData = std::move(m_pNodes[0].m_data);
 
 		m_pNodes[0] = m_pNodes[m_size-1];	//NOTE : 노드 내부에 저장되는 DataType의 이동 할당자가 noexcept임이 보장되지 않아 move(..)를 사용하지 않았음
 		m_size--;
@@ -251,7 +248,7 @@ public:
 	{
 		LogPrint("copy heap");
 
-		unique_ptr<HeapNode<DataType>[]> upTempData = unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[sourceHeap.m_capacity]);
+		std::unique_ptr<HeapNode<DataType>[]> upTempData = std::unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[sourceHeap.m_capacity]);
 
 		for (int i = 0; i < sourceHeap.m_size; i++)
 		{
@@ -271,7 +268,7 @@ public:
 
 		for (int i = 0; i < m_size; i++)
 		{
-			cout << "키 : " << m_pNodes[i].m_key << " / 데이터 : " << m_pNodes[i].m_data << endl;
+			std::cout << "키 : " << m_pNodes[i].m_key << " / 데이터 : " << m_pNodes[i].m_data << std::endl;
 		}
 	}
 
@@ -282,7 +279,7 @@ private:
 		LogPrint("give larget memory space");
 
 		int newCapacity = (m_capacity == 0) ? (50) : (2 * m_capacity);
-		unique_ptr<HeapNode<DataType>[]> upTempData = unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[newCapacity]);
+		std::unique_ptr<HeapNode<DataType>[]> upTempData = std::unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[newCapacity]);
 
 		for (int i = 0; i < m_size; i++)
 		{

@@ -63,9 +63,7 @@
 
     //NOTE : 디버깅 용
     void PreorderPrint() const
-
     void InorderPrint() const
-
     void PostorderPrint() const
 ```
  
@@ -112,9 +110,7 @@
 
     //NOTE : 디버깅 용
     void PreorderPrint() const
-
     void InorderPrint() const
-
     void PostorderPrint() const
 ```
 
@@ -163,9 +159,7 @@
 
     //NOTE : 디버깅 용
     void PreorderPrint() const
-
     void InorderPrint() const
-
     void PostorderPrint() const
 ```
 
@@ -434,7 +428,7 @@ Chapter 번호는 책에서 해당 트리 자료구조가 소개된 단원과는
 
 <!--------------------------------------------------------------------------------------------------------------------------------------------------->
 ## 5. 참고 자료
-[1] "C C++로 구현하는 자료구조" (주우석 지음 / 한빛아카데미 출판 / 2015년 발행)
+[1] "C, C++로 구현하는 자료구조" (주우석 지음 / 한빛아카데미 출판 / 2015년 발행)
 
 [2] "SW코딩 역량을 위한 C++ 프로그래밍" (홍봉희 지음 / 정익사 출판 / 2017년 발행)
 
@@ -447,8 +441,8 @@ https://learn.microsoft.com/en-us/cpp/cpp/rvalue-reference-declarator-amp-amp?vi
 [5] "How to: Design for exception safety" (Microsoft Learn / 2026년 6월 재방문)  
 https://learn.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety?view=msvc-170
 
-[5] "How to: Create and use unique_ptr instances" (Microsoft Learn / 2026년 6월 재방문)  
+[6] "How to: Create and use unique_ptr instances" (Microsoft Learn / 2026년 6월 재방문)  
 https://learn.microsoft.com/en-us/cpp/cpp/how-to-create-and-use-unique-ptr-instances?view=msvc-170
 
-[6] "Find memory leaks with the CRT library" (Microsoft Learn / 2026년 6월 재방문)  
+[7] "Find memory leaks with the CRT library" (Microsoft Learn / 2026년 6월 재방문)  
 https://learn.microsoft.com/en-us/cpp/c-runtime-library/find-memory-leaks-using-the-crt-library?view=msvc-170

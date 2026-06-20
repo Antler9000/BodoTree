@@ -11,23 +11,16 @@ template <typename DataType>
 class AVL_Node
 {	
 	friend class BstTemplate<AVL_Node, DataType>;
-
 	friend class AvlTree<DataType>;
 
-	friend ostream& operator <<(ostream& out, const AVL_Node<DataType>& printedNode)
+	friend std::ostream& operator <<(std::ostream& out, const AVL_Node<DataType>& printedNode)
 	{
-		cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data << " / 높이 : " << printedNode.m_height;
+		std::cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data << " / 높이 : " << printedNode.m_height;
 
 		return out;
 	}
 
 private:
-
-	int m_key;
-	DataType m_data;
-	int m_height;
-	AVL_Node<DataType>* m_pLeftChild;
-	AVL_Node<DataType>* m_pRightChild;
 
 	AVL_Node(int newKey, DataType newData)
 	{
@@ -46,16 +39,29 @@ private:
 		m_pLeftChild = nullptr;
 		m_pRightChild = nullptr;
 	}
+
+private:
+
+	int m_key;
+	DataType m_data;
+	int m_height;
+	AVL_Node<DataType>* m_pLeftChild;
+	AVL_Node<DataType>* m_pRightChild;
 };
 
 template <typename DataType>
 class AvlTree : public BstTemplate<AVL_Node, DataType>
 {
+public:
+	AvlTree() : BstTemplate<AVL_Node, DataType>() {}
+
+	void Insert(int newKey, DataType newData);
+
+	void Remove(int targetKey);
+
 private:
 	void RemoveTarget(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack);
-
 	void ReplaceWithInorderPredecessor(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack);
-
 	void ReplaceWithInorderSuccessor(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack);
 
 	void BalancingAllTargetToRoot(Stack<AVL_Node<DataType>*>* pRouteStack);
@@ -63,11 +69,8 @@ private:
 	void BalancingTargetNode(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent);
 
 	void RotationLL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent);
-
 	void RotationLR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent);
-
 	void RotationRL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent);
-
 	void RotationRR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent);
 
 	void UpdateHeight(AVL_Node<DataType>* pTarget)
@@ -83,13 +86,6 @@ private:
 	{
 		return (a > b) ? a : b;
 	}
-
-public:
-	AvlTree() : BstTemplate<AVL_Node, DataType>() {}
-
-	void Insert(int newKey, DataType newData);
-
-	void Remove(int targetKey);
 };
 
 template <typename DataType>
@@ -166,7 +162,7 @@ void AvlTree<DataType>::BalancingAllTargetToRoot(Stack<AVL_Node<DataType>*>* pRo
 		pRouteStack->GetTop(pParentOfRetraverse);
 		UpdateHeight(pRetraverse);
 
-		cout << "node's height : " << pRetraverse->m_height << endl;
+		std::cout << "node's height : " << pRetraverse->m_height << std::endl;
 
 		BalancingTargetNode(pRetraverse, pParentOfRetraverse);
 	}
@@ -228,7 +224,7 @@ void AvlTree<DataType>::BalancingTargetNode(AVL_Node<DataType>* pTarget, AVL_Nod
 template <typename DataType>
 void AvlTree<DataType>::RotationLL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	cout << "LL 회전" << endl;
+	std::cout << "LL 회전" << std::endl;
 
 	if (pParent == NULL)
 	{
@@ -258,7 +254,7 @@ void AvlTree<DataType>::RotationLL(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 template <typename DataType>
 void AvlTree<DataType>::RotationLR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	cout << "LR 회전" << endl;
+	std::cout << "LR 회전" << std::endl;
 
 	AVL_Node<DataType>* pLR_Location = pTarget->m_pLeftChild->m_pRightChild;
 	pTarget->m_pLeftChild->m_pRightChild = pLR_Location->m_pLeftChild;
@@ -275,7 +271,7 @@ void AvlTree<DataType>::RotationLR(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 template <typename DataType>
 void AvlTree<DataType>::RotationRL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	cout << "RL 회전" << endl;
+	std::cout << "RL 회전" << std::endl;
 
 	AVL_Node<DataType>* pRL_Location = pTarget->m_pRightChild->m_pLeftChild;
 	pTarget->m_pRightChild->m_pLeftChild = pRL_Location->m_pRightChild;
@@ -292,7 +288,7 @@ void AvlTree<DataType>::RotationRL(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 template <typename DataType>
 void AvlTree<DataType>::RotationRR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	cout << "RR 회전" << endl;
+	std::cout << "RR 회전" << std::endl;
 
 	if (pParent == NULL)
 	{
@@ -370,7 +366,7 @@ void AvlTree<DataType>::Remove(int targetKey)
 {
 	if (this->m_pHead == NULL)
 	{
-		cout << "Cannot Remove! tree is emptied" << endl;
+		std::cout << "Cannot Remove! tree is emptied" << std::endl;
 		return;
 	}
 

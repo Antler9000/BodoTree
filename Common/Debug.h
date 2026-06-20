@@ -4,22 +4,20 @@
 #include <iostream>
 #include <crtdbg.h>
 
-using namespace std;
-
 #ifdef TREE_LOG
-	#define LogPrint(statement) cout << "(Log : " << __func__ << ") " << statement << endl
+	#define LogPrint(statement) std::cout << "(Log : " << __func__ << ") " << statement << std::endl
 #else
 	#define LogPrint(statement)
 #endif
 
 #ifdef TREE_WARNING
-	#define WarningPrint(statement) cout << "(Warning : " << __func__ << ") " << statement << endl
+	#define WarningPrint(statement) std::cout << "(Warning : " << __func__ << ") " << statement << std::endl
 #else
 	#define WarningPrint(statement)
 #endif
 
 #ifdef TREE_ERROR
-	#define ErrorPrint(statement) cout << "(Error : " << __func__ << ") " << statement << endl
+	#define ErrorPrint(statement) std::cout << "(Error : " << __func__ << ") " << statement << std::endl
 #else
 	#define ErrorPrint(statement)
 #endif

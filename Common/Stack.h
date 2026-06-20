@@ -5,8 +5,6 @@
 #include <memory>
 #include <utility>
 
-using namespace std;
-
 template <typename DataType>
 class Stack
 {
@@ -71,7 +69,7 @@ public:
 		}
 		else if (m_capacity == m_size)
 		{
-			unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity * 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
+			std::unique_ptr<DataType[]> upNewData = std::unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity * 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
 			for (int i = 0; i < m_size; i++)
 			{
 				upNewData[i] = m_pDatum[i];		//NOTE : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
@@ -82,7 +80,7 @@ public:
 			m_capacity *= 2;
 		}
 		
-		m_pDatum[m_size] = forward<PushDataType>(newData);
+		m_pDatum[m_size] = std::forward<PushDataType>(newData);
 		m_size++;
 	}
 
@@ -107,7 +105,7 @@ public:
 			}
 			else
 			{
-				unique_ptr<DataType[]> upNewData = unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity / 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
+				std::unique_ptr<DataType[]> upNewData = std::unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity / 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
 				for (int i = 0; i < m_size; i++)
 				{
 					upNewData[i] = m_pDatum[i];		//NOTE : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음

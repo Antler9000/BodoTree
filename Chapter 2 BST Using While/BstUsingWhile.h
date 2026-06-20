@@ -5,19 +5,21 @@
 #include <iostream>
 #include <utility>
 
-using namespace std;
+template <typename DataType>
+class Bst;
 
 template <typename DataType>
 class BstNode
 {
 	friend class BstTemplate<BstNode, DataType>;
+	friend class Bst<DataType>;
 
 	//NOTE : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
-	friend struct default_delete<BstNode<DataType>>;
+	friend struct std::default_delete<BstNode<DataType>>;
 
-	friend ostream& operator <<(ostream& out, const BstNode<DataType>& printedNode)
+	friend std::ostream& operator <<(std::ostream& out, const BstNode<DataType>& printedNode)
 	{
-		cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data;
+		std::cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data;
 
 		return out;
 	}
@@ -26,7 +28,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}

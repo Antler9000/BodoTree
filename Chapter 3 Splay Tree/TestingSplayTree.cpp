@@ -12,6 +12,7 @@
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include <vector>
 #include <map>
 #include <utility>
 
