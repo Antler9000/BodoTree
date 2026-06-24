@@ -1,4 +1,4 @@
-#ifndef AVL_TREE_H
+ï»¿#ifndef AVL_TREE_H
 #define AVL_TREE_H
 
 #include "../Common/BstUsingWhileTemplate.h"
@@ -15,7 +15,7 @@ class AVL_Node
 
 	friend std::ostream& operator <<(std::ostream& out, const AVL_Node<DataType>& printedNode)
 	{
-		std::cout << "Å° : " << printedNode.m_key << " / µ¥ÀÌÅÍ : " << printedNode.m_data << " / ³ôÀÌ : " << printedNode.m_height;
+		std::cout << "í‚¤ : " << printedNode.m_key << " / ë°ì´í„° : " << printedNode.m_data << " / ë†’ì´ : " << printedNode.m_height;
 
 		return out;
 	}
@@ -53,7 +53,10 @@ template <typename DataType>
 class AvlTree : public BstTemplate<AVL_Node, DataType>
 {
 public:
-	AvlTree() : BstTemplate<AVL_Node, DataType>() {}
+	AvlTree() : BstTemplate<AVL_Node, DataType>()
+	{
+	
+	}
 
 	void Insert(int newKey, DataType newData);
 
@@ -89,9 +92,9 @@ private:
 };
 
 template <typename DataType>
-void AvlTree<DataType>::RemoveTarget(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack)
+inline void AvlTree<DataType>::RemoveTarget(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack)
 {
-	if (pTarget->m_pLeftChild != NULL && pTarget->m_pRightChild != NULL) //µÎ ÀÚ½Ä ¸ğµÎ ÀÖ´Â °æ¿ì¿£, ÁßÀ§¼±ÇàÀÚ¿Í ÁßÀ§ÈÄ¼ÓÀÚ Áß¿¡¼­ ±×³É ÁßÀ§ÈÄ¼ÓÀÚ(¿À¸¥ÂÊ ÀÚ½Ä Æ®¸®¿¡¼­ Á¦ÀÏ ÀÛÀº Å° °ªÀÇ ³ëµå)¸¦ ¾ø¾Ö±â·ÎÇÔ
+	if (pTarget->m_pLeftChild != NULL && pTarget->m_pRightChild != NULL) //ë‘ ìì‹ ëª¨ë‘ ìˆëŠ” ê²½ìš°ì—”, ì¤‘ìœ„ì„ í–‰ìì™€ ì¤‘ìœ„í›„ì†ì ì¤‘ì—ì„œ ê·¸ëƒ¥ ì¤‘ìœ„í›„ì†ì(ì˜¤ë¥¸ìª½ ìì‹ íŠ¸ë¦¬ì—ì„œ ì œì¼ ì‘ì€ í‚¤ ê°’ì˜ ë…¸ë“œ)ë¥¼ ì—†ì• ê¸°ë¡œí•¨
 	{
 		ReplaceWithInorderSuccessor(pTarget, pRouteStack);
 	}
@@ -110,7 +113,7 @@ void AvlTree<DataType>::RemoveTarget(AVL_Node<DataType>*& pTarget, Stack<AVL_Nod
 }
 
 template <typename DataType>
-void AvlTree<DataType>::ReplaceWithInorderPredecessor(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack)
+inline void AvlTree<DataType>::ReplaceWithInorderPredecessor(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack)
 {
 	AVL_Node<DataType>* pPrevious = NULL;
 	AVL_Node<DataType>* pTraverse = pTarget->m_pLeftChild;
@@ -131,7 +134,7 @@ void AvlTree<DataType>::ReplaceWithInorderPredecessor(AVL_Node<DataType>*& pTarg
 }
 
 template <typename DataType>
-void AvlTree<DataType>::ReplaceWithInorderSuccessor(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack)
+inline void AvlTree<DataType>::ReplaceWithInorderSuccessor(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack)
 {
 	AVL_Node<DataType>* pPrevious = NULL;
 	AVL_Node<DataType>* pTraverse = pTarget->m_pRightChild;
@@ -152,7 +155,7 @@ void AvlTree<DataType>::ReplaceWithInorderSuccessor(AVL_Node<DataType>*& pTarget
 }
 
 template <typename DataType>
-void AvlTree<DataType>::BalancingAllTargetToRoot(Stack<AVL_Node<DataType>*>* pRouteStack)
+inline void AvlTree<DataType>::BalancingAllTargetToRoot(Stack<AVL_Node<DataType>*>* pRouteStack)
 {
 	while (pRouteStack->IsEmpty() == false)
 	{
@@ -169,7 +172,7 @@ void AvlTree<DataType>::BalancingAllTargetToRoot(Stack<AVL_Node<DataType>*>* pRo
 }
 
 template <typename DataType>
-void AvlTree<DataType>::BalancingTargetNode(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
+inline void AvlTree<DataType>::BalancingTargetNode(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
 	int leftHeight = 0;
 	int rightHeight = 0;
@@ -222,9 +225,9 @@ void AvlTree<DataType>::BalancingTargetNode(AVL_Node<DataType>* pTarget, AVL_Nod
 }
 
 template <typename DataType>
-void AvlTree<DataType>::RotationLL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
+inline void AvlTree<DataType>::RotationLL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	std::cout << "LL È¸Àü" << std::endl;
+	std::cout << "LL íšŒì „" << std::endl;
 
 	if (pParent == NULL)
 	{
@@ -252,9 +255,9 @@ void AvlTree<DataType>::RotationLL(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 }
 
 template <typename DataType>
-void AvlTree<DataType>::RotationLR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
+inline void AvlTree<DataType>::RotationLR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	std::cout << "LR È¸Àü" << std::endl;
+	std::cout << "LR íšŒì „" << std::endl;
 
 	AVL_Node<DataType>* pLR_Location = pTarget->m_pLeftChild->m_pRightChild;
 	pTarget->m_pLeftChild->m_pRightChild = pLR_Location->m_pLeftChild;
@@ -269,9 +272,9 @@ void AvlTree<DataType>::RotationLR(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 }
 
 template <typename DataType>
-void AvlTree<DataType>::RotationRL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
+inline void AvlTree<DataType>::RotationRL(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	std::cout << "RL È¸Àü" << std::endl;
+	std::cout << "RL íšŒì „" << std::endl;
 
 	AVL_Node<DataType>* pRL_Location = pTarget->m_pRightChild->m_pLeftChild;
 	pTarget->m_pRightChild->m_pLeftChild = pRL_Location->m_pRightChild;
@@ -286,9 +289,9 @@ void AvlTree<DataType>::RotationRL(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 }
 
 template <typename DataType>
-void AvlTree<DataType>::RotationRR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
+inline void AvlTree<DataType>::RotationRR(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	std::cout << "RR È¸Àü" << std::endl;
+	std::cout << "RR íšŒì „" << std::endl;
 
 	if (pParent == NULL)
 	{
@@ -316,7 +319,7 @@ void AvlTree<DataType>::RotationRR(AVL_Node<DataType>* pTarget, AVL_Node<DataTyp
 }
 
 template <typename DataType>
-void AvlTree<DataType>::Insert(int newKey, DataType newData)
+inline void AvlTree<DataType>::Insert(int newKey, DataType newData)
 {
 	if (this->m_pHead == NULL)
 	{
@@ -362,7 +365,7 @@ void AvlTree<DataType>::Insert(int newKey, DataType newData)
 }
 
 template <typename DataType>
-void AvlTree<DataType>::Remove(int targetKey)
+inline void AvlTree<DataType>::Remove(int targetKey)
 {
 	if (this->m_pHead == NULL)
 	{
