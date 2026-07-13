@@ -4,6 +4,7 @@
 #include "../Common/BstUsingWhileTemplate.h"
 #include <iostream>
 #include <utility>
+#include <cstdint>
 
 template <typename DataType>
 class Bst;
@@ -14,7 +15,7 @@ class BstNode
 	friend class BstTemplate<BstNode, DataType>;
 	friend class Bst<DataType>;
 
-	//NOTE : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
+	//NOTE : unique_ptr은 scope를 벗어날 때 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
 	friend struct std::default_delete<BstNode<DataType>>;
 
 	friend std::ostream& operator <<(std::ostream& out, const BstNode<DataType>& printedNode)
@@ -28,7 +29,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	BstNode(std::int32_t newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}
@@ -49,10 +50,10 @@ private:
 
 private:
 
-	int			m_key;
-	DataType	m_data;
-	BstNode*	m_pLeftChild;
-	BstNode*	m_pRightChild;
+	std::int32_t	m_key;
+	DataType		m_data;
+	BstNode*		m_pLeftChild;
+	BstNode*		m_pRightChild;
 };
 
 template <typename DataType>

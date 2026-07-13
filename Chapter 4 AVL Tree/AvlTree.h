@@ -3,6 +3,7 @@
 
 #include "../Common/BstUsingWhileTemplate.h"
 #include "../Common/Debug.h"
+#include <cstdint>
 
 template <typename DataType>
 class AvlTree;
@@ -22,7 +23,7 @@ class AVL_Node
 
 private:
 
-	AVL_Node(int newKey, DataType newData)
+	AVL_Node(std::int32_t newKey, DataType newData)
 	{
 		m_key = newKey;
 		m_data = newData;
@@ -42,11 +43,11 @@ private:
 
 private:
 
-	int m_key;
-	DataType m_data;
-	int m_height;
-	AVL_Node<DataType>* m_pLeftChild;
-	AVL_Node<DataType>* m_pRightChild;
+	std::int32_t		m_key;
+	DataType			m_data;
+	std::int32_t		m_height;
+	AVL_Node<DataType>*	m_pLeftChild;
+	AVL_Node<DataType>*	m_pRightChild;
 };
 
 template <typename DataType>
@@ -58,9 +59,9 @@ public:
 	
 	}
 
-	void Insert(int newKey, DataType newData);
+	void Insert(std::int32_t newKey, DataType newData);
 
-	void Remove(int targetKey);
+	void Remove(std::int32_t targetKey);
 
 private:
 	void RemoveTarget(AVL_Node<DataType>*& pTarget, Stack<AVL_Node<DataType>*>* pRouteStack);
@@ -78,14 +79,14 @@ private:
 
 	void UpdateHeight(AVL_Node<DataType>* pTarget)
 	{
-		int heightFromLChild = 0;
-		int heightFromRChild = 0;
+		std::int32_t heightFromLChild = 0;
+		std::int32_t heightFromRChild = 0;
 		if (pTarget->m_pLeftChild != NULL) heightFromLChild = 1 + pTarget->m_pLeftChild->m_height;
 		if (pTarget->m_pRightChild != NULL) heightFromRChild = 1 + pTarget->m_pRightChild->m_height;
 		pTarget->m_height = Max(heightFromLChild, heightFromRChild);
 	}
 
-	int Max(int a, int b)
+	std::int32_t Max(std::int32_t a, std::int32_t b)
 	{
 		return (a > b) ? a : b;
 	}
@@ -174,8 +175,8 @@ inline void AvlTree<DataType>::BalancingAllTargetToRoot(Stack<AVL_Node<DataType>
 template <typename DataType>
 inline void AvlTree<DataType>::BalancingTargetNode(AVL_Node<DataType>* pTarget, AVL_Node<DataType>* pParent)
 {
-	int leftHeight = 0;
-	int rightHeight = 0;
+	std::int32_t leftHeight = 0;
+	std::int32_t rightHeight = 0;
 	if (pTarget->m_pLeftChild != NULL) leftHeight = 1 + pTarget->m_pLeftChild->m_height;
 	if (pTarget->m_pRightChild != NULL) rightHeight = 1 + pTarget->m_pRightChild->m_height;
 
@@ -319,7 +320,7 @@ inline void AvlTree<DataType>::RotationRR(AVL_Node<DataType>* pTarget, AVL_Node<
 }
 
 template <typename DataType>
-inline void AvlTree<DataType>::Insert(int newKey, DataType newData)
+inline void AvlTree<DataType>::Insert(std::int32_t newKey, DataType newData)
 {
 	if (this->m_pHead == NULL)
 	{
@@ -365,7 +366,7 @@ inline void AvlTree<DataType>::Insert(int newKey, DataType newData)
 }
 
 template <typename DataType>
-inline void AvlTree<DataType>::Remove(int targetKey)
+inline void AvlTree<DataType>::Remove(std::int32_t targetKey)
 {
 	if (this->m_pHead == NULL)
 	{

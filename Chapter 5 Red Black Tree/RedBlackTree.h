@@ -3,6 +3,7 @@
 
 #include "../Common/BstUsingWhileTemplate.h"
 #include "../Common/Debug.h"
+#include <cstdint>
 
 enum NodeColor { RED, BLACK };
 
@@ -39,7 +40,7 @@ class RedBlackNode
 
 private:
 
-	RedBlackNode(int newKey, DataType newData)
+	RedBlackNode(std::int32_t newKey, DataType newData)
 	{
 		m_key = newKey;
 		m_data = newData;
@@ -59,11 +60,11 @@ private:
 
 private:
 
-	int m_key;
-	DataType m_data;
-	NodeColor m_color;
-	RedBlackNode* m_pLeftChild;
-	RedBlackNode* m_pRightChild;
+	std::int32_t	m_key;
+	DataType		m_data;
+	NodeColor		m_color;
+	RedBlackNode*	m_pLeftChild;
+	RedBlackNode*	m_pRightChild;
 };
 
 template <typename DataType>
@@ -73,7 +74,7 @@ public:
 
 	RedBlackTree() : BstTemplate<RedBlackNode, DataType>() {}
 
-	void Insert(int newKey, DataType newData)
+	void Insert(std::int32_t newKey, DataType newData)
 	{
 		if (this->m_pHead == NULL)
 		{
@@ -130,7 +131,7 @@ public:
 		}
 	}
 
-	void Remove(int targetKey)
+	void Remove(std::int32_t targetKey)
 	{
 		Stack<RedBlackNode<DataType>*> pRouteStack;
 
@@ -203,7 +204,7 @@ private:
 		RedBlackNode<DataType>* pParent = nullptr;
 		pRouteStack->Pop(pParent);
 
-		if (Is4Node(pTarget))
+		if (Is4Node(pTarget) == true)
 		{
 			pTarget->m_pLeftChild->m_color = BLACK;
 			pTarget->m_pRightChild->m_color = BLACK;
@@ -598,7 +599,7 @@ private:
 		if (pParent->m_color == RED)
 		{
 			pParent->m_color = BLACK;
-			if(pBrother != NULL) pBrother->m_color = RED;
+			if (pBrother != NULL) pBrother->m_color = RED;
 
 			return;
 		}

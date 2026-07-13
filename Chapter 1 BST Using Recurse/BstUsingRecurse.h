@@ -4,6 +4,7 @@
 #include "../Common/Debug.h"
 #include <iostream>
 #include <utility>
+#include <cstdint>
 
 template <typename DataType>
 class Bst;
@@ -17,7 +18,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	BstNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	BstNode(std::int32_t newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}
@@ -38,7 +39,7 @@ private:
 
 private:
 
-	int					m_key;
+	std::int32_t		m_key;
 	DataType			m_data;
 	BstNode<DataType>*	m_pLeftChild;
 	BstNode<DataType>*	m_pRightChild;
@@ -104,7 +105,7 @@ public:
 	//RETURN	: newKey와 같은 키의 노드가 이미 존재하는 경우 false를 반환함
 	//NOTE		: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
-	bool Insert(int newKey, InsertDataType&& newData)
+	bool Insert(std::int32_t newKey, InsertDataType&& newData)
 	{
 		LogPrint("insert");
 
@@ -121,7 +122,7 @@ public:
 	}
 
 	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
-	bool Retrieve(int targetKey, DataType& outData) const
+	bool Retrieve(std::int32_t targetKey, DataType& outData) const
 	{
 		LogPrint("retrieve");
 
@@ -136,7 +137,7 @@ public:
 	}
 
 	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
-	bool Remove(int targetKey)
+	bool Remove(std::int32_t targetKey)
 	{
 		LogPrint("remove one item");
 
@@ -228,11 +229,11 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
-	bool InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, InsertDataType&& newData);
+	bool InsertRecurse(BstNode<DataType>* pSearchNode, std::int32_t newKey, InsertDataType&& newData);
 
-	bool RetrieveRecurse(const BstNode<DataType>* pSearchNode, int targetKey, DataType& outData) const;
+	bool RetrieveRecurse(const BstNode<DataType>* pSearchNode, std::int32_t targetKey, DataType& outData) const;
 
-	bool RemoveRecurse(BstNode<DataType>* pSearchNode, int targetKey);
+	bool RemoveRecurse(BstNode<DataType>* pSearchNode, std::int32_t targetKey);
 
 	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
 	void RemoveTarget(BstNode<DataType>*& pTargetNode);
@@ -252,7 +253,7 @@ private:
 
 template <typename DataType>
 template <typename InsertDataType>
-bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, InsertDataType&& newData)
+bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchNode, std::int32_t newKey, InsertDataType&& newData)
 {
 	LogPrint("insert recurse");
 
@@ -291,7 +292,7 @@ bool Bst<DataType>::InsertRecurse(BstNode<DataType>* pSearchNode, int newKey, In
 }
 
 template <typename DataType>
-bool Bst<DataType>::RetrieveRecurse(const BstNode<DataType>* pSearchNode, int targetKey, DataType& outData) const
+bool Bst<DataType>::RetrieveRecurse(const BstNode<DataType>* pSearchNode, std::int32_t targetKey, DataType& outData) const
 {
 	LogPrint("retrieve recurse");
 
@@ -330,7 +331,7 @@ bool Bst<DataType>::RetrieveRecurse(const BstNode<DataType>* pSearchNode, int ta
 }
 
 template <typename DataType>
-bool Bst<DataType>::RemoveRecurse(BstNode<DataType>* pSearchNode, int targetKey)
+bool Bst<DataType>::RemoveRecurse(BstNode<DataType>* pSearchNode, std::int32_t targetKey)
 {
 	LogPrint("remove recurse");
 

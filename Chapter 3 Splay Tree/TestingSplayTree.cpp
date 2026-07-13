@@ -275,8 +275,8 @@ int main()
 		그리고 편향이 해결되지 않더라도, 삭제에도 splay가 적용되도록 하여 이를 극복할 수 있는지 확인할 예정
 	*/
 
-	const int randomWorkloadNum = 10000000;
-	const int randomWorkloadPerDataLen = 30;
+	constexpr int randomWorkloadNum = 10000000;
+	constexpr int randomWorkloadPerDataLen = 30;
 	RandomWorkloadTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
 	cout << endl << "릴리즈 구성 테스트 2/4 : 랜덤 로컬 워크로드 테스트--------------------------------------------------" << endl;
@@ -311,9 +311,9 @@ int main()
 		삽입과 검색의 키가 동일한 3번 테스트와 달리 현 테스트는 삽입과 검색 메소드가 각각 셔플되기에 검색 대상 노드가 루트에 미리 대기하지 못하기 때문으로 추정함
 	*/
 
-	const int randomLocalWorkloadNum = randomWorkloadNum;
-	const int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
-	const int localBlockSize = 10;
+	constexpr int randomLocalWorkloadNum = randomWorkloadNum;
+	constexpr int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int localBlockSize = 10;
 	RandomLocalWorkloadTest(randomLocalWorkloadNum, randomLocalWorkloadPerDataLen, localBlockSize);
 
 	cout << endl << "릴리즈 구성 테스트 3/4 : 선형 증가 워크로드 테스트--------------------------------------------------" << endl;
@@ -343,8 +343,8 @@ int main()
 		게다가 선형 워크로드가 가진 지역성으로 캐시 히트율이 증가해 1번 랜덤 워크로드 테스트보다 훨씬 빠른 속도를 보이는 것으로 추정함
 	*/
 
-	const int linearIncreaseWorkloadNum = randomWorkloadNum;
-	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int linearIncreaseWorkloadNum = randomWorkloadNum;
+	constexpr int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
 	cout << endl << "릴리즈 구성 테스트 4/4 : 선형 감소 워크로드 테스트--------------------------------------------------" << endl;
@@ -368,8 +368,8 @@ int main()
 		앞선 3번 선형 증가 워크로드 테스트와 동일
 	*/
 
-	const int linearDecreaseWorkloadNum = randomWorkloadNum;
-	const int linearDecreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int linearDecreaseWorkloadNum = randomWorkloadNum;
+	constexpr int linearDecreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearDecreaseWorkloadTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 #endif
 

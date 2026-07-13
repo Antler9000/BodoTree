@@ -267,8 +267,8 @@ int main()
 		따라서 현 테스트에서 Bst가 std::map에 비해 삽입, 검색, 삭제 메소드에서 더 느린 속도를 보이는 이유는 설계상 문제보다는 구현 과정에서 최적화의 부족 때문으로 추정함
 	*/
 
-	const int randomWorkloadNum = 10000000;
-	const int randomWorkloadPerDataLen = 30;
+	constexpr int randomWorkloadNum = 10000000;
+	constexpr int randomWorkloadPerDataLen = 30;
 	RandomWorkloadSpeedTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
 	cout << endl << "릴리즈 구성 테스트 2/4 : 랜덤 로컬 워크로드 테스트--------------------------------------------------" << endl;
@@ -295,9 +295,9 @@ int main()
 		본 테스트에서 Bst와 std::map의 속도 차이가 벌어진 이유는 설계와 구현상에서 캐시 히트율 고려에 대한 수준 차이 때문으로 추정함
 	*/
 
-	const int randomLocalWorkloadNum = randomWorkloadNum;
-	const int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
-	const int localBlockSize = 10;
+	constexpr int randomLocalWorkloadNum = randomWorkloadNum;
+	constexpr int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int localBlockSize = 10;
 	RandomLocalWorkloadTest(randomLocalWorkloadNum, randomLocalWorkloadPerDataLen, localBlockSize);
 
 	cout << endl << "릴리즈 구성 테스트 3/4 : 선형 증가 워크로드 테스트--------------------------------------------------" << endl;
@@ -331,8 +331,8 @@ int main()
 		게다가 선형 워크로드가 가진 지역성으로 캐시 히트율이 증가해 1번 랜덤 워크로드 테스트보다 훨씬 빠른 속도를 보이는 것으로 추정함
 	*/
 
-	const int linearIncreaseWorkloadNum = randomWorkloadNum;
-	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int linearIncreaseWorkloadNum = randomWorkloadNum;
+	constexpr int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
 	cout << endl << "릴리즈 구성 테스트 4/4 : 선형 감소 워크로드 테스트--------------------------------------------------" << endl;
@@ -356,8 +356,8 @@ int main()
 		앞선 3번 선형 증가 워크로드 테스트와 같음
 	*/
 
-	const int linearDecreaseWorkloadNum = randomWorkloadNum;
-	const int linearDecreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int linearDecreaseWorkloadNum = randomWorkloadNum;
+	constexpr int linearDecreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearDecreaseWorkloadTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 #endif
 

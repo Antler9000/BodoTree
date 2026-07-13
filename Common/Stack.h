@@ -4,6 +4,7 @@
 #include "Debug.h"
 #include <memory>
 #include <utility>
+#include <cstdint>
 
 template <typename DataType>
 class Stack
@@ -70,7 +71,7 @@ public:
 		else if (m_capacity == m_size)
 		{
 			std::unique_ptr<DataType[]> upNewData = std::unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity * 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
-			for (int i = 0; i < m_size; i++)
+			for (std::int32_t i = 0; i < m_size; i++)
 			{
 				upNewData[i] = m_pDatum[i];		//NOTE : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
 			}
@@ -106,7 +107,7 @@ public:
 			else
 			{
 				std::unique_ptr<DataType[]> upNewData = std::unique_ptr<DataType[]>(DBG_NEW DataType[m_capacity / 2]);	//NOTE : DataType의 기본 생성자가 제공된다고 가정함
-				for (int i = 0; i < m_size; i++)
+				for (std::int32_t i = 0; i < m_size; i++)
 				{
 					upNewData[i] = m_pDatum[i];		//NOTE : DataType의 이동 할당 연산자가 noexcept임이 보장되지 않기에 move(..)를 사용하지 않았음
 				}
@@ -166,7 +167,7 @@ public:
 		m_pDatum = DBG_NEW DataType[sourceStack.m_capacity];
 		m_size = sourceStack.m_size;
 		m_capacity = sourceStack.m_capacity;
-		for (int i = 0; i < m_size; i++)
+		for (std::int32_t i = 0; i < m_size; i++)
 		{
 			m_pDatum[i] = sourceStack.m_pDatum[i];
 		}
@@ -176,9 +177,9 @@ public:
 
 private:
 
-	DataType* m_pDatum;
-	int m_size;
-	int m_capacity;
+	DataType*		m_pDatum;
+	std::int32_t	m_size;
+	std::int32_t	m_capacity;
 };
 
 #endif //STACK_H

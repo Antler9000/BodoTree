@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <cstdint>
 
 template <template <typename> class NodeType, typename DataType>
 class BstTemplate
@@ -72,7 +73,7 @@ public:
 	//RETURN	: newKey와 같은 키의 노드가 이미 존재하는 경우 false를 반환함
 	//NOTE		: 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename InsertDataType = DataType>
-	bool Insert(int newKey, InsertDataType&& newData)
+	bool Insert(std::int32_t newKey, InsertDataType&& newData)
 	{
 		LogPrint("insert");
 		
@@ -81,7 +82,7 @@ public:
 	}
 
 	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
-	bool Retrieve(int targetKey, DataType& outData) const
+	bool Retrieve(std::int32_t targetKey, DataType& outData) const
 	{
 		LogPrint("retrieve");
 
@@ -89,7 +90,7 @@ public:
 	}
 
 	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우 false를 반환함
-	bool Remove(int targetKey)
+	bool Remove(std::int32_t targetKey)
 	{
 		LogPrint("remove one item");
 
@@ -142,10 +143,10 @@ protected:	//NOTE : 제너릭 메소드들
 	//NOTE : 메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	//NOTE : 상위 메소드와 하위 작업 메소드가 const 메소드인 경우를 지원하기 위한 const 버전의 제너릭 메소드 버전도 같이 있음
 	template <typename MethodType, typename ArgumentType>
-	bool GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument);
+	bool GenericSearch(std::int32_t targetKey, MethodType&& method, ArgumentType&& argument);
 
 	template <typename MethodType, typename ArgumentType>
-	bool GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument) const;
+	bool GenericSearch(std::int32_t targetKey, MethodType&& method, ArgumentType&& argument) const;
 
 	//NOTE : 메소드나 인자가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	//NOTE : 트리 복사의 소스 트리에서 실행되거나, 순회 출력 메소드에서만 사용되므로 const 메소드로 선언하였음
@@ -186,7 +187,7 @@ protected:
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument)
+inline bool BstTemplate<NodeType, DataType>::GenericSearch(std::int32_t targetKey, MethodType&& method, ArgumentType&& argument)
 {
 	LogPrint("generic search method (not const method)");
 
@@ -231,7 +232,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, Method
 
 template <template <typename> class NodeType, typename DataType>
 template <typename MethodType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::GenericSearch(int targetKey, MethodType&& method, ArgumentType&& argument) const
+inline bool BstTemplate<NodeType, DataType>::GenericSearch(std::int32_t targetKey, MethodType&& method, ArgumentType&& argument) const
 {
 	LogPrint("generic search method (const method)");
 
@@ -340,7 +341,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(MethodType
 		enum NodeJob
 		{
 			KEEP_SEARCH,
-			DO_TODO
+			DO_TASK
 		};
 
 		NodeJob nodeJob;
@@ -354,7 +355,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(MethodType
 	{
 		if (traverseRecord.nodeJob == Record::KEEP_SEARCH)
 		{
-			depthFirstSearchStack.Push({ Record::DO_TODO , traverseRecord.pNode });
+			depthFirstSearchStack.Push({ Record::DO_TASK , traverseRecord.pNode });
 
 			if (traverseRecord.pNode->m_pRightChild != nullptr)
 			{
@@ -366,7 +367,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(MethodType
 				depthFirstSearchStack.Push({ Record::KEEP_SEARCH, traverseRecord.pNode->m_pLeftChild });
 			}
 		}
-		else if (traverseRecord.nodeJob == Record::DO_TODO)
+		else if (traverseRecord.nodeJob == Record::DO_TASK)
 		{
 			(this->*std::forward<MethodType>(method))(traverseRecord.pNode, std::forward<ArgumentType>(argument));
 		}

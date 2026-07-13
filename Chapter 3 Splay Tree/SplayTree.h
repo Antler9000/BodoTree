@@ -6,6 +6,7 @@
 #include "../Common/Stack.h"
 #include <iostream>
 #include <utility>
+#include <cstdint>
 
 template <typename DataType>
 class SplayTree;
@@ -31,7 +32,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	SplayNode(int newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	SplayNode(std::int32_t newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}
@@ -52,7 +53,7 @@ private:
 
 private:
 
-	int						m_key;
+	std::int32_t			m_key;
 	DataType				m_data;
 	SplayNode<DataType>*	m_pLeftChild;
 	SplayNode<DataType>*	m_pRightChild;
@@ -71,7 +72,7 @@ public:
 	~SplayTree() noexcept = default;
 
 	//RETURN : targetKey와 같은 키를 가진 노드가 존재하지 않는 경우에 false를 반환함
-	bool Retrieve(int targetKey, DataType& outData)
+	bool Retrieve(std::int32_t targetKey, DataType& outData)
 	{
 		LogPrint("retrieve with splay");
 
@@ -93,7 +94,6 @@ public:
 			{
 				outData = pSearchNode->m_data;
 
-				//TODO : 반복문으로 루트 노드까지 올리도록 로직을 수정하자 (+삽입, 삭제에도 splay를 적용하기)
 				SplayNode<DataType>* pParentOfSearchNode = nullptr;
 				SplayNode<DataType>* pGrandParentOfSearchNode = nullptr;
 				SplayNode<DataType>* pGreatGrandParentOfSearchNode = nullptr;

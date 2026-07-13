@@ -306,8 +306,8 @@ int main()
 		우선 폴리몰피즘을 사용한 현재 힙의 구현 방식을 좀 더 단단한 방식으로 개선해서 속도를 올릴 필요가 있음.
 	*/
 
-	const int randomWorkloadNum = 10000000;
-	const int randomWorkloadPerDataLen = 30;
+	constexpr int randomWorkloadNum = 10000000;
+	constexpr int randomWorkloadPerDataLen = 30;
 	RandomWorkloadTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
 	cout << endl << "릴리즈 구성 테스트 2/4 : 랜덤 로컬 워크로드 테스트--------------------------------------------------" << endl;
@@ -331,9 +331,9 @@ int main()
 		블럭 안의 지역성이 캐시 히트율을 높여주어 앞선 1번 랜덤 워크로드 테스트보다 전반적으로 빠른 속도가 나온 것으로 보임.
 	*/
 
-	const int randomLocalWorkloadNum = randomWorkloadNum;
-	const int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
-	const int localBlockSize = 10;
+	constexpr int randomLocalWorkloadNum = randomWorkloadNum;
+	constexpr int randomLocalWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int localBlockSize = 10;
 	RandomLocalWorkloadTest(randomLocalWorkloadNum, randomLocalWorkloadPerDataLen, localBlockSize);
 
 	cout << endl << "릴리즈 구성 테스트 3/4 : 선형 증가 워크로드 테스트--------------------------------------------------" << endl;
@@ -360,8 +360,8 @@ int main()
 		앞서 1번 랜덤 워크로드 테스트에서 말했듯이 현재 힙의 구현에 사용된 폴리몰피즘 방식부터 탈피하고서 최적화를 해나갸아할 듯함
 	*/
 
-	const int linearIncreaseWorkloadNum = randomWorkloadNum;
-	const int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
+	constexpr int linearIncreaseWorkloadNum = randomWorkloadNum;
+	constexpr int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
 	cout << endl << "릴리즈 구성 테스트 4/4 : 선형 감소 워크로드 테스트--------------------------------------------------" << endl;
@@ -388,8 +388,8 @@ int main()
 		앞서 1번 랜덤 워크로드 테스트에서 말했듯이 현재 힙의 구현에 사용된 폴리몰피즘 방식부터 탈피하고서 최적화를 해나갸아할 듯함
 	*/
 
-	const int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
-	const int linearDecreaseWorkloadPerDataLen = linearIncreaseWorkloadPerDataLen;
+	constexpr int linearDecreaseWorkloadNum = linearIncreaseWorkloadNum;
+	constexpr int linearDecreaseWorkloadPerDataLen = linearIncreaseWorkloadPerDataLen;
 	LinearDecreaseWorkloadTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 #endif
 

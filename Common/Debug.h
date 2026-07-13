@@ -5,21 +5,21 @@
 #include <crtdbg.h>
 
 #ifdef TREE_LOG
-	#define LogPrint(statement) std::cout << "(Log : " << __func__ << ") " << statement << std::endl
+	#define LogPrint(description) std::cout << "(Log : " << __func__ << ") " << description << std::endl
 #else
-	#define LogPrint(statement)
+	#define LogPrint(description)
 #endif
 
 #ifdef TREE_WARNING
-	#define WarningPrint(statement) std::cout << "(Warning : " << __func__ << ") " << statement << std::endl
+	#define WarningPrint(description) std::cout << "(Warning : " << __func__ << ") " << description << std::endl
 #else
-	#define WarningPrint(statement)
+	#define WarningPrint(description)
 #endif
 
 #ifdef TREE_ERROR
-	#define ErrorPrint(statement) std::cout << "(Error : " << __func__ << ") " << statement << std::endl
+	#define ErrorPrint(description) std::cout << "(Error : " << __func__ << ") " << description << std::endl
 #else
-	#define ErrorPrint(statement)
+	#define ErrorPrint(description)
 #endif
 
 //NOTE :	메모리 누수로 이어진 new 할당을 추적하기 위해선 기존 new가 아니라 오버로딩된 특별한 new를 사용하여야 함

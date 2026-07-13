@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <cstdint>
 
 template <typename DataType>
 class Heap;
@@ -35,7 +36,7 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	HeapNode(int key, NewDataType&& data) : m_key(key), m_data(std::forward<NewDataType>(data))
+	HeapNode(std::int32_t key, NewDataType&& data) : m_key(key), m_data(std::forward<NewDataType>(data))
 	{
 
 	}
@@ -83,8 +84,8 @@ private:
 
 private:
 	
-	int			m_key;
-	DataType	m_data;
+	std::int32_t	m_key;
+	DataType		m_data;
 };
 
 template <typename DataType>
@@ -162,7 +163,7 @@ public:
 
 	//PARAMTER : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename PushDataType = DataType>
-	void Push(int newKey, PushDataType&& newData)
+	void Push(std::int32_t newKey, PushDataType&& newData)
 	{
 		LogPrint("push");
 
@@ -246,8 +247,7 @@ public:
 		LogPrint("copy heap");
 
 		std::unique_ptr<HeapNode<DataType>[]> upTempData = std::unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[sourceHeap.m_capacity]);
-
-		for (int i = 0; i < sourceHeap.m_size; i++)
+		for (std::int32_t i = 0; i < sourceHeap.m_size; i++)
 		{
 			upTempData[i] = sourceHeap.m_pNodes[i];
 		}
@@ -263,7 +263,7 @@ public:
 	{
 		LogPrint("print heap");
 
-		for (int i = 0; i < m_size; i++)
+		for (std::int32_t i = 0; i < m_size; i++)
 		{
 			std::cout << "키 : " << m_pNodes[i].m_key << " / 데이터 : " << m_pNodes[i].m_data << std::endl;
 		}
@@ -275,10 +275,9 @@ private:
 	{
 		LogPrint("give larget memory space");
 
-		int newCapacity = (m_capacity == 0) ? (50) : (2 * m_capacity);
+		std::int32_t newCapacity = (m_capacity == 0) ? (50) : (2 * m_capacity);
 		std::unique_ptr<HeapNode<DataType>[]> upTempData = std::unique_ptr<HeapNode<DataType>[]>(DBG_NEW HeapNode<DataType>[newCapacity]);
-
-		for (int i = 0; i < m_size; i++)
+		for (std::int32_t i = 0; i < m_size; i++)
 		{
 			upTempData[i] = m_pNodes[i];	//NOTE : 노드 내부에 저장되는 DataType의 이동 할당자가 noexcept임이 보장되지 않아 move(..)를 사용하지 않았음
 		}
@@ -293,9 +292,8 @@ private:
 	{
 		LogPrint("reorder by promoting");
 
-		int targetIndex = m_size - 1;
-		int parentIndex = GetParentIndex(targetIndex);
-
+		std::int32_t targetIndex = m_size - 1;
+		std::int32_t parentIndex = GetParentIndex(targetIndex);
 		while (targetIndex != parentIndex && IsNotOrdered(parentIndex, targetIndex))
 		{
 			Swap(m_pNodes[targetIndex], m_pNodes[parentIndex]);
@@ -310,16 +308,15 @@ private:
 	{
 		LogPrint("reorder by demoting");
 
-		int targetIndex = 0;
-		int leftChildIndex = GetLeftChildIndex(targetIndex);
-		int rightChildIndex = GetRightChildIndex(targetIndex);
-		int targetChildIndex;
-
+		std::int32_t targetIndex = 0;
+		std::int32_t leftChildIndex = GetLeftChildIndex(targetIndex);
+		std::int32_t rightChildIndex = GetRightChildIndex(targetIndex);
+		std::int32_t targetChildIndex;
 		while (leftChildIndex < m_size)
 		{
 			if (rightChildIndex < m_size)
 			{
-				if (IsLeftChildTarget(leftChildIndex, rightChildIndex))
+				if (IsLeftChildTarget(leftChildIndex, rightChildIndex) == true)
 				{
 					targetChildIndex = leftChildIndex;
 				}
@@ -333,7 +330,7 @@ private:
 				targetChildIndex = leftChildIndex;
 			}
 
-			if (IsNotOrdered(targetIndex, targetChildIndex))
+			if (IsNotOrdered(targetIndex, targetChildIndex) == true)
 			{
 				Swap(m_pNodes[targetIndex], m_pNodes[targetChildIndex]);
 
@@ -357,21 +354,21 @@ private:
 		nodeB = temp;
 	}
 
-	int GetLeftChildIndex(int dataIndex)
+	std::int32_t GetLeftChildIndex(std::int32_t dataIndex)
 	{
 		LogPrint("get left child index");
 
 		return (dataIndex * 2 + 1);
 	}
 
-	int GetRightChildIndex(int dataIndex)
+	std::int32_t GetRightChildIndex(std::int32_t dataIndex)
 	{
 		LogPrint("get right child index");
 
 		return (dataIndex * 2 + 2);
 	}
 
-	int GetParentIndex(int dataIndex)
+	std::int32_t GetParentIndex(std::int32_t dataIndex)
 	{
 		LogPrint("get parent index");
 
@@ -379,15 +376,14 @@ private:
 	}
 
 	//NOTE : 상속된 최소힙 or 최대힙에서 각기 방식으로 구체화함
-	//TODO : 동적 폴리몰피즘을 사용하지 않고 정적인 방식으로 구현하자
-	virtual bool IsNotOrdered(int parentIndex, int childIndex) = 0;
-	virtual bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex) = 0;
+	virtual bool IsNotOrdered(std::int32_t parentIndex, std::int32_t childIndex) = 0;
+	virtual bool IsLeftChildTarget(std::int32_t leftChildIndex, std::int32_t rightChildIndex) = 0;
 
 protected:
 
-	HeapNode<DataType>* m_pNodes;
-	int m_size;
-	int m_capacity;
+	HeapNode<DataType>*	m_pNodes;
+	std::int32_t		m_size;
+	std::int32_t		m_capacity;
 };
 
 template <typename DataType>
@@ -404,7 +400,7 @@ public:
 
 private:
 
-	bool IsNotOrdered(int parentIndex, int childIndex)
+	bool IsNotOrdered(std::int32_t parentIndex, std::int32_t childIndex)
 	{
 		LogPrint("is not ordered? in MinHeap");
 
@@ -418,7 +414,7 @@ private:
 		}
 	}
 
-	bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex)
+	bool IsLeftChildTarget(std::int32_t leftChildIndex, std::int32_t rightChildIndex)
 	{
 		LogPrint("is left child target? in MinHeap");
 
@@ -447,7 +443,7 @@ public:
 
 private:
 
-	bool IsNotOrdered(int parentIndex, int childIndex)
+	bool IsNotOrdered(std::int32_t parentIndex, std::int32_t childIndex)
 	{
 		LogPrint("is not ordered? in MaxHeap");
 
@@ -461,7 +457,7 @@ private:
 		}
 	}
 
-	bool IsLeftChildTarget(int leftChildIndex, int rightChildIndex)
+	bool IsLeftChildTarget(std::int32_t leftChildIndex, std::int32_t rightChildIndex)
 	{
 		LogPrint("is left child target? in MaxHeap");
 
