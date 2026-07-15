@@ -108,7 +108,7 @@ public:
 		RemovingBstByRotationRR();
 	}
 
-	//NOTE	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
+	//NOTE	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 매개변수를 사용함
 	//			복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 인자 전달에 복사를 이용하면 순환 오류가 남
 	void CopyTree(const BstTemplate<NodeType, DataType>& sourceBst)
 	{
@@ -168,12 +168,12 @@ protected:	//NOTE : 제너릭 메소드들
 
 protected:	//NOTE : 제너릭 메소드에 전달되는 하위 작업 함수 객체들
 
-	//NOTE : 삽입 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
+	//NOTE : 삽입 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 매개변수를 사용함
 	struct InsertNodeFuncObject { bool operator ()(BstTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode); };
 
 	struct RetrieveNodeFuncObject { bool operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, DataType& outData) const; };
 
-	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
+	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 매개변수를 사용함
 	struct RemoveNodeFuncObject { bool operator ()(BstTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pTargetNode, void* pDummyParameter); };
 	void ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode);
 	void ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode);

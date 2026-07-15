@@ -213,7 +213,7 @@ private:
 		}
 	}
 
-	//NOTE : ZIG는 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용함
+	//NOTE : ZIG는 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 매개변수를 사용함
 	void ZigL(SplayNode<DataType>*& pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig left");
@@ -232,7 +232,7 @@ private:
 		pFatherOfTarget = pTarget;
 	}
 
-	//NOTE : ZIG_ZIG나 ZIG_ZAG와 같이 조부까지 변화가 일어나는 경우를 위해, 조부를 가리키는 증조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용하였음
+	//NOTE : ZIG_ZIG나 ZIG_ZAG와 같이 조부까지 변화가 일어나는 경우를 위해, 조부를 가리키는 증조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 매개변수를 사용하였음
 	void ZigZigLL(SplayNode<DataType>*& pGrandFatherOfTarget, SplayNode<DataType>* pFatherOfTarget, SplayNode<DataType>* pTarget)
 	{
 		LogPrint("zig zig left left");

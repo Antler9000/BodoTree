@@ -281,7 +281,7 @@ private:
 	}
 
 	//회전으로 인해 조부 노드의 위치가 변하면, 증조부 노드의 자식 포인터도 그에 맞게 업데이트해줘야 함
-	//따라서 조부 노드의 경우에는 단순히 해당 노드의 포인터를 값으로 받아오지 않고, 증조부 노드의 자식 포인터의 레퍼런스 인자로 받아왔다.
+	//따라서 조부 노드의 경우에는 단순히 해당 노드의 포인터를 값으로 받아오지 않고, 증조부 노드의 자식 포인터의 레퍼런스 매개변수로 받아왔음
 	void SelectProperRotation(bool isDoubleRed, RedBlackNode<DataType>* pTarget, RedBlackNode<DataType>* pParent, RedBlackNode<DataType>*& pGrandParent)
 	{
 		if (pGrandParent->m_pLeftChild == pParent)
@@ -353,7 +353,7 @@ private:
 	}
 
 	//삭제 대상이 리프 노드여서 아에 삭제되는 경우,
-	//그 노드를 가리키는 부모노드의 자식 포인터를 null로 해야하기에 레퍼런스 인자를 두었다.
+	//그 노드를 가리키는 부모노드의 자식 포인터를 null로 해야하기에 레퍼런스 매개변수로 두었음
 	void RemoveTarget(RedBlackNode<DataType>*& pTarget, Stack<RedBlackNode<DataType>*>* pRouteStack)
 	{
 		if (pTarget->m_pLeftChild != NULL && pTarget->m_pRightChild != NULL)	//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함

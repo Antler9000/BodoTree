@@ -171,7 +171,7 @@ public:
 		m_pHead = nullptr;
 	}
 
-	//NOTE	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 인자를 사용함
+	//NOTE	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 매개변수를 사용함
 	//			복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 복사 생성자를 이용하면 순환 오류가 남
 	void CopyTree(const Bst<DataType>& sourceTree)
 	{
@@ -235,7 +235,7 @@ private:
 
 	bool RemoveRecurse(BstNode<DataType>* pSearchNode, std::int32_t targetKey);
 
-	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 인자를 사용함
+	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 매개변수를 사용함
 	void RemoveTarget(BstNode<DataType>*& pTargetNode);
 	void ReplaceWithInorderPredecessor(BstNode<DataType>*& pTargetNode);
 	void ReplaceWithInorderSuccessor(BstNode<DataType>*& pTargetNode);
