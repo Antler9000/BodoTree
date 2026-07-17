@@ -1,7 +1,7 @@
 ﻿#ifndef RED_BLACK_TREE_H
 #define RED_BLACK_TREE_H
 
-#include "../Common/BstUsingWhileTemplate.h"
+#include "../Common/BSTTemplate.h"
 #include "../Common/Debug.h"
 #include <cstdint>
 

@@ -1,7 +1,7 @@
 ﻿#ifndef BST_USING_WHILE_H
 #define BST_USING_WHILE_H
 
-#include "../Common/BstUsingWhileTemplate.h"
+#include "../Common/BSTTemplate.h"
 #include <iostream>
 #include <utility>
 #include <cstdint>

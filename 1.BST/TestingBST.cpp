@@ -1,9 +1,9 @@
 ﻿//로그 출력문들을 활성화하고 싶을 시 아래 구문의 주석을 해제할 것
 //#define TREE_LOG	
-//#define TREE_ERROR
 //#define TREE_WARNING
+//#define TREE_ERROR
 
-#include "BstUsingRecurse.h"
+#include "BST.h"
 #include <crtdbg.h>
 #include <iostream>
 #include <chrono>
@@ -26,7 +26,7 @@ void RandomLocalWorkloadTest(int workloadNum, int workloadPerDataLen, int localB
 void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
-//NOTE : insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Bst와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
+//NOTE	: insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 Bst와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
 time_point<steady_clock> TestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
@@ -253,18 +253,21 @@ int main()
 		[randomWorkloadNum			= 10,000,000]
 		[randomWorkloadPerDataLen	= 30]
 
-		복사 삽입	: Bst = 18.66초	|	std::map = 16.41초
-		이동 삽입	: Bst = 17.80초	|	std::map = 15.57초
-		검색		: Bst = 17.78초	|	std::map = 17.02초
-		삭제		: Bst = 24.90초	|	std::map = 20.12초
-		소멸		: Bst =  4.83초	|	std::map =  5.18초
+		복사 삽입	: Bst = 16.46초	|	std::map = 15.83초 -4%
+		이동 삽입	: Bst = 15.77초	|	std::map = 14.58초 -8%
+		검색		: Bst = 16.97초	|	std::map = 17.64초
+		삭제		: Bst = 21.92초	|	std::map = 18.61초
+		소멸		: Bst =  4.51초	|	std::map =  4.38초
 	*/
 
 	/*	(테스팅 해석)
-		어셈블리 파일을 확인한 결과, Bst의 삽입-검색-삭제 메소드는 반복문으로 변환되므로(꼬리 재귀 최적화 추정), 재귀 호출이 속도 저하의 원인은 아님
-		또한 랜덤 워크로드를 통해 트리 균형은 유지되었을 것이니, 균형 트리가 아니라는 점이 속도 저하의 원인은 아님
-
-		따라서 현 테스트에서 Bst가 std::map에 비해 삽입, 검색, 삭제 메소드에서 더 느린 속도를 보이는 이유는 설계상 문제보다는 구현 과정에서 최적화의 부족 때문으로 추정함
+		본 트리는 반복문으로 구현되었기에, 컴파일러의 최적화에 상관없이 재귀 호출은 무조건 일어나지 않음
+		
+		빌드된 어셈블리 코드를 보았을 때 삽입과 검색 메소드는 모두 인라이닝 되었고 이로 인해 std::map과 속도 차이가 적음
+		그럼에도 상대적으로 10% 정도 느린 속도는 상세적인 최적화가 부족하기 때문으로 추정함
+		
+		삭제 메소드의 하위 작업 호출이 인라이닝되지 못한 것을 확인하였고 std::map과의 속도 차이도 크게 나타남
+		삭제 메소드는 하위 작업 메소드의 크기가 커서 인라이닝되지 못한 것으로 추정함 
 	*/
 
 	constexpr int randomWorkloadNum = 10000000;
@@ -282,15 +285,15 @@ int main()
 		[randomLocalWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
 		[localBlockSize					= 10]
 
-		복사 삽입	: Bst =  8.59초	|	std::map =  3.98초
-		이동 삽입	: Bst =  8.75초	|	std::map =  3.72초
-		검색		: Bst =  6.78초	|	std::map =  3.63초
-		삭제		: Bst =  8.47초	|	std::map =  4.17초
-		소멸		: Bst =  3.90초	|	std::map =  3.34초
+		복사 삽입	: Bst =  7.75초	|	std::map =  4.09초
+		이동 삽입	: Bst =  6.74초	|	std::map =  3.34초
+		검색		: Bst =  6.60초	|	std::map =  3.65초
+		삭제		: Bst =  7.70초	|	std::map =  4.11초
+		소멸		: Bst =  3.51초	|	std::map =  3.38초
 	*/
 
 	/*	(테스팅 해석)
-		워크로드가 지역 선형성을 가지게 되므로 1번 랜덤 워크로드 테스트에 비해서 Bst의 트리 높이는 더 높아질 것임
+		워크로드가 지역 선형성을 가지게 되므로 1번 랜덤 워크로드 테스트에 비해서 Bst의 트리 높이는 더 높아짐
 		그럼에도 1번 랜덤 워크로드 테스트에 비해서 Bst의 삽입, 검색, 삭제 메소드가 더 빨라진 이유는 캐시 히트율이 높아졌기 때문으로 추정함
 		본 테스트에서 Bst와 std::map의 속도 차이가 벌어진 이유는 설계와 구현상에서 캐시 히트율 고려에 대한 수준 차이 때문으로 추정함
 	*/
@@ -310,23 +313,19 @@ int main()
 		[linearIncreaseWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
 		[linearIncreaseWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
 
-		복사 삽입	: Bst = 시간초과|	std::map =  1.64초
-		이동 삽입	: Bst = 시간초과|	std::map =  1.15초
-		검색		: Bst = 시간초과|	std::map =  0.62초
-		삭제		: Bst =  0.02초	|	std::map =  1.11초
-		소멸		: Bst = 오류발생|	std::map =  0.72초
+		복사 삽입	: Bst = 시간초과|	std::map =  1.79초
+		이동 삽입	: Bst = 시간초과|	std::map =  1.51초
+		검색		: Bst = 시간초과|	std::map =  0.66초
+		삭제		: Bst =  0.02초	|	std::map =  1.84초
+		소멸		: Bst =  0.36초 |	std::map =  1.32초
 	*/
 
 	/*	(테스팅 해석)
-		선형 워크로드는 Bst를 편향시켜 리스트와 같은 모양이 되도록 함
+		선형 워크로드는 Bst를 편향시켜 리스트와 같은 형상이 되도록 함
 		
-		이로 인해서 소멸자의 재귀 호출이 깊어져 스택 오버플로우가 발생함
-
-		삽입 메소드와 검색 메소드는 리스트와 같은 모양이 되어서 나타나는 O(N^2)의 시간 복잡도 때문에 시간 초과가 나지만,
-		어셈블리 파일을 확인한 결과 재귀 호출이 일어나지 않고 있어 스택 오버플로우를 피하였음(꼬리 재귀 최적화가 적용된 것으로 추정)
-
-		삭제 메소드에선 오류가 나지 않고 속도도 매우 빠른 이유는 선형 삽입과 똑같은 키로 삭제를 수행하니 매번 삭제 대상이 루트에 위치해서임
-
+		삽입 메소드와 검색 메소드는 리스트와 같은 모양이 되어서 나타나는 O(N^2)의 시간 복잡도 때문에 시간 초과가 남
+		시간초과로 삽입이 덜 이루어졌으므로, 이후의 '삭제', '소멸'의 측정 시간은 신뢰할 수 없음
+		
 		Bst와 달리 std::map은 균형을 유지하는 트리이기 때문에 선형 워크로드에 대해서도 O(NlogN)의 시간 복잡도를 가져 매우 빠른 속도를 보임
 		게다가 선형 워크로드가 가진 지역성으로 캐시 히트율이 증가해 1번 랜덤 워크로드 테스트보다 훨씬 빠른 속도를 보이는 것으로 추정함
 	*/
@@ -345,11 +344,11 @@ int main()
 		[linearDecreaseWorkloadNum			= 앞선 1번 랜덤 워크로드 테스트와 동일]
 		[linearDecreaseWorkloadPerDataLen	= 앞선 1번 랜덤 워크로드 테스트와 동일]
 
-		복사 삽입	: Bst = 시간초과|	std::map =  1.65초
-		이동 삽입	: Bst = 시간초과|	std::map =  1.24초
+		복사 삽입	: Bst = 시간초과|	std::map =  1.89초
+		이동 삽입	: Bst = 시간초과|	std::map =  1.46초
 		검색		: Bst = 시간초과|	std::map =  0.68초
-		삭제		: Bst =  0.01초	|	std::map =  1.39초
-		소멸		: Bst = 오류발생|	std::map =  0.79초
+		삭제		: Bst =  0.02초	|	std::map =  1.64초
+		소멸		: Bst =  0.35초 |	std::map =  1.98초
 	*/
 
 	/*	(테스팅 해석)
@@ -361,7 +360,7 @@ int main()
 	LinearDecreaseWorkloadTest(linearDecreaseWorkloadNum, linearDecreaseWorkloadPerDataLen);
 #endif
 
-	cout << endl << "테스트 종료-----------------------------------------------------------------------------------------" << endl;
+	cout << endl << "테스트 종료----------------------------------------------------------------------------------" << endl;
 
 	return 0;
 }
@@ -589,6 +588,7 @@ void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen)
 
 	cout << endl << endl << endl << endl << endl;
 }
+
 
 time_point<steady_clock> TestBst(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload)
 {

@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a2f1fba0-7a0f-4243-b682-1f395eb2e57c}</ProjectGuid>
-    <RootNamespace>My6레드블랙트리</RootNamespace>
+    <ProjectGuid>{4c87787a-7d79-415e-aaff-6c4ece0869a3}</ProjectGuid>
+    <RootNamespace>My5AVL트리</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -129,13 +129,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TestingRedBlackTree.cpp" />
+    <ClCompile Include="TestingAVLTree.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\BstUsingWhileTemplate.h" />
+    <ClInclude Include="..\Common\BSTTemplate.h" />
     <ClInclude Include="..\Common\Debug.h" />
     <ClInclude Include="..\Common\Stack.h" />
-    <ClInclude Include="RedBlackTree.h" />
+    <ClInclude Include="AVLTree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

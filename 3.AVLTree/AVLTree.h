@@ -1,7 +1,7 @@
 ﻿#ifndef AVL_TREE_H
 #define AVL_TREE_H
 
-#include "../Common/BstUsingWhileTemplate.h"
+#include "../Common/BSTTemplate.h"
 #include "../Common/Debug.h"
 #include <cstdint>
 

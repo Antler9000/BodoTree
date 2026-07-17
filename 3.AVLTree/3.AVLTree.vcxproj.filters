@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestingSplayTree.cpp">
+    <ClCompile Include="TestingAVLTree.cpp">
       <Filter>Testing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SplayTree.h">
+    <ClInclude Include="AVLTree.h">
       <Filter>TreeStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\BSTTemplate.h">
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Debug.h">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Stack.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\BstUsingWhileTemplate.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>

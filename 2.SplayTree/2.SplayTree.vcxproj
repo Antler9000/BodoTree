@@ -132,7 +132,7 @@
     <ClCompile Include="TestingSplayTree.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\BstUsingWhileTemplate.h" />
+    <ClInclude Include="..\Common\BSTTemplate.h" />
     <ClInclude Include="..\Common\Debug.h" />
     <ClInclude Include="..\Common\Stack.h" />
     <ClInclude Include="SplayTree.h" />

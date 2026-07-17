@@ -5,17 +5,13 @@ VisualStudioVersion = 18.5.11723.231
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "솔루션 항목", "솔루션 항목", "{218ACC26-1832-4821-89A6-34626C15C3CE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.BstUsingRecurse", "Chapter 1 BST using Recurse\1.BstUsingRecurse.vcxproj", "{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.BST", "1.BST\1.BST.vcxproj", "{83DA579E-5A6C-4A11-8CD6-D684B49622C0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2.BstUsingWhile", "Chapter 2 BST using While\2.BstUsingWhile.vcxproj", "{83DA579E-5A6C-4A11-8CD6-D684B49622C0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2.SplayTree", "2.SplayTree\2.SplayTree.vcxproj", "{8B6F47A9-BD3E-432D-A816-8059FAAB47FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3.SplayTree", "Chapter 3 Splay Tree\3.SplayTree.vcxproj", "{8B6F47A9-BD3E-432D-A816-8059FAAB47FA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3.AVLTree", "3.AVLTree\3.AVLTree.vcxproj", "{4C87787A-7D79-415E-AAFF-6C4ECE0869A3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "4.AvlTree", "Chapter 4 AVL Tree\4.AvlTree.vcxproj", "{4C87787A-7D79-415E-AAFF-6C4ECE0869A3}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "5.RedBlackTree", "Chapter 5 Red Black Tree\5.RedBlackTree.vcxproj", "{A2F1FBA0-7A0F-4243-B682-1F395EB2E57C}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6.Heap", "Chapter 6 Heap\6.Heap.vcxproj", "{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "4.RedBlackTree", "4.RedBlackTree\4.RedBlackTree.vcxproj", "{A2F1FBA0-7A0F-4243-B682-1F395EB2E57C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Debug|x64.ActiveCfg = Debug|x64
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Debug|x64.Build.0 = Debug|x64
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Debug|x86.ActiveCfg = Debug|Win32
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Debug|x86.Build.0 = Debug|Win32
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Release|x64.ActiveCfg = Release|x64
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Release|x64.Build.0 = Release|x64
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Release|x86.ActiveCfg = Release|Win32
-		{1B4BB6D6-C527-4FB4-A3DE-067CE5F2DDC1}.Release|x86.Build.0 = Release|Win32
 		{83DA579E-5A6C-4A11-8CD6-D684B49622C0}.Debug|x64.ActiveCfg = Debug|x64
 		{83DA579E-5A6C-4A11-8CD6-D684B49622C0}.Debug|x64.Build.0 = Debug|x64
 		{83DA579E-5A6C-4A11-8CD6-D684B49622C0}.Debug|x86.ActiveCfg = Debug|Win32
@@ -65,14 +53,6 @@ Global
 		{A2F1FBA0-7A0F-4243-B682-1F395EB2E57C}.Release|x64.Build.0 = Release|x64
 		{A2F1FBA0-7A0F-4243-B682-1F395EB2E57C}.Release|x86.ActiveCfg = Release|Win32
 		{A2F1FBA0-7A0F-4243-B682-1F395EB2E57C}.Release|x86.Build.0 = Release|Win32
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Debug|x64.ActiveCfg = Debug|x64
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Debug|x64.Build.0 = Debug|x64
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Debug|x86.ActiveCfg = Debug|Win32
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Debug|x86.Build.0 = Debug|Win32
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Release|x64.ActiveCfg = Release|x64
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Release|x64.Build.0 = Release|x64
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Release|x86.ActiveCfg = Release|Win32
-		{918C8202-3EBD-42C4-9ADD-CC83E2E988B8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
