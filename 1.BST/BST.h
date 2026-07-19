@@ -1,24 +1,24 @@
 ﻿#ifndef BST_USING_WHILE_H
 #define BST_USING_WHILE_H
 
-#include "../Common/BSTTemplate.h"
+#include "BSTTemplate.h"
 #include <iostream>
 #include <utility>
 #include <cstdint>
 
 template <typename DataType>
-class Bst;
+class BST;
 
 template <typename DataType>
-class BstNode
+class BSTNode
 {
-	friend class BstTemplate<BstNode, DataType>;
-	friend class Bst<DataType>;
+	friend class BSTTemplate<BSTNode, DataType>;
+	friend class BST<DataType>;
 
 	//NOTE : unique_ptr은 scope를 벗어날 때 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
-	friend struct std::default_delete<BstNode<DataType>>;
+	friend struct std::default_delete<BSTNode<DataType>>;
 
-	friend std::ostream& operator <<(std::ostream& out, const BstNode<DataType>& printedNode)
+	friend std::ostream& operator <<(std::ostream& out, const BSTNode<DataType>& printedNode)
 	{
 		std::cout << "키 : " << printedNode.m_key << " / 데이터 : " << printedNode.m_data;
 
@@ -29,44 +29,44 @@ private:
 
 	//NOTE : 데이터가 lvalue인 경우와 rvalue인 경우를 모두 각 참조로 받을 수 있도록 포워딩을 사용함
 	template <typename NewDataType = DataType>
-	BstNode(std::int32_t newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	BSTNode(std::int32_t newKey, NewDataType&& newData) : m_key(newKey), m_data(std::forward<NewDataType>(newData)), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}
 
-	BstNode(const BstNode& sourceNode) : m_key(sourceNode.m_key), m_data(sourceNode.m_data), m_pLeftChild(nullptr), m_pRightChild(nullptr)
+	BSTNode(const BSTNode& sourceNode) : m_key(sourceNode.m_key), m_data(sourceNode.m_data), m_pLeftChild(nullptr), m_pRightChild(nullptr)
 	{
 
 	}
 
 	//NOTE : 이진 탐색 트리 템플릿 클래스에 소멸자가 정의되어있으므로, 별도의 노드 소멸자 정의는 필요 없음
-	~BstNode() noexcept = default;
+	~BSTNode() noexcept = default;
 
 	//NOTE : 쓰이지 않는 노드 생성, 할당 방식들
-	BstNode() = delete;
-	BstNode(BstNode&& sourceNode) = delete;
-	BstNode& operator = (const BstNode& sourceNode) = delete;
-	BstNode& operator = (BstNode&& sourceNode) = delete;
+	BSTNode() = delete;
+	BSTNode(BSTNode&& sourceNode) = delete;
+	BSTNode& operator = (const BSTNode& sourceNode) = delete;
+	BSTNode& operator = (BSTNode&& sourceNode) = delete;
 
 private:
 
 	std::int32_t	m_key;
 	DataType		m_data;
-	BstNode*		m_pLeftChild;
-	BstNode*		m_pRightChild;
+	BSTNode*		m_pLeftChild;
+	BSTNode*		m_pRightChild;
 };
 
 template <typename DataType>
-class Bst : public BstTemplate<BstNode, DataType>
+class BST : public BSTTemplate<BSTNode, DataType>
 {
 public:
 
-	Bst() = default;
-	Bst(const Bst<DataType>& sourceTree) = default;
-	Bst(Bst<DataType>&& sourceTree) noexcept = default;
-	Bst<DataType>& operator = (const Bst<DataType>& sourceTree) = default;
-	Bst<DataType>& operator = (Bst<DataType>&& sourceTree) noexcept = default;
-	~Bst() noexcept = default;
+	BST() = default;
+	BST(const BST<DataType>& sourceTree) = default;
+	BST(BST<DataType>&& sourceTree) noexcept = default;
+	BST<DataType>& operator = (const BST<DataType>& sourceTree) = default;
+	BST<DataType>& operator = (BST<DataType>&& sourceTree) noexcept = default;
+	~BST() noexcept = default;
 };
 
 #endif //BST_USING_WHILE_H

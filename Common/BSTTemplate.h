@@ -1,38 +1,38 @@
 ﻿#ifndef BST_USING_WHILE_TEMPLATE_H
 #define BST_USING_WHILE_TEMPLATE_H
 
-#include "../Common/Debug.h"
-#include "../Common/Stack.h"
+#include "Debug.h"
+#include "Stack.h"
 #include <iostream>
 #include <memory>
 #include <utility>
 #include <cstdint>
 
 template <template <typename> class NodeType, typename DataType>
-class BstTemplate
+class BSTTemplate
 {
 public:
 
-	BstTemplate() : m_pHead(nullptr)
+	BSTTemplate() : m_pHead(nullptr)
 	{
 		LogPrint("empty constructor");
 	}
 
-	BstTemplate(const BstTemplate<NodeType, DataType>& sourceTree) : m_pHead(nullptr)
+	BSTTemplate(const BSTTemplate<NodeType, DataType>& sourceTree) : m_pHead(nullptr)
 	{
 		LogPrint("copy constructor");
 
 		CopyTree(sourceTree);
 	}
 
-	BstTemplate(BstTemplate<NodeType, DataType>&& sourceTree) noexcept : m_pHead(sourceTree.m_pHead)
+	BSTTemplate(BSTTemplate<NodeType, DataType>&& sourceTree) noexcept : m_pHead(sourceTree.m_pHead)
 	{
 		LogPrint("move constructor");
 
 		sourceTree.m_pHead = nullptr;
 	}
 
-	BstTemplate<NodeType, DataType>& operator = (const BstTemplate<NodeType, DataType>& sourceTree)
+	BSTTemplate<NodeType, DataType>& operator = (const BSTTemplate<NodeType, DataType>& sourceTree)
 	{
 		LogPrint("copy assignment");
 
@@ -46,7 +46,7 @@ public:
 		return *this;
 	}
 
-	BstTemplate<NodeType, DataType>& operator = (BstTemplate<NodeType, DataType>&& sourceTree) noexcept
+	BSTTemplate<NodeType, DataType>& operator = (BSTTemplate<NodeType, DataType>&& sourceTree) noexcept
 	{
 		LogPrint("move assignment");
 
@@ -63,7 +63,7 @@ public:
 		return *this;
 	}
 
-	~BstTemplate() noexcept
+	~BSTTemplate() noexcept
 	{
 		LogPrint("destructor");
 
@@ -105,18 +105,18 @@ public:
 	{
 		LogPrint("remove tree");
 
-		RemovingBstByRotationRR();
+		RemovingBSTByRotationRR();
 	}
 
 	//NOTE	:	트리의 값전달로 인해 복사생성자가 실행되는 것을 막기 위해 레퍼런스 매개변수를 사용함
 	//			복사 생성자가 CopyTree(..)를 이용해 구현되어있으므로 CopyTree가 인자 전달에 복사를 이용하면 순환 오류가 남
-	void CopyTree(const BstTemplate<NodeType, DataType>& sourceBst)
+	void CopyTree(const BSTTemplate<NodeType, DataType>& sourceBST)
 	{
 		LogPrint("copy tree");
 
-		BstTemplate<NodeType, DataType> tempTree;
+		BSTTemplate<NodeType, DataType> tempTree;
 		CopyNodeFuncObject copyFuncObject;
-		sourceBst.GenericPreorderTraverse(copyFuncObject, &tempTree);
+		sourceBST.GenericPreorderTraverse(copyFuncObject, &tempTree);
 		*this = std::move(tempTree);
 	}
 
@@ -169,23 +169,23 @@ protected:	//NOTE : 제너릭 메소드들
 protected:	//NOTE : 제너릭 메소드에 전달되는 하위 작업 함수 객체들
 
 	//NOTE : 삽입 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 매개변수를 사용함
-	struct InsertNodeFuncObject { bool operator ()(BstTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode); };
+	struct InsertNodeFuncObject { bool operator ()(BSTTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode); };
 
-	struct RetrieveNodeFuncObject { bool operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, DataType& outData) const; };
+	struct RetrieveNodeFuncObject { bool operator ()(const BSTTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, DataType& outData) const; };
 
 	//NOTE : 삭제 위치를 가리키는 자식 포인터를 곤칠 수 있도록 레퍼런스 매개변수를 사용함
-	struct RemoveNodeFuncObject { bool operator ()(BstTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pTargetNode, void* pDummyParameter); };
+	struct RemoveNodeFuncObject { bool operator ()(BSTTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pTargetNode, void* pDummyParameter); };
 	void ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode);
 	void ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode);
 
-	struct CopyNodeFuncObject { void operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const; };
+	struct CopyNodeFuncObject { void operator ()(const BSTTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pSourceNode, BSTTemplate<NodeType, DataType>* pDestBST) const; };
 
-	struct PrintNodeFuncObject { void operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, void* pDummyParameter) const; };
+	struct PrintNodeFuncObject { void operator ()(const BSTTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, void* pDummyParameter) const; };
 
 protected:	//NOTE : 논 제너릭 하위 메소드
 
 	//NOTE : 트리의 소멸자와 이동 할당 연산자의 하위 메소드로 사용되므로 예외를 던지는 경우가 없도록 하였음
-	void RemovingBstByRotationRR() noexcept;
+	void RemovingBSTByRotationRR() noexcept;
 
 protected:
 
@@ -194,7 +194,7 @@ protected:
 
 template <template <typename> class NodeType, typename DataType>
 template <typename FuncObjectType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::GenericSearch(FuncObjectType funcObject, std::int32_t targetKey, ArgumentType&& argument)
+inline bool BSTTemplate<NodeType, DataType>::GenericSearch(FuncObjectType funcObject, std::int32_t targetKey, ArgumentType&& argument)
 {
 	LogPrint("generic search method (not const method)");
 
@@ -239,7 +239,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(FuncObjectType funcOb
 
 template <template <typename> class NodeType, typename DataType>
 template <typename FuncObjectType, typename ArgumentType>
-inline bool BstTemplate<NodeType, DataType>::GenericSearch(FuncObjectType funcObject, std::int32_t targetKey, ArgumentType&& argument) const
+inline bool BSTTemplate<NodeType, DataType>::GenericSearch(FuncObjectType funcObject, std::int32_t targetKey, ArgumentType&& argument) const
 {
 	LogPrint("generic search method (const method)");
 
@@ -284,7 +284,7 @@ inline bool BstTemplate<NodeType, DataType>::GenericSearch(FuncObjectType funcOb
 
 template <template <typename> class NodeType, typename DataType>
 template <typename FuncObjectType, typename ArgumentType>
-inline void BstTemplate<NodeType, DataType>::GenericPreorderTraverse(FuncObjectType funcObject, ArgumentType&& argument) const
+inline void BSTTemplate<NodeType, DataType>::GenericPreorderTraverse(FuncObjectType funcObject, ArgumentType&& argument) const
 {
 	LogPrint("generic preorder traverse method");
 
@@ -309,7 +309,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPreorderTraverse(FuncObjectT
 
 template <template <typename> class NodeType, typename DataType>
 template <typename FuncObjectType, typename ArgumentType>
-inline void BstTemplate<NodeType, DataType>::GenericInorderTraverse(FuncObjectType funcObject, ArgumentType&& argument) const
+inline void BSTTemplate<NodeType, DataType>::GenericInorderTraverse(FuncObjectType funcObject, ArgumentType&& argument) const
 {
 	LogPrint("generic inorder traverse method");
 
@@ -339,7 +339,7 @@ inline void BstTemplate<NodeType, DataType>::GenericInorderTraverse(FuncObjectTy
 
 template <template <typename> class NodeType, typename DataType>
 template <typename FuncObjectType, typename ArgumentType>
-inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(FuncObjectType funcObject, ArgumentType&& argument) const
+inline void BSTTemplate<NodeType, DataType>::GenericPostorderTraverse(FuncObjectType funcObject, ArgumentType&& argument) const
 {
 	LogPrint("generic postorder traverse method");
 
@@ -384,7 +384,7 @@ inline void BstTemplate<NodeType, DataType>::GenericPostorderTraverse(FuncObject
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline bool BstTemplate<NodeType, DataType>::InsertNodeFuncObject::operator ()(BstTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode)
+inline bool BSTTemplate<NodeType, DataType>::InsertNodeFuncObject::operator ()(BSTTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pInsertPosition, std::unique_ptr<NodeType<DataType>> upNewNode)
 {
 	LogPrint("insert node task method");
 
@@ -401,7 +401,7 @@ inline bool BstTemplate<NodeType, DataType>::InsertNodeFuncObject::operator ()(B
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline bool BstTemplate<NodeType, DataType>::RetrieveNodeFuncObject::operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, DataType& outData) const
+inline bool BSTTemplate<NodeType, DataType>::RetrieveNodeFuncObject::operator ()(const BSTTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, DataType& outData) const
 {
 	LogPrint("retrieve node task method");
 
@@ -418,7 +418,7 @@ inline bool BstTemplate<NodeType, DataType>::RetrieveNodeFuncObject::operator ()
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline bool BstTemplate<NodeType, DataType>::RemoveNodeFuncObject::operator ()(BstTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pTargetNode, void* pDummyParameter)
+inline bool BSTTemplate<NodeType, DataType>::RemoveNodeFuncObject::operator ()(BSTTemplate<NodeType, DataType>* pThis, NodeType<DataType>*& pTargetNode, void* pDummyParameter)
 {
 	LogPrint("remove node task method");
 
@@ -459,7 +459,7 @@ inline bool BstTemplate<NodeType, DataType>::RemoveNodeFuncObject::operator ()(B
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode)
+inline void BSTTemplate<NodeType, DataType>::ReplaceWithInorderPredecessor(NodeType<DataType>*& pTargetNode)
 {
 	LogPrint("replace with inorder predecessor");
 
@@ -490,7 +490,7 @@ inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderPredecessor(NodeT
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode)
+inline void BSTTemplate<NodeType, DataType>::ReplaceWithInorderSuccessor(NodeType<DataType>*& pTargetNode)
 {
 	LogPrint("replace with inorder successor");
 
@@ -521,17 +521,17 @@ inline void BstTemplate<NodeType, DataType>::ReplaceWithInorderSuccessor(NodeTyp
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::CopyNodeFuncObject::operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pSourceNode, BstTemplate<NodeType, DataType>* pDestBst) const
+inline void BSTTemplate<NodeType, DataType>::CopyNodeFuncObject::operator ()(const BSTTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pSourceNode, BSTTemplate<NodeType, DataType>* pDestBST) const
 {
 	LogPrint("copy node task method");
 
 	std::unique_ptr<NodeType<DataType>> upCopiedNode = std::unique_ptr<NodeType<DataType>>(DBG_NEW NodeType<DataType>(*pSourceNode));
 	InsertNodeFuncObject insertNodeFuncObject;
-	pDestBst->GenericSearch(insertNodeFuncObject, pSourceNode->m_key, move(upCopiedNode));
+	pDestBST->GenericSearch(insertNodeFuncObject, pSourceNode->m_key, move(upCopiedNode));
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::PrintNodeFuncObject::operator ()(const BstTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, void* pDummyParameter) const
+inline void BSTTemplate<NodeType, DataType>::PrintNodeFuncObject::operator ()(const BSTTemplate<NodeType, DataType>* pThis, const NodeType<DataType>* pTargetNode, void* pDummyParameter) const
 {
 	LogPrint("print node task method");
 
@@ -539,7 +539,7 @@ inline void BstTemplate<NodeType, DataType>::PrintNodeFuncObject::operator ()(co
 }
 
 template <template <typename> class NodeType, typename DataType>
-inline void BstTemplate<NodeType, DataType>::RemovingBstByRotationRR() noexcept
+inline void BSTTemplate<NodeType, DataType>::RemovingBSTByRotationRR() noexcept
 {
 	LogPrint("removing bst by using Right Right rotation");
 

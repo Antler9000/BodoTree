@@ -1,8 +1,8 @@
 ﻿#ifndef AVL_TREE_H
 #define AVL_TREE_H
 
-#include "../Common/BSTTemplate.h"
-#include "../Common/Debug.h"
+#include "BSTTemplate.h"
+#include "Debug.h"
 #include <cstdint>
 
 template <typename DataType>
@@ -11,7 +11,7 @@ class AvlTree;
 template <typename DataType>
 class AVL_Node
 {	
-	friend class BstTemplate<AVL_Node, DataType>;
+	friend class BSTTemplate<AVL_Node, DataType>;
 	friend class AvlTree<DataType>;
 
 	friend std::ostream& operator <<(std::ostream& out, const AVL_Node<DataType>& printedNode)
@@ -51,10 +51,10 @@ private:
 };
 
 template <typename DataType>
-class AvlTree : public BstTemplate<AVL_Node, DataType>
+class AvlTree : public BSTTemplate<AVL_Node, DataType>
 {
 public:
-	AvlTree() : BstTemplate<AVL_Node, DataType>()
+	AvlTree() : BSTTemplate<AVL_Node, DataType>()
 	{
 	
 	}

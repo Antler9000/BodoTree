@@ -1,8 +1,8 @@
 ﻿#ifndef RED_BLACK_TREE_H
 #define RED_BLACK_TREE_H
 
-#include "../Common/BSTTemplate.h"
-#include "../Common/Debug.h"
+#include "BSTTemplate.h"
+#include "Debug.h"
 #include <cstdint>
 
 enum NodeColor { RED, BLACK };
@@ -28,7 +28,7 @@ class RedBlackTree;
 template <typename DataType>
 class RedBlackNode
 {
-	friend class BstTemplate<RedBlackNode, DataType>;
+	friend class BSTTemplate<RedBlackNode, DataType>;
 	friend class RedBlackTree<DataType>;
 
 	friend std::ostream& operator <<(std::ostream& out, const RedBlackNode<DataType>& targetNode)
@@ -68,11 +68,11 @@ private:
 };
 
 template <typename DataType>
-class RedBlackTree : public BstTemplate<RedBlackNode, DataType>
+class RedBlackTree : public BSTTemplate<RedBlackNode, DataType>
 {
 public:
 
-	RedBlackTree() : BstTemplate<RedBlackNode, DataType>() {}
+	RedBlackTree() : BSTTemplate<RedBlackNode, DataType>() {}
 
 	void Insert(std::int32_t newKey, DataType newData)
 	{

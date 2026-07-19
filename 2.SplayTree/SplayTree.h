@@ -1,9 +1,9 @@
 ﻿#ifndef SplayTree_H
 #define SplayTree_H
 
-#include "../Common/BSTTemplate.h"
-#include "../Common/Debug.h"
-#include "../Common/Stack.h"
+#include "BSTTemplate.h"
+#include "Debug.h"
+#include "Stack.h"
 #include <iostream>
 #include <utility>
 #include <cstdint>
@@ -11,11 +11,11 @@
 template <typename DataType>
 class SplayTree;
 
-//NOTE : BstNode와 구성이 동일하지만, 단원의 구분을 위해서 SplayNode를 별도로 정의했음
+//NOTE : BSTNode와 구성이 동일하지만, 단원의 구분을 위해서 SplayNode를 별도로 정의했음
 template <typename DataType>
 class SplayNode
 {
-	friend class BstTemplate<SplayNode, DataType>;
+	friend class BSTTemplate<SplayNode, DataType>;
 	friend class SplayTree<DataType>;
 
 	//NOTE : unique_ptr은 유사시 가리키는 대상의 소멸을 호출하므로, HeapNode의 소멸자에 접근할 수 있어야 함
@@ -60,7 +60,7 @@ private:
 };
 
 template <typename DataType>
-class SplayTree : public BstTemplate<SplayNode, DataType>
+class SplayTree : public BSTTemplate<SplayNode, DataType>
 {
 public:
 

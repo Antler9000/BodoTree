@@ -23,16 +23,12 @@ template <typename DataType>
 void PrintKeyAndData(int key, const DataType& retrievedData);
 
 void RandomWorkloadTest(int workloadNum, int workloadPerDataLen);
-
 void RandomLocalWorkloadTest(int workloadNum, int workloadPerDataLen, int localBlockSize);
-
 void LinearIncreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
-
 void LinearDecreaseWorkloadTest(int workloadNum, int workloadPerDataLen);
 
 //paramter : insertDataWorkload는 복사 비용이 크지만, 그럼에도 하나의 워크로드를 SplayTree와 map에 반복해서 사용할 수 있도록 값복사 형식의 매개변수를 사용함
 time_point<steady_clock> TestSplayTree(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
-
 time_point<steady_clock> TestMap(steady_clock& clock, int workloadNum, vector<string> insertDataWorkload, const vector<int>& insertKeyWorkload, const vector<int>& retrieveKeyWorkload, const vector<int>& removeKeyWorkload);
 
 int main()
@@ -41,7 +37,7 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	cout << endl << "디버그 구성 테스트 1/3 : SplayTree<int>-------------------------------------------------------------" << endl;
+	cout << endl << "기능 테스트 1/3 : SplayTree<int>-------------------------------------------------------------" << endl;
 
 	SplayTree<int> intTestSplayTree;
 
@@ -108,7 +104,7 @@ int main()
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
 	intExplicitCopyTestSplayTree.PreorderPrint();
 
-	cout << endl << "디버그 구성 테스트 2/3 : SplayTree<float>-----------------------------------------------------------" << endl;
+	cout << endl << "기능 테스트 2/3 : SplayTree<float>-----------------------------------------------------------" << endl;
 
 	SplayTree<float> floatTestSplayTree;
 
@@ -175,7 +171,7 @@ int main()
 	cout << endl << "복사한 트리는 원본과 독립적임 (트리 B)" << endl;
 	floatExplicitCopyTestSplayTree.PreorderPrint();
 
-	cout << endl << "디버그 구성 테스트 3/3 : SplayTree<string>----------------------------------------------------------" << endl;
+	cout << endl << "기능 테스트 3/3 : SplayTree<string>----------------------------------------------------------" << endl;
 
 	SplayTree<string> stringTestSplayTree;
 
@@ -246,7 +242,7 @@ int main()
 #ifndef _DEBUG
 	cout << fixed << setprecision(2);
 
-	cout << endl << "릴리즈 구성 테스트 1/4 : 랜덤 워크로드 테스트-------------------------------------------------------" << endl;
+	cout << endl << "속도 테스트 1/4 : 랜덤 워크로드 테스트-------------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		randomWorkloadNum 횟수만큼 복사 삽입(트리 A), 이동 삽입(트리 B), 검색(트리 A), 삭제(트리 A)와 소멸(트리 B)을 수행함
@@ -279,7 +275,7 @@ int main()
 	constexpr int randomWorkloadPerDataLen = 30;
 	RandomWorkloadTest(randomWorkloadNum, randomWorkloadPerDataLen);
 
-	cout << endl << "릴리즈 구성 테스트 2/4 : 랜덤 로컬 워크로드 테스트--------------------------------------------------" << endl;
+	cout << endl << "속도 테스트 2/4 : 랜덤 로컬 워크로드 테스트--------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		앞선 1번 랜덤 워크로드 테스트와 비슷하나, 키 값들이 localBlockSize 단위로 내부에서 선형 증가 연속성을 가지도록 하였음
@@ -299,7 +295,10 @@ int main()
 
 	/*	(테스팅 해석)
 		우선 워크로드가 지역 선형성을 띄면서 트리의 높이가 1번 랜덤 워크로드 테스트에 비해 높아질 것임에도 불구하고,
-		Bst와 std::map 둘 다 1번 랜덤 워크로드 테스트에서보다 더 빠른 속도를 보이는 이유는 지역성을 통한 캐시 히트율 상승 때문으로 추정함
+		
+		
+		
+		와 std::map 둘 다 1번 랜덤 워크로드 테스트에서보다 더 빠른 속도를 보이는 이유는 지역성을 통한 캐시 히트율 상승 때문으로 추정함
 
 		삽입에서의 속도보다 검색의 속도가 느리다는 점, 그리고 검색 이후 삭제 메소드에서도 속도가 느려졌다는 점 등을 보았을 때,
 		앞선 1번 랜덤 워크로드 테스트와 마찬가지로 검색 메소드 중 수행하는 splay 조정이 트리를 편향시키는 것으로 추정함
@@ -316,7 +315,7 @@ int main()
 	constexpr int localBlockSize = 10;
 	RandomLocalWorkloadTest(randomLocalWorkloadNum, randomLocalWorkloadPerDataLen, localBlockSize);
 
-	cout << endl << "릴리즈 구성 테스트 3/4 : 선형 증가 워크로드 테스트--------------------------------------------------" << endl;
+	cout << endl << "속도 테스트 3/4 : 선형 증가 워크로드 테스트--------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		앞선 1번 랜덤 워크로드 테스트와 비슷하나, 키값들을 뒤섞지 않고 선형 그대로 사용함
@@ -339,7 +338,7 @@ int main()
 		삭제 메소드에도 검색처럼 splay 조정을 수행하도록 할 시 속도가 개선될 거라 생각함
 		삽입이 느린 이유는 균형 트리가 아닌 이진 탐색 트리의 단점을 그대로 가진 것이나, 삽입에도 splay 조정이 수행되도록 하여 이것이 개선되는지 확인해볼 예정
 	
-		Bst와 달리 std::map은 균형을 유지하는 트리이기 때문에 선형 워크로드에 대해서도 O(NlogN)의 시간 복잡도를 가져 매우 빠른 속도를 보임
+		BST와 달리 std::map은 균형을 유지하는 트리이기 때문에 선형 워크로드에 대해서도 O(NlogN)의 시간 복잡도를 가져 매우 빠른 속도를 보임
 		게다가 선형 워크로드가 가진 지역성으로 캐시 히트율이 증가해 1번 랜덤 워크로드 테스트보다 훨씬 빠른 속도를 보이는 것으로 추정함
 	*/
 
@@ -347,7 +346,7 @@ int main()
 	constexpr int linearIncreaseWorkloadPerDataLen = randomWorkloadPerDataLen;
 	LinearIncreaseWorkloadTest(linearIncreaseWorkloadNum, linearIncreaseWorkloadPerDataLen);
 
-	cout << endl << "릴리즈 구성 테스트 4/4 : 선형 감소 워크로드 테스트--------------------------------------------------" << endl;
+	cout << endl << "속도 테스트 4/4 : 선형 감소 워크로드 테스트--------------------------------------------------" << endl;
 
 	/*	(테스팅 방법)
 		앞선 3번 선형 증가 워크로드 테스트와 비슷하나, 키를 역순으로 사용함
