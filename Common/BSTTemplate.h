@@ -429,7 +429,7 @@ inline bool BSTTemplate<NodeType, DataType>::RemoveNodeFuncObject::operator ()(B
 		return false;
 	}
 
-	//NOTE : 중위선행자와 중위후속자가 둘 다 있는 경우에는 균형 유지에 조금이나마 도움이 되기 위해서 대체할 대상을 다소 무작위적인 홀짱 방식으로 선택함
+	//NOTE : 중위선행자와 중위후속자가 둘 다 있는 경우에는 균형 유지에 조금이나마 도움이 되기 위해서 대체할 대상을 다소 무작위적인 홀짝 방식으로 선택함
 	if (pTargetNode->m_pLeftChild != nullptr && pTargetNode->m_pRightChild != nullptr)
 	{
 		if (pTargetNode->m_key % 2 == 0)
